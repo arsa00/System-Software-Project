@@ -1,0 +1,4 @@
+// PODSETNIK ZA KREIRANJE MAKE FILE-a
+bison -d -t ./auxiliary/parser.y 
+flex ./auxiliary/lexer.l 
+g++ -g -o assembler ./src/assembler.cpp lex.yy.c parser.tab.c parser.tab.h auxiliary/inc/exceptions.hpp 

@@ -7,6 +7,11 @@ using namespace std;
 extern int yyparse();
 extern FILE* yyin;
 
+void yyerror(char* s)
+{
+  cerr << s << endl;
+}
+
 int main(int argc, char const *argv[])
 {
   const char *file_input, *file_output;
@@ -16,12 +21,12 @@ int main(int argc, char const *argv[])
 
     for (int i = 1; i < argc; i++)
     {
-      string argStr = argv[i];
+      string argStr (argv[i]);
 
       // every option should have "continue" at the end of if statement
       if(argStr == "-o") 
       {
-        argStr = argv[++i];
+        argStr.assign(argv[++i]);
         if(argStr.empty()) throw new file_exception();
         file_output = argv[i];
         continue;
@@ -34,7 +39,7 @@ int main(int argc, char const *argv[])
 
     yyin = fopen(file_input, "r");
     if(yyin == nullptr) throw new file_exception();
-    
+
     yyparse();
   }
   catch(const exception& e)
