@@ -1,5 +1,6 @@
 %{
   #include <iostream>
+  #include <string>
   extern int yylex (void);
   extern void yyerror(char* s);
 %}
@@ -8,7 +9,7 @@
 %union {
   char *alias;
   char *symbol_name;
-  int literal_value;
+  char *literal_value;
 }
 
 %token<alias> INSTRUCTION_ZERO_PARAM
@@ -26,13 +27,17 @@
 %token DIRECTIVE_END
 
 %token<symbol_name> SYMBOL
-%token<literal_value> LITERAL
+%token<literal_value> LITERAL_BIN
+%token<literal_value> LITERAL_OCT
+%token<literal_value> LITERAL_DEC
+%token<literal_value> LITERAL_HEX
 
 %token WHITESPACE
 %token COMMA
 %token EOL
 %token UNDEFIEND
 
+%type<symbol_name> symbol_literal_list;
 
 %%
 
@@ -41,9 +46,7 @@ code:
 ;
 
 line:
-EOL
-| .word EOL { std::cout << ".word" << std::endl; }
-| symbol_literal_list
+.word symbol_literal_list EOL { std::cout << ".word" << std::endl; }
 ;
 
 .word:
@@ -51,12 +54,12 @@ DIRECTIVE_WORD
 ;
 
 symbol_literal_list:
-SYMBOL COMMA SYMBOL { std::cout << "simbol1: " << $1 << " simbol2: " << $3 << std::endl; }
-| SYMBOL COMMA LITERAL { std::cout << "simbol1: " << $1 << " literal2: " << $3 << std::endl; }
-| LITERAL COMMA SYMBOL { std::cout << "literal1: " << $1 << " simbol2: " << $3 << std::endl; }
-| LITERAL COMMA LITERAL { std::cout << "literal1: " << $1 << " literal2: " << $3 << std::endl; }
+symbol_literal_list COMMA symbol_literal_list
 | SYMBOL { std::cout << "simbol: " << $1 << std::endl; }
-| LITERAL { std::cout << "literal: " << $1 << std::endl; }
+| LITERAL_BIN { std::cout << "literal: " << std::stoi($1 + 2, 0, 2) << std::endl; }
+| LITERAL_OCT { std::cout << "literal: " << std::stoi($1, 0, 8) << std::endl; }
+| LITERAL_DEC { std::cout << "literal: " << std::stoi($1, 0, 10) << std::endl; }
+| LITERAL_HEX { std::cout << "literal: " << std::stoi($1, 0, 16) << std::endl; }
 ;
 
 %%

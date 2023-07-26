@@ -62,11 +62,14 @@ extern int yydebug;
     DIRECTIVE_EQU = 268,
     DIRECTIVE_END = 269,
     SYMBOL = 270,
-    LITERAL = 271,
-    WHITESPACE = 272,
-    COMMA = 273,
-    EOL = 274,
-    UNDEFIEND = 275
+    LITERAL_BIN = 271,
+    LITERAL_OCT = 272,
+    LITERAL_DEC = 273,
+    LITERAL_HEX = 274,
+    WHITESPACE = 275,
+    COMMA = 276,
+    EOL = 277,
+    UNDEFIEND = 278
   };
 #endif
 
@@ -74,13 +77,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 8 "./auxiliary/parser.y"
+#line 9 "./auxiliary/parser.y"
 
   char *alias;
   char *symbol_name;
-  int literal_value;
+  char *literal_value;
 
-#line 84 "./auxiliary/inc/parser.hpp"
+#line 87 "./auxiliary/inc/parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

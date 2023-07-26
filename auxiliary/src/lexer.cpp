@@ -466,10 +466,8 @@ char *yytext;
 #line 1 "./auxiliary/lexer.l"
 #line 2 "./auxiliary/lexer.l"
   #include "../inc/parser.hpp"
-  #include <string>
-  #include <iostream>
-#line 472 "./auxiliary/src/lexer.cpp"
-#line 473 "./auxiliary/src/lexer.cpp"
+#line 470 "./auxiliary/src/lexer.cpp"
+#line 471 "./auxiliary/src/lexer.cpp"
 
 #define INITIAL 0
 
@@ -686,10 +684,10 @@ YY_DECL
 		}
 
 	{
-#line 9 "./auxiliary/lexer.l"
+#line 7 "./auxiliary/lexer.l"
 
 
-#line 693 "./auxiliary/src/lexer.cpp"
+#line 691 "./auxiliary/src/lexer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -748,66 +746,66 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 11 "./auxiliary/lexer.l"
+#line 9 "./auxiliary/lexer.l"
 { return DIRECTIVE_GLOBAL; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 12 "./auxiliary/lexer.l"
+#line 10 "./auxiliary/lexer.l"
 { return DIRECTIVE_WORD; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 14 "./auxiliary/lexer.l"
+#line 12 "./auxiliary/lexer.l"
 { yylval.symbol_name = yytext; return SYMBOL; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 16 "./auxiliary/lexer.l"
-{ yylval.literal_value = std::stoi(yytext+2, 0, 2); return LITERAL; }
+#line 14 "./auxiliary/lexer.l"
+{ yylval.literal_value = yytext; return LITERAL_BIN; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 17 "./auxiliary/lexer.l"
-{ yylval.literal_value = std::stoi(yytext, 0, 8); return LITERAL; }
+#line 15 "./auxiliary/lexer.l"
+{ yylval.literal_value = yytext; return LITERAL_OCT; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 18 "./auxiliary/lexer.l"
-{ yylval.literal_value = std::stoi(yytext, 0, 10); return LITERAL; }
+#line 16 "./auxiliary/lexer.l"
+{ yylval.literal_value = yytext; return LITERAL_DEC; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 19 "./auxiliary/lexer.l"
-{ yylval.literal_value = std::stoi(yytext, 0, 16); return LITERAL; }
+#line 17 "./auxiliary/lexer.l"
+{ yylval.literal_value = yytext; return LITERAL_HEX; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 22 "./auxiliary/lexer.l"
+#line 20 "./auxiliary/lexer.l"
 { return COMMA; }
 	YY_BREAK
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 23 "./auxiliary/lexer.l"
+#line 21 "./auxiliary/lexer.l"
 { return EOL; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 24 "./auxiliary/lexer.l"
+#line 22 "./auxiliary/lexer.l"
 { }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 25 "./auxiliary/lexer.l"
+#line 23 "./auxiliary/lexer.l"
 { return UNDEFIEND; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 27 "./auxiliary/lexer.l"
+#line 25 "./auxiliary/lexer.l"
 ECHO;
 	YY_BREAK
-#line 811 "./auxiliary/src/lexer.cpp"
+#line 809 "./auxiliary/src/lexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1812,5 +1810,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 27 "./auxiliary/lexer.l"
+#line 25 "./auxiliary/lexer.l"
 

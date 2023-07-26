@@ -1,7 +1,5 @@
 %{
   #include "../inc/parser.hpp"
-  #include <string>
-  #include <iostream>
 %}
 
 %option noyywrap
@@ -13,10 +11,10 @@
 
 [._A-Za-z][._0-9A-Za-z]* { yylval.symbol_name = yytext; return SYMBOL; }
 
-0b[0-1]+ { yylval.literal_value = std::stoi(yytext+2, 0, 2); return LITERAL; }
-0[0-7]* { yylval.literal_value = std::stoi(yytext, 0, 8); return LITERAL; }
-[1-9][0-9]* { yylval.literal_value = std::stoi(yytext, 0, 10); return LITERAL; }
-0x[0-9a-fA-F]+ { yylval.literal_value = std::stoi(yytext, 0, 16); return LITERAL; }
+0b[0-1]+ { yylval.literal_value = yytext; return LITERAL_BIN; }
+0[0-7]* { yylval.literal_value = yytext; return LITERAL_OCT; }
+[1-9][0-9]* { yylval.literal_value = yytext; return LITERAL_DEC; }
+0x[0-9a-fA-F]+ { yylval.literal_value = yytext; return LITERAL_HEX; }
 
 
 "," { return COMMA; }
