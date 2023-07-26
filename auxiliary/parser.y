@@ -1,4 +1,5 @@
 %{
+  #include <iostream>
   extern int yylex (void);
   extern void yyerror(char* s);
 %}
@@ -18,8 +19,8 @@ code:
 ;
 
 code_line: 
-INSTRUCTION EOL { printf("INSTRUKCIJA: %s\n", $1); }
-| DIRECTIVE EOL { printf("DIREKTIVA: %s\n", $1); }
+INSTRUCTION EOL { std::cout << "INSTRUKCIJA: " << $1 << std::endl; }
+| DIRECTIVE EOL { std::cout << "DIREKTIVA: " << $1 << std::endl; }
 ;
 
 %%
