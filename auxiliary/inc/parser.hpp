@@ -61,15 +61,16 @@ extern int yydebug;
     DIRECTIVE_ASCII = 267,
     DIRECTIVE_EQU = 268,
     DIRECTIVE_END = 269,
-    SYMBOL = 270,
-    LITERAL_BIN = 271,
-    LITERAL_OCT = 272,
-    LITERAL_DEC = 273,
-    LITERAL_HEX = 274,
-    WHITESPACE = 275,
-    COMMA = 276,
-    EOL = 277,
-    UNDEFIEND = 278
+    LABEL = 270,
+    SYMBOL = 271,
+    LITERAL_BIN = 272,
+    LITERAL_OCT = 273,
+    LITERAL_DEC = 274,
+    LITERAL_HEX = 275,
+    WHITESPACE = 276,
+    COMMA = 277,
+    EOL = 278,
+    UNDEFIEND = 279
   };
 #endif
 
@@ -83,7 +84,7 @@ union YYSTYPE
   char *symbol_name;
   char *literal_value;
 
-#line 87 "./auxiliary/inc/parser.hpp"
+#line 88 "./auxiliary/inc/parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

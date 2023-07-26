@@ -26,6 +26,7 @@
 %token DIRECTIVE_EQU
 %token DIRECTIVE_END
 
+%token<symbol_name> LABEL
 %token<symbol_name> SYMBOL
 %token<literal_value> LITERAL_BIN
 %token<literal_value> LITERAL_OCT
@@ -39,6 +40,7 @@
 
 %type<symbol_name> symbol_literal_list;
 
+
 %%
 
 code: 
@@ -49,20 +51,26 @@ line:
 DIRECTIVE_WORD symbol_literal_list EOL { std::cout << ".word" << std::endl; }
 | DIRECTIVE_GLOBAL symbol_list EOL { std::cout << ".global" << std::endl; }
 | DIRECTIVE_EXTERN symbol_list EOL { std::cout << ".extern" << std::endl; }
-| DIRECTIVE_SECTION SYMBOL EOL { std::cout << ".section " << $2 << std::endl; }
+| DIRECTIVE_SECTION single_symbol EOL { std::cout << ".section" << std::endl; }
 | DIRECTIVE_SKIP all_literals EOL { std::cout << ".skip" << std::endl; }
 | DIRECTIVE_END EOL { std::cout << ".end" << std::endl; }
+| LABEL { std::cout << "labela: " << $1 << std::endl; }
+| EOL
 ;
 
 symbol_list:
 symbol_list COMMA symbol_list
-| SYMBOL { std::cout << "simbol: " << $1 << std::endl; }
+| single_symbol
 ;
 
 symbol_literal_list:
 symbol_literal_list COMMA symbol_literal_list
-| SYMBOL { std::cout << "simbol: " << $1 << std::endl; }
+| single_symbol
 | all_literals
+;
+
+single_symbol:
+SYMBOL { std::cout << "simbol: " << $1 << std::endl; }
 ;
 
 all_literals:

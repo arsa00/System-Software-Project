@@ -1,5 +1,6 @@
 %{
   #include "../inc/parser.hpp"
+  #include <string.h>
 %}
 
 %option noyywrap
@@ -14,6 +15,7 @@
 ".end" { return DIRECTIVE_END; }
 
 [._A-Za-z][._0-9A-Za-z]* { yylval.symbol_name = yytext; return SYMBOL; }
+[._A-Za-z][._0-9A-Za-z]*: { yytext[strlen(yytext)-1] = '\0'; yylval.symbol_name = yytext; return LABEL; }
 
 0b[0-1]+ { yylval.literal_value = yytext; return LITERAL_BIN; }
 0[0-7]* { yylval.literal_value = yytext; return LITERAL_OCT; }
@@ -23,6 +25,7 @@
 
 "," { return COMMA; }
 \n { return EOL; }
+#.*\n { return EOL; }
 [ \t]+ { }
 . { return UNDEFIEND; }
 

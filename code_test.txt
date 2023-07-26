@@ -1,7 +1,10 @@
 .word 0x0c, .abc, qwe, 22, 0b011, 0b1010, 017, 19
+#komentar 1
 .section .text
-.skip 0x32
+.skip 0x32 # komentar 2
 .global t, m, d, lj, an, ak, j
 .extern _akiano_, .22
+#komentar 3
 .section .bss
+   skok_labela: 
 .end
