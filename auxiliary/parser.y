@@ -46,17 +46,27 @@ code:
 ;
 
 line:
-.word symbol_literal_list EOL { std::cout << ".word" << std::endl; }
+DIRECTIVE_WORD symbol_literal_list EOL { std::cout << ".word" << std::endl; }
+| DIRECTIVE_GLOBAL symbol_list EOL { std::cout << ".global" << std::endl; }
+| DIRECTIVE_EXTERN symbol_list EOL { std::cout << ".extern" << std::endl; }
+| DIRECTIVE_SECTION SYMBOL EOL { std::cout << ".section " << $2 << std::endl; }
+| DIRECTIVE_SKIP all_literals EOL { std::cout << ".skip" << std::endl; }
+| DIRECTIVE_END EOL { std::cout << ".end" << std::endl; }
 ;
 
-.word:
-DIRECTIVE_WORD
+symbol_list:
+symbol_list COMMA symbol_list
+| SYMBOL { std::cout << "simbol: " << $1 << std::endl; }
 ;
 
 symbol_literal_list:
 symbol_literal_list COMMA symbol_literal_list
 | SYMBOL { std::cout << "simbol: " << $1 << std::endl; }
-| LITERAL_BIN { std::cout << "literal: " << std::stoi($1 + 2, 0, 2) << std::endl; }
+| all_literals
+;
+
+all_literals:
+LITERAL_BIN { std::cout << "literal: " << std::stoi($1 + 2, 0, 2) << std::endl; }
 | LITERAL_OCT { std::cout << "literal: " << std::stoi($1, 0, 8) << std::endl; }
 | LITERAL_DEC { std::cout << "literal: " << std::stoi($1, 0, 10) << std::endl; }
 | LITERAL_HEX { std::cout << "literal: " << std::stoi($1, 0, 16) << std::endl; }

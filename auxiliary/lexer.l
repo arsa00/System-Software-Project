@@ -7,7 +7,11 @@
 %%
 
 ".global" { return DIRECTIVE_GLOBAL; }
+".extern" { return DIRECTIVE_EXTERN; }
+".section" { return DIRECTIVE_SECTION; }
 ".word" { return DIRECTIVE_WORD; }
+".skip" { return DIRECTIVE_SKIP; }
+".end" { return DIRECTIVE_END; }
 
 [._A-Za-z][._0-9A-Za-z]* { yylval.symbol_name = yytext; return SYMBOL; }
 
