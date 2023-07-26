@@ -1,4 +1,16 @@
-jmp
-je
-.section
-ld
+.word 
+0x1A
+0xa2
+
+025
+22
+
+0b011
+as
+.a
+52
+_asd.Zasto,a
+0xa, 12
+32, abc
+abc, qwe
+a

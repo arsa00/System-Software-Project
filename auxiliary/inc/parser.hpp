@@ -49,9 +49,24 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    INSTRUCTION = 258,
-    DIRECTIVE = 259,
-    EOL = 260
+    INSTRUCTION_ZERO_PARAM = 258,
+    INSTRUCTION_ONE_PARAM = 259,
+    INSTRUCTION_TWO_PARAM = 260,
+    INSTRUCTION_THREE_PARAM = 261,
+    DIRECTIVE_GLOBAL = 262,
+    DIRECTIVE_EXTERN = 263,
+    DIRECTIVE_SECTION = 264,
+    DIRECTIVE_WORD = 265,
+    DIRECTIVE_SKIP = 266,
+    DIRECTIVE_ASCII = 267,
+    DIRECTIVE_EQU = 268,
+    DIRECTIVE_END = 269,
+    SYMBOL = 270,
+    LITERAL = 271,
+    WHITESPACE = 272,
+    COMMA = 273,
+    EOL = 274,
+    UNDEFIEND = 275
   };
 #endif
 
@@ -59,11 +74,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 7 "./auxiliary/parser.y"
+#line 8 "./auxiliary/parser.y"
 
-  char *instruction_alias;
+  char *alias;
+  char *symbol_name;
+  int literal_value;
 
-#line 67 "./auxiliary/inc/parser.hpp"
+#line 84 "./auxiliary/inc/parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

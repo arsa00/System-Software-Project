@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string.h>
 #include "../auxiliary/inc/exceptions.hpp"
+#include "../auxiliary/inc/parser.hpp"
 
 using namespace std;
 
