@@ -2,6 +2,7 @@
   #include "../inc/parser.hpp"
   #include <string.h>
   #include <iostream>
+  #include <string>
 %}
 
 %option noyywrap
@@ -52,6 +53,10 @@
 0x[0-9a-fA-F]+ { yylval.literal_value = yytext; return LITERAL_HEX; }
 \"([^"\\\n]|\\(.|\n))*\" { yytext[strlen(yytext)-1] = '\0'; yylval.literal_value = yytext + 1; return LITERAL_STRING; }
 
+(%r1[0-5]|%r[0-9]) { yylval.gpr_index = std::stoi(yytext+2, 0, 10); return GP_REG; }
+"%status" { yylval.gpr_index = 0; return CS_REG; }
+"%handler" { yylval.gpr_index = 1; return CS_REG; }
+"%cause" { yylval.gpr_index = 2; return CS_REG; }
 
 "," { return COMMA; }
 \n { return EOL; }

@@ -14,11 +14,14 @@ int
 iret
 
 call printf
-call 0x404
+call 0x0310
 ret
 
 jmp skok_labela
 jmp 0x0016
+
+beq %r12, %r12, printf
+beq %r2, %r8, 0x1519
 
 halt
 .end

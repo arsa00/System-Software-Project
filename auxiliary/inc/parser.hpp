@@ -90,9 +90,11 @@ extern int yydebug;
     LITERAL_DEC = 296,
     LITERAL_HEX = 297,
     LITERAL_STRING = 298,
-    COMMA = 299,
-    EOL = 300,
-    UNDEFIEND = 301
+    GP_REG = 299,
+    CS_REG = 300,
+    COMMA = 301,
+    EOL = 302,
+    UNDEFIEND = 303
   };
 #endif
 
@@ -104,8 +106,10 @@ union YYSTYPE
 
   char *symbol_name;
   char *literal_value;
+  int gpr_index;
+  int csr_index;
 
-#line 109 "./auxiliary/inc/parser.hpp"
+#line 113 "./auxiliary/inc/parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -9,6 +9,8 @@
 %union {
   char *symbol_name;
   char *literal_value;
+  int gpr_index;
+  int csr_index;
 }
 
 %token INSTRUCTION_HALT
@@ -56,6 +58,9 @@
 %token<literal_value> LITERAL_HEX
 %token<literal_value> LITERAL_STRING
 
+%token<gpr_index> GP_REG;
+%token<csr_index> CS_REG;
+
 %token COMMA
 %token EOL
 %token UNDEFIEND
@@ -86,6 +91,8 @@ DIRECTIVE_WORD symbol_literal_list EOL { std::cout << ".word" << std::endl; }
 | INSTRUCTION_CALL all_num_literals EOL { std::cout << "call" << std::endl; }
 | INSTRUCTION_JMP single_symbol EOL { std::cout << "jmp" << std::endl; }
 | INSTRUCTION_JMP all_num_literals EOL { std::cout << "jmp" << std::endl; }
+| INSTRUCTION_BEQ single_gp_reg COMMA single_gp_reg COMMA single_symbol EOL { std::cout << "beq" << std::endl; }
+| INSTRUCTION_BEQ single_gp_reg COMMA single_gp_reg COMMA all_num_literals EOL { std::cout << "beq" << std::endl; }
 | EOL
 ;
 
@@ -113,6 +120,14 @@ LITERAL_BIN { std::cout << "literal: " << std::stoi($1 + 2, 0, 2) << std::endl; 
 
 string_literal:
 LITERAL_STRING { std::cout << "literal: " << $1 << std::endl; }
+;
+
+single_gp_reg:
+GP_REG { std::cout << "GP registar: " << $1 << std::endl; }
+;
+
+single_cs_reg:
+CS_REG { std::cout << "CS registar: " << $1 << std::endl; }
 ;
 
 %%
