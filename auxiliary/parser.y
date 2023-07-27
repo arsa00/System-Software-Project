@@ -78,6 +78,14 @@ DIRECTIVE_WORD symbol_literal_list EOL { std::cout << ".word" << std::endl; }
 | DIRECTIVE_END EOL { std::cout << ".end" << std::endl; }
 | DIRECTIVE_ASCII string_literal EOL { std::cout << ".ascii" << std::endl; }
 | LABEL { std::cout << "labela: " << $1 << std::endl; }
+| INSTRUCTION_HALT EOL { std::cout << "halt" << std::endl; }
+| INSTRUCTION_INT EOL { std::cout << "int" << std::endl; }
+| INSTRUCTION_IRET EOL { std::cout << "iret" << std::endl; }
+| INSTRUCTION_RET EOL { std::cout << "ret" << std::endl; }
+| INSTRUCTION_CALL single_symbol EOL { std::cout << "call" << std::endl; }
+| INSTRUCTION_CALL all_num_literals EOL { std::cout << "call" << std::endl; }
+| INSTRUCTION_JMP single_symbol EOL { std::cout << "jmp" << std::endl; }
+| INSTRUCTION_JMP all_num_literals EOL { std::cout << "jmp" << std::endl; }
 | EOL
 ;
 

@@ -7,5 +7,18 @@
 #komentar 3
 .section .bss
    skok_labela: 
-.ascii "Proba definisanja stri"nga 'navodi' 9876543210#@!~`=+*&\-_-/=?%$w"
+.ascii "Proba definisanja stri\"nga 'navodi' 9876543210#@!~`=+*&\-_-/=?%$w \
+*** nov red! ***"
+
+int
+iret
+
+call printf
+call 0x404
+ret
+
+jmp skok_labela
+jmp 0x0016
+
+halt
 .end
