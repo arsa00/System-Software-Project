@@ -32,8 +32,8 @@
 %token<literal_value> LITERAL_OCT
 %token<literal_value> LITERAL_DEC
 %token<literal_value> LITERAL_HEX
+%token<literal_value> LITERAL_STRING
 
-%token WHITESPACE
 %token COMMA
 %token EOL
 %token UNDEFIEND
@@ -52,8 +52,9 @@ DIRECTIVE_WORD symbol_literal_list EOL { std::cout << ".word" << std::endl; }
 | DIRECTIVE_GLOBAL symbol_list EOL { std::cout << ".global" << std::endl; }
 | DIRECTIVE_EXTERN symbol_list EOL { std::cout << ".extern" << std::endl; }
 | DIRECTIVE_SECTION single_symbol EOL { std::cout << ".section" << std::endl; }
-| DIRECTIVE_SKIP all_literals EOL { std::cout << ".skip" << std::endl; }
+| DIRECTIVE_SKIP all_num_literals EOL { std::cout << ".skip" << std::endl; }
 | DIRECTIVE_END EOL { std::cout << ".end" << std::endl; }
+| DIRECTIVE_ASCII string_literal EOL { std::cout << ".ascii" << std::endl; }
 | LABEL { std::cout << "labela: " << $1 << std::endl; }
 | EOL
 ;
@@ -66,18 +67,22 @@ symbol_list COMMA symbol_list
 symbol_literal_list:
 symbol_literal_list COMMA symbol_literal_list
 | single_symbol
-| all_literals
+| all_num_literals
 ;
 
 single_symbol:
 SYMBOL { std::cout << "simbol: " << $1 << std::endl; }
 ;
 
-all_literals:
+all_num_literals:
 LITERAL_BIN { std::cout << "literal: " << std::stoi($1 + 2, 0, 2) << std::endl; }
 | LITERAL_OCT { std::cout << "literal: " << std::stoi($1, 0, 8) << std::endl; }
 | LITERAL_DEC { std::cout << "literal: " << std::stoi($1, 0, 10) << std::endl; }
 | LITERAL_HEX { std::cout << "literal: " << std::stoi($1, 0, 16) << std::endl; }
+;
+
+string_literal:
+LITERAL_STRING { std::cout << "literal: " << $1 << std::endl; }
 ;
 
 %%

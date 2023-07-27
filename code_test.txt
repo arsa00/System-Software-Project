@@ -7,4 +7,5 @@
 #komentar 3
 .section .bss
    skok_labela: 
+.ascii "Proba definisanja stri"nga 'navodi' 9876543210#@!~`=+*&\-_-/=?%$w"
 .end

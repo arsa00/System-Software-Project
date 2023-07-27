@@ -67,7 +67,7 @@ extern int yydebug;
     LITERAL_OCT = 273,
     LITERAL_DEC = 274,
     LITERAL_HEX = 275,
-    WHITESPACE = 276,
+    LITERAL_STRING = 276,
     COMMA = 277,
     EOL = 278,
     UNDEFIEND = 279

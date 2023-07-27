@@ -1,6 +1,7 @@
 %{
   #include "../inc/parser.hpp"
   #include <string.h>
+  #include <iostream>
 %}
 
 %option noyywrap
@@ -12,6 +13,7 @@
 ".section" { return DIRECTIVE_SECTION; }
 ".word" { return DIRECTIVE_WORD; }
 ".skip" { return DIRECTIVE_SKIP; }
+".ascii" { return DIRECTIVE_ASCII; }
 ".end" { return DIRECTIVE_END; }
 
 [._A-Za-z][._0-9A-Za-z]* { yylval.symbol_name = yytext; return SYMBOL; }
@@ -21,6 +23,7 @@
 0[0-7]* { yylval.literal_value = yytext; return LITERAL_OCT; }
 [1-9][0-9]* { yylval.literal_value = yytext; return LITERAL_DEC; }
 0x[0-9a-fA-F]+ { yylval.literal_value = yytext; return LITERAL_HEX; }
+\"[\x00-\x7F]+\" { yytext[strlen(yytext)-1] = '\0'; yylval.literal_value = yytext + 1; return LITERAL_STRING; }
 
 
 "," { return COMMA; }
