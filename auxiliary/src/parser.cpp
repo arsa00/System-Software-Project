@@ -121,28 +121,50 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    INSTRUCTION_ZERO_PARAM = 258,
-    INSTRUCTION_ONE_PARAM = 259,
-    INSTRUCTION_TWO_PARAM = 260,
-    INSTRUCTION_THREE_PARAM = 261,
-    DIRECTIVE_GLOBAL = 262,
-    DIRECTIVE_EXTERN = 263,
-    DIRECTIVE_SECTION = 264,
-    DIRECTIVE_WORD = 265,
-    DIRECTIVE_SKIP = 266,
-    DIRECTIVE_ASCII = 267,
-    DIRECTIVE_EQU = 268,
-    DIRECTIVE_END = 269,
-    LABEL = 270,
-    SYMBOL = 271,
-    LITERAL_BIN = 272,
-    LITERAL_OCT = 273,
-    LITERAL_DEC = 274,
-    LITERAL_HEX = 275,
-    LITERAL_STRING = 276,
-    COMMA = 277,
-    EOL = 278,
-    UNDEFIEND = 279
+    INSTRUCTION_HALT = 258,
+    INSTRUCTION_INT = 259,
+    INSTRUCTION_IRET = 260,
+    INSTRUCTION_CALL = 261,
+    INSTRUCTION_RET = 262,
+    INSTRUCTION_JMP = 263,
+    INSTRUCTION_BEQ = 264,
+    INSTRUCTION_BNE = 265,
+    INSTRUCTION_BGT = 266,
+    INSTRUCTION_PUSH = 267,
+    INSTRUCTION_POP = 268,
+    INSTRUCTION_XCHG = 269,
+    INSTRUCTION_ADD = 270,
+    INSTRUCTION_SUB = 271,
+    INSTRUCTION_MUL = 272,
+    INSTRUCTION_DIV = 273,
+    INSTRUCTION_NOT = 274,
+    INSTRUCTION_AND = 275,
+    INSTRUCTION_OR = 276,
+    INSTRUCTION_XOR = 277,
+    INSTRUCTION_SHL = 278,
+    INSTRUCTION_SHR = 279,
+    INSTRUCTION_LD = 280,
+    INSTRUCTION_ST = 281,
+    INSTRUCTION_CSRRD = 282,
+    INSTRUCTION_CSRWR = 283,
+    DIRECTIVE_GLOBAL = 284,
+    DIRECTIVE_EXTERN = 285,
+    DIRECTIVE_SECTION = 286,
+    DIRECTIVE_WORD = 287,
+    DIRECTIVE_SKIP = 288,
+    DIRECTIVE_ASCII = 289,
+    DIRECTIVE_EQU = 290,
+    DIRECTIVE_END = 291,
+    LABEL = 292,
+    SYMBOL = 293,
+    LITERAL_BIN = 294,
+    LITERAL_OCT = 295,
+    LITERAL_DEC = 296,
+    LITERAL_HEX = 297,
+    LITERAL_STRING = 298,
+    COMMA = 299,
+    EOL = 300,
+    UNDEFIEND = 301
   };
 #endif
 
@@ -152,11 +174,10 @@ union YYSTYPE
 {
 #line 9 "./auxiliary/parser.y"
 
-  char *alias;
   char *symbol_name;
   char *literal_value;
 
-#line 160 "./auxiliary/src/parser.cpp"
+#line 181 "./auxiliary/src/parser.cpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -478,7 +499,7 @@ union yyalloc
 #define YYLAST   40
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  25
+#define YYNTOKENS  47
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  8
 /* YYNRULES -- Number of rules.  */
@@ -487,7 +508,7 @@ union yyalloc
 #define YYNSTATES  40
 
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   279
+#define YYMAXUTOK   301
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -526,16 +547,19 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22,    23,    24
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+      45,    46
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    46,    46,    47,    51,    52,    53,    54,    55,    56,
-      57,    58,    59,    63,    64,    68,    69,    70,    74,    78,
-      79,    80,    81,    85
+       0,    68,    68,    69,    73,    74,    75,    76,    77,    78,
+      79,    80,    81,    85,    86,    90,    91,    92,    96,   100,
+     101,   102,   103,   107
 };
 #endif
 
@@ -544,14 +568,20 @@ static const yytype_int8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "INSTRUCTION_ZERO_PARAM",
-  "INSTRUCTION_ONE_PARAM", "INSTRUCTION_TWO_PARAM",
-  "INSTRUCTION_THREE_PARAM", "DIRECTIVE_GLOBAL", "DIRECTIVE_EXTERN",
-  "DIRECTIVE_SECTION", "DIRECTIVE_WORD", "DIRECTIVE_SKIP",
-  "DIRECTIVE_ASCII", "DIRECTIVE_EQU", "DIRECTIVE_END", "LABEL", "SYMBOL",
-  "LITERAL_BIN", "LITERAL_OCT", "LITERAL_DEC", "LITERAL_HEX",
-  "LITERAL_STRING", "COMMA", "EOL", "UNDEFIEND", "$accept", "code", "line",
-  "symbol_list", "symbol_literal_list", "single_symbol",
+  "$end", "error", "$undefined", "INSTRUCTION_HALT", "INSTRUCTION_INT",
+  "INSTRUCTION_IRET", "INSTRUCTION_CALL", "INSTRUCTION_RET",
+  "INSTRUCTION_JMP", "INSTRUCTION_BEQ", "INSTRUCTION_BNE",
+  "INSTRUCTION_BGT", "INSTRUCTION_PUSH", "INSTRUCTION_POP",
+  "INSTRUCTION_XCHG", "INSTRUCTION_ADD", "INSTRUCTION_SUB",
+  "INSTRUCTION_MUL", "INSTRUCTION_DIV", "INSTRUCTION_NOT",
+  "INSTRUCTION_AND", "INSTRUCTION_OR", "INSTRUCTION_XOR",
+  "INSTRUCTION_SHL", "INSTRUCTION_SHR", "INSTRUCTION_LD", "INSTRUCTION_ST",
+  "INSTRUCTION_CSRRD", "INSTRUCTION_CSRWR", "DIRECTIVE_GLOBAL",
+  "DIRECTIVE_EXTERN", "DIRECTIVE_SECTION", "DIRECTIVE_WORD",
+  "DIRECTIVE_SKIP", "DIRECTIVE_ASCII", "DIRECTIVE_EQU", "DIRECTIVE_END",
+  "LABEL", "SYMBOL", "LITERAL_BIN", "LITERAL_OCT", "LITERAL_DEC",
+  "LITERAL_HEX", "LITERAL_STRING", "COMMA", "EOL", "UNDEFIEND", "$accept",
+  "code", "line", "symbol_list", "symbol_literal_list", "single_symbol",
   "all_num_literals", "string_literal", YY_NULLPTR
 };
 #endif
@@ -563,11 +593,13 @@ static const yytype_int16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279
+     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
+     285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
+     295,   296,   297,   298,   299,   300,   301
 };
 # endif
 
-#define YYPACT_NINF (-11)
+#define YYPACT_NINF (-32)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -581,10 +613,10 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -4,    -7,    -7,    -7,    -2,     3,     7,     6,   -11,   -11,
-      32,    -4,   -11,   -10,   -11,     2,    10,   -11,   -11,   -11,
-     -11,     4,   -11,   -11,    11,   -11,    12,   -11,   -11,   -11,
-      -7,   -11,   -11,   -11,    -2,   -11,   -11,   -11,    14,    15
+     -26,   -29,   -29,   -29,   -25,   -19,   -31,   -27,   -32,   -32,
+      32,   -26,   -32,   -20,   -32,   -18,   -12,   -32,   -32,   -32,
+     -32,   -16,   -32,   -32,   -11,   -32,   -10,   -32,   -32,   -32,
+     -29,   -32,   -32,   -32,   -25,   -32,   -32,   -32,    -8,    -7
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -601,7 +633,7 @@ static const yytype_int8 yydefact[] =
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -11,    27,   -11,     0,     5,    -3,    35,   -11
+     -32,    27,   -32,     0,     5,    -3,    35,   -32
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
@@ -616,18 +648,18 @@ static const yytype_int8 yydefgoto[] =
 static const yytype_int8 yytable[] =
 {
       16,    22,    15,     1,     2,     3,     4,     5,     6,    12,
-       7,     8,    30,    31,    12,    17,    18,    19,    20,     9,
-      17,    18,    19,    20,    30,    32,    34,    35,    25,    27,
+       7,     8,    25,    12,    17,    18,    19,    20,    27,     9,
+      17,    18,    19,    20,    30,    31,    30,    32,    34,    35,
       38,    22,    28,    33,    36,    37,    30,    34,    29,    39,
       24
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     4,     2,     7,     8,     9,    10,    11,    12,    16,
-      14,    15,    22,    23,    16,    17,    18,    19,    20,    23,
-      17,    18,    19,    20,    22,    23,    22,    23,    21,    23,
-      30,    34,     0,    23,    23,    23,    22,    22,    11,    34,
+       3,     4,     2,    29,    30,    31,    32,    33,    34,    38,
+      36,    37,    43,    38,    39,    40,    41,    42,    45,    45,
+      39,    40,    41,    42,    44,    45,    44,    45,    44,    45,
+      30,    34,     0,    45,    45,    45,    44,    44,    11,    34,
        5
 };
 
@@ -635,18 +667,18 @@ static const yytype_int8 yycheck[] =
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     7,     8,     9,    10,    11,    12,    14,    15,    23,
-      26,    27,    16,    28,    30,    28,    30,    17,    18,    19,
-      20,    29,    30,    31,    31,    21,    32,    23,     0,    26,
-      22,    23,    23,    23,    22,    23,    23,    23,    28,    29
+       0,    29,    30,    31,    32,    33,    34,    36,    37,    45,
+      48,    49,    38,    50,    52,    50,    52,    39,    40,    41,
+      42,    51,    52,    53,    53,    43,    54,    45,     0,    48,
+      44,    45,    45,    45,    44,    45,    45,    45,    50,    51
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    25,    26,    26,    27,    27,    27,    27,    27,    27,
-      27,    27,    27,    28,    28,    29,    29,    29,    30,    31,
-      31,    31,    31,    32
+       0,    47,    48,    48,    49,    49,    49,    49,    49,    49,
+      49,    49,    49,    50,    50,    51,    51,    51,    52,    53,
+      53,    53,    53,    54
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -1350,91 +1382,91 @@ yyreduce:
   switch (yyn)
     {
   case 4:
-#line 51 "./auxiliary/parser.y"
+#line 73 "./auxiliary/parser.y"
                                        { std::cout << ".word" << std::endl; }
-#line 1356 "./auxiliary/src/parser.cpp"
+#line 1388 "./auxiliary/src/parser.cpp"
     break;
 
   case 5:
-#line 52 "./auxiliary/parser.y"
+#line 74 "./auxiliary/parser.y"
                                    { std::cout << ".global" << std::endl; }
-#line 1362 "./auxiliary/src/parser.cpp"
+#line 1394 "./auxiliary/src/parser.cpp"
     break;
 
   case 6:
-#line 53 "./auxiliary/parser.y"
+#line 75 "./auxiliary/parser.y"
                                    { std::cout << ".extern" << std::endl; }
-#line 1368 "./auxiliary/src/parser.cpp"
+#line 1400 "./auxiliary/src/parser.cpp"
     break;
 
   case 7:
-#line 54 "./auxiliary/parser.y"
+#line 76 "./auxiliary/parser.y"
                                       { std::cout << ".section" << std::endl; }
-#line 1374 "./auxiliary/src/parser.cpp"
+#line 1406 "./auxiliary/src/parser.cpp"
     break;
 
   case 8:
-#line 55 "./auxiliary/parser.y"
+#line 77 "./auxiliary/parser.y"
                                       { std::cout << ".skip" << std::endl; }
-#line 1380 "./auxiliary/src/parser.cpp"
+#line 1412 "./auxiliary/src/parser.cpp"
     break;
 
   case 9:
-#line 56 "./auxiliary/parser.y"
+#line 78 "./auxiliary/parser.y"
                     { std::cout << ".end" << std::endl; }
-#line 1386 "./auxiliary/src/parser.cpp"
+#line 1418 "./auxiliary/src/parser.cpp"
     break;
 
   case 10:
-#line 57 "./auxiliary/parser.y"
+#line 79 "./auxiliary/parser.y"
                                      { std::cout << ".ascii" << std::endl; }
-#line 1392 "./auxiliary/src/parser.cpp"
+#line 1424 "./auxiliary/src/parser.cpp"
     break;
 
   case 11:
-#line 58 "./auxiliary/parser.y"
+#line 80 "./auxiliary/parser.y"
         { std::cout << "labela: " << (yyvsp[0].symbol_name) << std::endl; }
-#line 1398 "./auxiliary/src/parser.cpp"
+#line 1430 "./auxiliary/src/parser.cpp"
     break;
 
   case 18:
-#line 74 "./auxiliary/parser.y"
+#line 96 "./auxiliary/parser.y"
        { std::cout << "simbol: " << (yyvsp[0].symbol_name) << std::endl; }
-#line 1404 "./auxiliary/src/parser.cpp"
+#line 1436 "./auxiliary/src/parser.cpp"
     break;
 
   case 19:
-#line 78 "./auxiliary/parser.y"
+#line 100 "./auxiliary/parser.y"
             { std::cout << "literal: " << std::stoi((yyvsp[0].literal_value) + 2, 0, 2) << std::endl; }
-#line 1410 "./auxiliary/src/parser.cpp"
+#line 1442 "./auxiliary/src/parser.cpp"
     break;
 
   case 20:
-#line 79 "./auxiliary/parser.y"
+#line 101 "./auxiliary/parser.y"
               { std::cout << "literal: " << std::stoi((yyvsp[0].literal_value), 0, 8) << std::endl; }
-#line 1416 "./auxiliary/src/parser.cpp"
+#line 1448 "./auxiliary/src/parser.cpp"
     break;
 
   case 21:
-#line 80 "./auxiliary/parser.y"
+#line 102 "./auxiliary/parser.y"
               { std::cout << "literal: " << std::stoi((yyvsp[0].literal_value), 0, 10) << std::endl; }
-#line 1422 "./auxiliary/src/parser.cpp"
+#line 1454 "./auxiliary/src/parser.cpp"
     break;
 
   case 22:
-#line 81 "./auxiliary/parser.y"
+#line 103 "./auxiliary/parser.y"
               { std::cout << "literal: " << std::stoi((yyvsp[0].literal_value), 0, 16) << std::endl; }
-#line 1428 "./auxiliary/src/parser.cpp"
+#line 1460 "./auxiliary/src/parser.cpp"
     break;
 
   case 23:
-#line 85 "./auxiliary/parser.y"
+#line 107 "./auxiliary/parser.y"
                { std::cout << "literal: " << (yyvsp[0].literal_value) << std::endl; }
-#line 1434 "./auxiliary/src/parser.cpp"
+#line 1466 "./auxiliary/src/parser.cpp"
     break;
 
 
-#line 1438 "./auxiliary/src/parser.cpp"
+#line 1470 "./auxiliary/src/parser.cpp"
 
       default: break;
     }
@@ -1666,4 +1698,4 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 88 "./auxiliary/parser.y"
+#line 110 "./auxiliary/parser.y"

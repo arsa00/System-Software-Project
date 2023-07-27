@@ -16,6 +16,33 @@
 ".ascii" { return DIRECTIVE_ASCII; }
 ".end" { return DIRECTIVE_END; }
 
+"halt" { return INSTRUCTION_HALT; }
+"int" { return INSTRUCTION_INT; }
+"iret" { return INSTRUCTION_IRET; }
+"call" { return INSTRUCTION_CALL; }
+"ret" { return INSTRUCTION_RET; }
+"jmp" { return INSTRUCTION_JMP; }
+"beq" { return INSTRUCTION_BEQ; }
+"bne" { return INSTRUCTION_BNE; }
+"bgt" { return INSTRUCTION_BGT; }
+"push" { return INSTRUCTION_PUSH; }
+"pop" { return INSTRUCTION_POP; }
+"xchg" { return INSTRUCTION_XCHG; }
+"add" { return INSTRUCTION_ADD; }
+"sub" { return INSTRUCTION_SUB; }
+"mul" { return INSTRUCTION_MUL; }
+"div" { return INSTRUCTION_DIV; }
+"not" { return INSTRUCTION_NOT; }
+"and" { return INSTRUCTION_AND; }
+"or" { return INSTRUCTION_OR; }
+"xor" { return INSTRUCTION_XOR; }
+"shl" { return INSTRUCTION_SHL; }
+"shr" { return INSTRUCTION_SHR; }
+"ld" { return INSTRUCTION_LD; }
+"st" { return INSTRUCTION_ST; }
+"csrrd" { return INSTRUCTION_CSRRD; }
+"csrwr" { return INSTRUCTION_CSRWR; }
+
 [._A-Za-z][._0-9A-Za-z]* { yylval.symbol_name = yytext; return SYMBOL; }
 [._A-Za-z][._0-9A-Za-z]*: { yytext[strlen(yytext)-1] = '\0'; yylval.symbol_name = yytext; return LABEL; }
 
