@@ -61,6 +61,10 @@
 %token<gpr_index> GP_REG;
 %token<csr_index> CS_REG;
 
+%token PLUS
+%token SQUARE_BRACKET_L
+%token SQUARE_BRACKET_R
+%token DOLLAR
 %token COMMA
 %token EOL
 %token UNDEFIEND
@@ -112,6 +116,8 @@ DIRECTIVE_WORD symbol_literal_list EOL { std::cout << ".word" << std::endl; }
 | INSTRUCTION_SHR single_gp_reg COMMA single_gp_reg EOL { std::cout << "shr" << std::endl; }
 | INSTRUCTION_CSRRD single_cs_reg COMMA single_gp_reg EOL { std::cout << "csrrd" << std::endl; }
 | INSTRUCTION_CSRWR single_gp_reg COMMA single_cs_reg EOL { std::cout << "csrwr" << std::endl; }
+| INSTRUCTION_LD ld_st_operand COMMA single_gp_reg EOL { std::cout << "ld" << std::endl; }
+| INSTRUCTION_ST single_gp_reg COMMA ld_st_operand EOL { std::cout << "st" << std::endl; }
 | EOL
 ;
 
@@ -148,5 +154,19 @@ GP_REG { std::cout << "GP registar: " << $1 << std::endl; }
 single_cs_reg:
 CS_REG { std::cout << "CS registar: " << $1 << std::endl; }
 ;
+
+ld_st_operand:
+DOLLAR all_num_literals { std::cout << "immed" << std::endl; }
+| DOLLAR single_symbol { std::cout << "immed" << std::endl; }
+| all_num_literals { std::cout << "mem dir" << std::endl; }
+| single_symbol  { std::cout << "mem dir" << std::endl; }
+| single_cs_reg  { std::cout << "reg dir" << std::endl; }
+| single_gp_reg  { std::cout << "reg dir" << std::endl; }
+| SQUARE_BRACKET_L single_cs_reg SQUARE_BRACKET_R  { std::cout << "reg mem" << std::endl; }
+| SQUARE_BRACKET_L single_gp_reg SQUARE_BRACKET_R  { std::cout << "reg mem" << std::endl; }
+| SQUARE_BRACKET_L single_cs_reg PLUS all_num_literals SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; }
+| SQUARE_BRACKET_L single_gp_reg PLUS all_num_literals SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; }
+| SQUARE_BRACKET_L single_cs_reg PLUS single_symbol SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; }
+| SQUARE_BRACKET_L single_gp_reg PLUS single_symbol SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; }
 
 %%

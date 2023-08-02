@@ -58,6 +58,10 @@
 "%handler" { yylval.gpr_index = 1; return CS_REG; }
 "%cause" { yylval.gpr_index = 2; return CS_REG; }
 
+"+" { return PLUS; }
+"[" { return SQUARE_BRACKET_L; }
+"]" { return SQUARE_BRACKET_R; }
+"$" { return DOLLAR; }
 "," { return COMMA; }
 \n { return EOL; }
 #.*\n { return EOL; }

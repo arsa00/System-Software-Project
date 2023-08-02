@@ -54,5 +54,30 @@ csrwr  %r12, %status
 csrwr  %r10, %handler
 csrwr  %r11, %cause
 
+ld $0x15, %r3
+ld $family, %r3
+
+ld 0x21, %r5
+ld .temp, %r8
+
+ld %r4, %r5
+ld [%r7], %r8
+
+ld [%r4 + 22], %r5
+ld [%handler + .temp_val], %r8
+
+
+st %r3, $0x19 
+st %r3, $family
+
+st %r5, 0x21
+st %r8, .temp
+
+st %r5, %r4
+st %r8, [%r7]
+
+st %r10, [%r4 + 22]
+st %r12, [%handler + .temp_val]
+
 halt
 .end

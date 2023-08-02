@@ -92,9 +92,13 @@ extern int yydebug;
     LITERAL_STRING = 298,
     GP_REG = 299,
     CS_REG = 300,
-    COMMA = 301,
-    EOL = 302,
-    UNDEFIEND = 303
+    PLUS = 301,
+    SQUARE_BRACKET_L = 302,
+    SQUARE_BRACKET_R = 303,
+    DOLLAR = 304,
+    COMMA = 305,
+    EOL = 306,
+    UNDEFIEND = 307
   };
 #endif
 
@@ -109,7 +113,7 @@ union YYSTYPE
   int gpr_index;
   int csr_index;
 
-#line 113 "./auxiliary/inc/parser.hpp"
+#line 117 "./auxiliary/inc/parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
