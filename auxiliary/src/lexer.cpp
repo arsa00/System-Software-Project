@@ -1097,7 +1097,7 @@ YY_RULE_SETUP
 case 49:
 YY_RULE_SETUP
 #line 65 "./auxiliary/lexer.l"
-{ return UNDEFIEND; }
+{ std::cout << "UND " << yytext << std::endl; return UNDEFIEND; }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP

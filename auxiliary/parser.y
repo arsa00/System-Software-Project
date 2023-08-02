@@ -93,6 +93,25 @@ DIRECTIVE_WORD symbol_literal_list EOL { std::cout << ".word" << std::endl; }
 | INSTRUCTION_JMP all_num_literals EOL { std::cout << "jmp" << std::endl; }
 | INSTRUCTION_BEQ single_gp_reg COMMA single_gp_reg COMMA single_symbol EOL { std::cout << "beq" << std::endl; }
 | INSTRUCTION_BEQ single_gp_reg COMMA single_gp_reg COMMA all_num_literals EOL { std::cout << "beq" << std::endl; }
+| INSTRUCTION_BNE single_gp_reg COMMA single_gp_reg COMMA single_symbol EOL { std::cout << "bne" << std::endl; }
+| INSTRUCTION_BNE single_gp_reg COMMA single_gp_reg COMMA all_num_literals EOL { std::cout << "bne" << std::endl; }
+| INSTRUCTION_BGT single_gp_reg COMMA single_gp_reg COMMA single_symbol EOL { std::cout << "bgt" << std::endl; }
+| INSTRUCTION_BGT single_gp_reg COMMA single_gp_reg COMMA all_num_literals EOL { std::cout << "bgt" << std::endl; }
+| INSTRUCTION_PUSH single_gp_reg EOL { std::cout << "push" << std::endl; }
+| INSTRUCTION_POP single_gp_reg EOL { std::cout << "pop" << std::endl; }
+| INSTRUCTION_XCHG single_gp_reg COMMA single_gp_reg EOL { std::cout << "xchg" << std::endl; }
+| INSTRUCTION_ADD single_gp_reg COMMA single_gp_reg EOL { std::cout << "add" << std::endl; }
+| INSTRUCTION_SUB single_gp_reg COMMA single_gp_reg EOL { std::cout << "sub" << std::endl; }
+| INSTRUCTION_MUL single_gp_reg COMMA single_gp_reg EOL { std::cout << "mul" << std::endl; }
+| INSTRUCTION_DIV single_gp_reg COMMA single_gp_reg EOL { std::cout << "div" << std::endl; }
+| INSTRUCTION_NOT single_gp_reg EOL { std::cout << "not" << std::endl; }
+| INSTRUCTION_AND single_gp_reg COMMA single_gp_reg EOL { std::cout << "and" << std::endl; }
+| INSTRUCTION_OR single_gp_reg COMMA single_gp_reg EOL { std::cout << "or" << std::endl; }
+| INSTRUCTION_XOR single_gp_reg COMMA single_gp_reg EOL { std::cout << "xor" << std::endl; }
+| INSTRUCTION_SHL single_gp_reg COMMA single_gp_reg EOL { std::cout << "shl" << std::endl; }
+| INSTRUCTION_SHR single_gp_reg COMMA single_gp_reg EOL { std::cout << "shr" << std::endl; }
+| INSTRUCTION_CSRRD single_cs_reg COMMA single_gp_reg EOL { std::cout << "csrrd" << std::endl; }
+| INSTRUCTION_CSRWR single_gp_reg COMMA single_cs_reg EOL { std::cout << "csrwr" << std::endl; }
 | EOL
 ;
 
