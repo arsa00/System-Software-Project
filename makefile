@@ -1,7 +1,7 @@
-
+ASSEMBLER_FILES = ./inc/*.hpp ./inc/instructions/*.hpp ./src/*.cpp
 
 assembler:
-	g++ -g -o asembler ./src/assembler.cpp ./auxiliary/src/lexer.cpp ./auxiliary/src/parser.cpp ./auxiliary/inc/parser.hpp ./auxiliary/inc/exceptions.hpp
+	g++ -g -o asembler $(ASSEMBLER_FILES) ./auxiliary/src/lexer.cpp ./auxiliary/src/parser.cpp ./auxiliary/inc/parser.hpp ./auxiliary/inc/exceptions.hpp
 
 
 clean: 

@@ -1,3 +1,6 @@
+#ifndef LITERAL_HPP
+#define LITERAL_HPP
+
 #include "parameter.hpp"
 #include <string>
 
@@ -17,3 +20,5 @@ public:
   void set_str_value(std::string val);
   void set_str_value(char *val);
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef SYMBOL_HPP
+#define SYMBOL_HPP
+
 #include "parameter.hpp"
 #include <string>
 
@@ -22,3 +25,5 @@ public:
 
   ~Symbol();
 };
+
+#endif

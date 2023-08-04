@@ -1,3 +1,6 @@
+#ifndef DIRECTIVE_HPP
+#define DIRECTIVE_HPP
+
 #include "command.hpp"
 #include "parameter.hpp"
 #include<list>
@@ -14,3 +17,5 @@ public:
   Parameter deque_param();
   std::list<Parameter> get_params() const;
 };
+
+#endif

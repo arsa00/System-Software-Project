@@ -1,3 +1,6 @@
+#ifndef TYPES_HPP
+#define TYPES_HPP
+
 namespace type {
 
   enum PARAMETER_TYPE { SYMBOL = 0, LITERAL };
@@ -22,6 +25,8 @@ namespace type {
   enum MEMORY_ADDRESSING_MODES 
   {
     IMMED, MEM_DIR, REG_DIR, REG_IND, REG_IND_WITH_DISP
-  }
+  };
 
 }
+
+#endif

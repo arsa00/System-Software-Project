@@ -8,6 +8,8 @@ using namespace std;
 extern int yyparse();
 extern FILE* yyin;
 
+extern void test1();
+
 void yyerror(char* s)
 {
   cerr << s << endl;
@@ -49,6 +51,7 @@ int main(int argc, char const *argv[])
     return 1;
   }
   
+  test1();
 
   return 0;
 }

@@ -1,3 +1,6 @@
+#ifndef INSTRUCTION_HPP
+#define INSTRUCTION_HPP
+
 #include "command.hpp"
 #include "parameter.hpp"
 #include<list>
@@ -18,3 +21,5 @@ public:
   void set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES);
   type::MEMORY_ADDRESSING_MODES get_mem_addr_mode() const;
 };
+
+#endif
