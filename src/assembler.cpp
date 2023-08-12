@@ -40,6 +40,7 @@ int main(int argc, char const *argv[])
       file_input = argv[i];
     }
 
+cout << file_input << endl;
     yyin = fopen(file_input, "r");
     if(yyin == nullptr) throw new file_exception();
 

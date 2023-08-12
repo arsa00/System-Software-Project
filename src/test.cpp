@@ -35,9 +35,11 @@ void test1()
 
   ins->execute();
 
-  Command &ins2 = *ins;
-ins2.execute();
+// test copy constructor and destructor for instructions
+  instruction::HALT halt_ins = (instruction::HALT&)(*ins);
+  Instruction *ins2 = new instruction::HALT(halt_ins);
+ins2->execute();
   delete ins;
 
-  ins2.execute();
+  ins2->execute();
 }
