@@ -8,9 +8,9 @@ namespace instruction {
 
   class HALT : public Instruction {
 
-    void execute() override
+    void execute() const override
     {
-      std::cout << "000000000" << std::endl;
+      std::cout << "HALT INSTRUCTION EXECUTED: 000000000" << std::endl;
     }
 
   };

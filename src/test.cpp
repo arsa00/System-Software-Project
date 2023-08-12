@@ -16,22 +16,28 @@ void test1()
   std::cout << literal->get_num_value() << std::endl;
 
   Instruction *ins = new instruction::HALT();
-  ins->enque_param(*symbol);
-  ins->enque_param(*literal);
+  ins->enque_param(symbol);
+  ins->enque_param(literal);
 
-  std::list<Parameter> params = ins->get_params();
+  std::list<Parameter *> params = ins->get_params();
 
   while(!params.empty()) {
-    Parameter param = params.back();
+    Parameter *param = params.front();
 
-    if(param.get_type() == type::SYMBOL) {
-      std::cout << "PARAM: " << ((Symbol) param).get_name(); << std::endl;
+    if(param->get_type() == type::SYMBOL) {
+      std::cout << "PARAM [simbol]: " << ((Symbol *) param)->get_name() << std::endl;
     }
     else
-      std::cout << "PARAM: " << ((Literal) param).get_num_value(); << std::endl;
+      std::cout << "PARAM [literal]: " << ((Literal *) param)->get_num_value() << std::endl;
 
-    params.pop_back();
+    params.pop_front();
   }
 
   ins->execute();
+
+  Command &ins2 = *ins;
+ins2.execute();
+  delete ins;
+
+  ins2.execute();
 }
