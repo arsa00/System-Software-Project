@@ -25,10 +25,13 @@ public:
   Command& operator=(Command &&);
   ~Command();
   
-  void set_params(std::list<Parameter*> params);
+  void set_params(const std::list<Parameter*> &params);
+  std::list<Parameter*> get_params() const;
+  void delete_params();
+  void clear_params();
   void enque_param(Parameter *param);
   Parameter* deque_param();
-  std::list<Parameter*> get_params() const;
+  
 
   virtual void execute() const = 0;
 };

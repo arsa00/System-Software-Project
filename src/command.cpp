@@ -6,7 +6,7 @@ void Command::destroy()
   Parameter *param;
   while((param = this->deque_param()))
   {
-    std::cout << "Deleting parameter..." << std::endl;
+    // std::cout << "Deleting parameter..." << std::endl;
     delete param;
   }
 }
@@ -17,7 +17,7 @@ void Command::clone(const Command &cmd)
 
   for(Parameter* const& param : cmd_params) 
   {
-    Parameter *new_param = new Parameter(*param);
+    Parameter *new_param = new Parameter(*param); // TODO: implement copy constructor for Parameter
     this->enque_param(new_param);
   }
 }
@@ -33,24 +33,24 @@ void Command::move(Command &cmd)
 
 Command::Command(type::COMMAND_TYPE type) : type(type) 
 {
-  std::cout << "Def constructor..." << std::endl;
+  // std::cout << "Def constructor..." << std::endl;
 }
 
 Command::Command(const Command &cmd)
 {
-  std::cout << "Copy constructor..." << std::endl;
+  // std::cout << "Copy constructor..." << std::endl;
   this->clone(cmd);
 }
 
 Command::Command(Command &&cmd)
 {  
-  std::cout << "Move constructor..." << std::endl;
+  // std::cout << "Move constructor..." << std::endl;
   this->move(cmd);
 }
 
 Command& Command::operator=(const Command &cmd)
 {
-  std::cout << "Copy assigment operator..." << std::endl;
+  // std::cout << "Copy assigment operator..." << std::endl;
   if(this == &cmd) return *this;
 
   this->destroy();
@@ -59,7 +59,7 @@ Command& Command::operator=(const Command &cmd)
 
 Command& Command::operator=(Command &&cmd)
 {
-  std::cout << "Move assigment operator..." << std::endl;
+  // std::cout << "Move assigment operator..." << std::endl;
   if(this == &cmd) return *this;
 
   this->destroy();
@@ -71,9 +71,24 @@ Command::~Command()
   this->destroy();
 }
 
-void Command::set_params(std::list<Parameter*> params)
+void Command::set_params(const std::list<Parameter*> &params)
 {
   this->params = params;
+}
+
+void Command::clear_params()
+{
+  this->params.clear();
+}
+
+void Command::delete_params()
+{
+  this->destroy();
+}
+
+std::list<Parameter*> Command::get_params() const
+{
+  return this->params;
 }
 
 void Command::enque_param(Parameter *param) 
@@ -88,9 +103,4 @@ Parameter* Command::deque_param()
   Parameter *param = this->params.front();
   this->params.pop_front();
   return param;
-}
-
-std::list<Parameter*> Command::get_params() const
-{
-  return this->params;
 }

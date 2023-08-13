@@ -8,7 +8,7 @@ class Directive : public Command
 private:
 
 public:
-  Directive() : Command(type::INSTRUCTION) { }
+  Directive() : Command(type::DIRECTIVE) { }
 };
 
 #endif
