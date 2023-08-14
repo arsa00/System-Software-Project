@@ -39,11 +39,8 @@ void test1()
   instruction::HALT halt_ins = (instruction::HALT&)(*ins);
   Instruction *ins2 = new instruction::HALT(halt_ins);
 
-// XXX: this is added due to missing of Parameter copy constructor
-  ins2->clear_params();
-  ins2->set_params(ins->get_params());
 
-  // delete ins; // XXX: this should be uncommented once Parameter copy constructor is added
+  delete ins;
 
   ins2->execute();
 

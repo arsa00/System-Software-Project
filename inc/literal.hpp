@@ -11,7 +11,6 @@ private:
   std::string str_value;
 public:
   Literal() : Parameter(type::LITERAL) { }
-  ~Literal();
 
   uint32_t    get_num_value() const;
   std::string get_str_value() const;
@@ -19,6 +18,8 @@ public:
   void set_num_value(uint32_t val);
   void set_str_value(std::string val);
   void set_str_value(char *val);
+
+  Literal* clone() const override;
 };
 
 #endif

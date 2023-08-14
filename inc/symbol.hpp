@@ -23,7 +23,7 @@ public:
   void set_name(std::string val);
   void set_name(char *val);
 
-  ~Symbol();
+  Symbol* clone() const override;
 };
 
 #endif
