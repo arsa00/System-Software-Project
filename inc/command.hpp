@@ -31,7 +31,6 @@ public:
   void clear_params();
   void enque_param(Parameter *param);
   Parameter* deque_param();
-  
 
   virtual void execute() const = 0;
 };

@@ -9,6 +9,7 @@ extern int yyparse();
 extern FILE* yyin;
 
 extern void test1();
+extern void test2();
 
 void yyerror(char* s)
 {
@@ -40,7 +41,7 @@ int main(int argc, char const *argv[])
       file_input = argv[i];
     }
 
-cout << file_input << endl;
+    // cout << file_input << endl;
     yyin = fopen(file_input, "r");
     if(yyin == nullptr) throw new file_exception();
 
@@ -53,6 +54,7 @@ cout << file_input << endl;
   }
   
   test1();
+  test2();
 
   return 0;
 }

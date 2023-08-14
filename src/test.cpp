@@ -3,6 +3,7 @@
 #include "../inc/literal.hpp"
 #include "../inc/instruction.hpp"
 #include <iostream>
+#include "../inc/command_builder.hpp"
 
 
 void test1()
@@ -44,7 +45,7 @@ void test1()
 
   ins2->execute();
 
-  Instruction *ins3 = new instruction::HALT();
+  Command *ins3 = new instruction::HALT();
   ins3->set_params(ins2->get_params());
   ins3->enque_param(new Symbol(".test22"));
 
@@ -61,5 +62,39 @@ void test1()
 
     params.pop_front();
   }
+}
 
+void test2()
+{
+  std::cout << std::endl << "----------- TEST 2 ----------- " << std::endl << std::endl;
+  Symbol *symbol = new Symbol(".test");
+
+  Literal *literal = new Literal(); // TODO: implement Literal constructor with params
+  literal->set_num_value(1212);
+
+  Literal *literal2 = new Literal();
+  literal2->set_num_value(15190310);
+
+  CommandBuilder::get_instance().enque_param(symbol);
+  CommandBuilder::get_instance().enque_param(literal);
+  CommandBuilder::get_instance().enque_param(literal2);
+
+  Instruction *ins = CommandBuilder::get_instance().build_instruction(type::HALT);
+
+  std::list<Parameter *> params = ins->get_params();
+
+  while(!params.empty()) {
+    Parameter *param = params.front();
+
+    if(param->get_type() == type::SYMBOL) {
+      std::cout << "PARAM [simbol]: " << ((Symbol *) param)->get_name() << std::endl;
+    }
+    else
+      std::cout << "PARAM [literal]: " << ((Literal *) param)->get_num_value() << std::endl;
+
+    params.pop_front();
+  }
+
+  ins->execute();
+  delete ins;
 }

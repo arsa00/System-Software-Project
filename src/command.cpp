@@ -17,7 +17,7 @@ void Command::clone(const Command &cmd)
 
   for(Parameter* const& param : cmd_params) 
   {
-    Parameter *new_param = param->clone(); // TODO: implement copy constructor for Parameter
+    Parameter *new_param = param->clone();
     this->enque_param(new_param);
   }
 }
@@ -27,7 +27,7 @@ void Command::move(Command &cmd)
   Parameter *cmd_param;
   while((cmd_param = cmd.deque_param()))
   {
-    this->enque_param(cmd_param->clone()); // TODO: implement copy constructor for Parameter
+    this->enque_param(cmd_param->clone());
   }
 }
 
