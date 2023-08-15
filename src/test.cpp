@@ -69,15 +69,14 @@ void test2()
   std::cout << std::endl << "----------- TEST 2 ----------- " << std::endl << std::endl;
   Symbol *symbol = new Symbol(".test");
 
-  Literal *literal = new Literal(); // TODO: implement Literal constructor with params
-  literal->set_num_value(1212);
-
-  Literal *literal2 = new Literal();
-  literal2->set_num_value(15190310);
+  Literal *literal = new Literal(1212); // TODO: implement Literal constructor with params
+  Literal *literal2 = new Literal(15190310);
+  Literal *literal3 = new Literal("Proba tekst literala");
 
   CommandBuilder::get_instance().enque_param(symbol);
   CommandBuilder::get_instance().enque_param(literal);
   CommandBuilder::get_instance().enque_param(literal2);
+  CommandBuilder::get_instance().enque_param(literal3);
 
   Instruction *ins = CommandBuilder::get_instance().build_instruction(type::HALT);
 
@@ -90,7 +89,7 @@ void test2()
       std::cout << "PARAM [simbol]: " << ((Symbol *) param)->get_name() << std::endl;
     }
     else
-      std::cout << "PARAM [literal]: " << ((Literal *) param)->get_num_value() << std::endl;
+      std::cout << "PARAM [literal]: " << ((Literal *) param)->get_num_value()  << " : " << ((Literal *) param)->get_str_value() << std::endl;
 
     params.pop_front();
   }

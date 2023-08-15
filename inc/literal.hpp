@@ -11,6 +11,9 @@ private:
   std::string str_value;
 public:
   Literal() : Parameter(type::LITERAL) { }
+  Literal(uint32_t val);
+  Literal(std::string val);
+  Literal(char *val);
 
   uint32_t    get_num_value() const;
   std::string get_str_value() const;
