@@ -1,4 +1,5 @@
-#include "../inc/instructions/halt.hpp"
+#include "../inc/all_instructions.hpp"
+#include "../inc/all_directives.hpp"
 #include "../inc/symbol.hpp"
 #include "../inc/literal.hpp"
 #include "../inc/instruction.hpp"
@@ -101,8 +102,17 @@ void test2()
   CommandBuilder::get_instance().enque_param(new Symbol("dvrednost"));
   CommandBuilder::get_instance().enque_param(new Symbol("test_builder"));
   CommandBuilder::get_instance().enque_param(new Symbol(".working"));
-
   Directive *dir = CommandBuilder::get_instance().build_directive(type::GLOBAL);
+  dir->execute();
+  delete dir;
+
+  ins = CommandBuilder::get_instance().build_instruction(type::INT);
+  ins->execute();
+  delete ins;
+
+  CommandBuilder::get_instance().enque_param(new Symbol(".extern.text"));
+  CommandBuilder::get_instance().enque_param(new Symbol("_working_"));
+  dir = CommandBuilder::get_instance().build_directive(type::EXTERN);
   dir->execute();
   delete dir;
 }

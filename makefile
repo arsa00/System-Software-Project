@@ -1,4 +1,4 @@
-ASSEMBLER_FILES = ./inc/*.hpp ./inc/instructions/*.hpp ./src/*.cpp
+ASSEMBLER_FILES = ./inc/*.hpp ./src/*.cpp
 
 assembler:
 	g++ -g -o asembler $(ASSEMBLER_FILES) ./auxiliary/src/lexer.cpp ./auxiliary/src/parser.cpp ./auxiliary/inc/parser.hpp ./auxiliary/inc/exceptions.hpp
