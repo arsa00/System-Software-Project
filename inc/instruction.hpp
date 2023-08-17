@@ -19,13 +19,15 @@ public:
 
   void set_gp_reg_0(type::GP_REG gp_reg);
   void set_gp_reg_1(type::GP_REG gp_reg);
-  type::GP_REG set_gp_reg_0() const; // XXX: maybe remove getters
-  type::GP_REG set_gp_reg_1() const;
+  void set_gp_regs(type::GP_REG gp_reg_0, type::GP_REG gp_reg_1);
+  type::GP_REG get_gp_reg_0() const; // XXX: maybe remove getters
+  type::GP_REG get_gp_reg_1() const;
 
   void set_cs_reg_0(type::CS_REG cs_reg);
   void set_cs_reg_1(type::CS_REG cs_reg);
-  type::CS_REG set_cs_reg_0() const; // XXX: maybe remove getters
-  type::CS_REG set_cs_reg_1() const;
+  void set_cs_regs(type::CS_REG cs_reg_0, type::CS_REG cs_reg_1);
+  type::CS_REG get_cs_reg_0() const; // XXX: maybe remove getters
+  type::CS_REG get_cs_reg_1() const;
 
 };
 
