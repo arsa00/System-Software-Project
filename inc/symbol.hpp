@@ -13,7 +13,7 @@ public:
   Symbol(std::string name, uint32_t value = -1) : Parameter(type::SYMBOL) 
   { 
     this->name = name; 
-    value = value;
+    this->value = value;
   }
 
   uint32_t    get_value() const;

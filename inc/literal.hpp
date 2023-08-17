@@ -10,7 +10,7 @@ private:
   uint32_t num_value;
   std::string str_value;
 public:
-  Literal() : Parameter(type::LITERAL) { }
+  Literal();
   Literal(uint32_t val);
   Literal(std::string val);
   Literal(char *val);

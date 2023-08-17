@@ -1,5 +1,6 @@
 #include "../inc/literal.hpp"
 
+Literal::Literal() : Parameter(type::LITERAL) { }
 Literal::Literal(uint32_t val) : Parameter(type::LITERAL) { this->num_value = val; }
 Literal::Literal(std::string val) : Parameter(type::LITERAL) { this->str_value = val; }
 Literal::Literal(char *val) : Parameter(type::LITERAL) { this->str_value.assign(val); }

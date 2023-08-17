@@ -69,7 +69,7 @@ void test2()
   std::cout << std::endl << "----------- TEST 2 ----------- " << std::endl << std::endl;
   Symbol *symbol = new Symbol(".test");
 
-  Literal *literal = new Literal(1212); // TODO: implement Literal constructor with params
+  Literal *literal = new Literal(1212);
   Literal *literal2 = new Literal(15190310);
   Literal *literal3 = new Literal("Proba tekst literala");
 
@@ -88,7 +88,7 @@ void test2()
     if(param->get_type() == type::SYMBOL) {
       std::cout << "PARAM [simbol]: " << ((Symbol *) param)->get_name() << std::endl;
     }
-    else
+    else // TODO: see how will client know which data is set (maybe two separated classes NUMERIC_LITERAL && STRING_LITERAL?)
       std::cout << "PARAM [literal]: " << ((Literal *) param)->get_num_value()  << " : " << ((Literal *) param)->get_str_value() << std::endl;
 
     params.pop_front();
@@ -96,4 +96,13 @@ void test2()
 
   ins->execute();
   delete ins;
+
+  // CommandBuilder::get_instance().enque_param(symbol);
+  CommandBuilder::get_instance().enque_param(new Symbol("dvrednost"));
+  CommandBuilder::get_instance().enque_param(new Symbol("test_builder"));
+  CommandBuilder::get_instance().enque_param(new Symbol(".working"));
+
+  Directive *dir = CommandBuilder::get_instance().build_directive(type::GLOBAL);
+  dir->execute();
+  delete dir;
 }
