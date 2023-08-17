@@ -149,6 +149,7 @@ Instruction* CommandBuilder::build_instruction(type::INSTRUCTION_TYPE ins_alias)
     case type::LD:
       {
         ins = new instruction::LD();
+        ins->set_mem_addr_mode(this->mem_addr_mode);
         ins->set_gp_reg_0(this->gp_reg_0);
         ins->set_params(this->get_params());
       }
@@ -156,6 +157,7 @@ Instruction* CommandBuilder::build_instruction(type::INSTRUCTION_TYPE ins_alias)
     case type::ST:
       {
         ins = new instruction::ST();
+        ins->set_mem_addr_mode(this->mem_addr_mode);
         ins->set_gp_reg_0(this->gp_reg_0);
         ins->set_params(this->get_params());
       }
