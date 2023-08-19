@@ -33,24 +33,24 @@ void Command::move(Command &cmd)
 
 Command::Command(type::COMMAND_TYPE type) : type(type)
 {
-  std::cout << "Def constructor..." << std::endl;
+  // std::cout << "Def constructor..." << std::endl;
 }
 
 Command::Command(const Command &cmd)
 {
-  std::cout << "Copy constructor..." << std::endl;
+  // std::cout << "Copy constructor..." << std::endl;
   this->clone(cmd);
 }
 
 Command::Command(Command &&cmd)
 {
-  std::cout << "Move constructor..." << std::endl;
+  // std::cout << "Move constructor..." << std::endl;
   this->move(cmd);
 }
 
 Command &Command::operator=(const Command &cmd)
 {
-  std::cout << "Copy assigment operator..." << std::endl;
+  // std::cout << "Copy assigment operator..." << std::endl;
   if (this == &cmd)
     return *this;
 
@@ -60,7 +60,7 @@ Command &Command::operator=(const Command &cmd)
 
 Command &Command::operator=(Command &&cmd)
 {
-  std::cout << "Move assigment operator..." << std::endl;
+  // std::cout << "Move assigment operator..." << std::endl;
   if (this == &cmd)
     return *this;
 

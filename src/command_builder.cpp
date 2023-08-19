@@ -1,6 +1,7 @@
 #include "../inc/command_builder.hpp"
 #include "../inc/all_instructions.hpp"
 #include "../inc/all_directives.hpp"
+// TODO: maybe add validation in building process
 
 CommandBuilder &CommandBuilder::get_instance()
 {
@@ -164,7 +165,7 @@ Instruction *CommandBuilder::build_instruction(type::INSTRUCTION_TYPE ins_alias)
   }
   break;
   case type::INSTRUCTION_TYPE::ST:
-  {
+  { // TODO: call yyerror if unallowed combination of mem_addr_mode is set
     ins = new instruction::ST();
     ins->set_mem_addr_mode(this->mem_addr_mode);
     ins->set_gp_reg_0(this->gp_reg_0);
