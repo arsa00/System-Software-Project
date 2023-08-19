@@ -6,10 +6,11 @@
 #include <iostream>
 #include "../inc/command_builder.hpp"
 
-
 void test1()
 {
-  std::cout << std::endl << "----------- TEST 1 ----------- " << std::endl << std::endl;
+  std::cout << std::endl
+            << "----------- TEST 1 ----------- " << std::endl
+            << std::endl;
   Symbol *symbol = new Symbol(".test");
   std::cout << symbol->get_name() << std::endl;
 
@@ -23,24 +24,25 @@ void test1()
 
   std::list<Parameter *> params = ins->get_params();
 
-  while(!params.empty()) {
+  while (!params.empty())
+  {
     Parameter *param = params.front();
 
-    if(param->get_type() == type::SYMBOL) {
-      std::cout << "PARAM [simbol]: " << ((Symbol *) param)->get_name() << std::endl;
+    if (param->get_type() == type::PARAMETER_TYPE::SYMBOL)
+    {
+      std::cout << "PARAM [simbol]: " << ((Symbol *)param)->get_name() << std::endl;
     }
     else
-      std::cout << "PARAM [literal]: " << ((Literal *) param)->get_num_value() << std::endl;
+      std::cout << "PARAM [literal]: " << ((Literal *)param)->get_num_value() << std::endl;
 
     params.pop_front();
   }
 
   ins->execute();
 
-// test copy constructor and destructor for instructions
-  instruction::HALT halt_ins = (instruction::HALT&)(*ins);
+  // test copy constructor and destructor for instructions
+  instruction::HALT halt_ins = (instruction::HALT &)(*ins);
   Instruction *ins2 = new instruction::HALT(halt_ins);
-
 
   delete ins;
 
@@ -52,14 +54,16 @@ void test1()
 
   params = ins3->get_params();
 
-  while(!params.empty()) {
+  while (!params.empty())
+  {
     Parameter *param = params.front();
 
-    if(param->get_type() == type::SYMBOL) {
-      std::cout << "PARAM [simbol]: " << ((Symbol *) param)->get_name() << std::endl;
+    if (param->get_type() == type::PARAMETER_TYPE::SYMBOL)
+    {
+      std::cout << "PARAM [simbol]: " << ((Symbol *)param)->get_name() << std::endl;
     }
     else
-      std::cout << "PARAM [literal]: " << ((Literal *) param)->get_num_value() << std::endl;
+      std::cout << "PARAM [literal]: " << ((Literal *)param)->get_num_value() << std::endl;
 
     params.pop_front();
   }
@@ -67,7 +71,9 @@ void test1()
 
 void test2()
 {
-  std::cout << std::endl << "----------- TEST 2 ----------- " << std::endl << std::endl;
+  std::cout << std::endl
+            << "----------- TEST 2 ----------- " << std::endl
+            << std::endl;
   Symbol *symbol = new Symbol(".test");
 
   Literal *literal = new Literal(1212);
@@ -79,18 +85,20 @@ void test2()
   CommandBuilder::get_instance().enque_param(literal2);
   CommandBuilder::get_instance().enque_param(literal3);
 
-  Instruction *ins = CommandBuilder::get_instance().build_instruction(type::HALT);
+  Instruction *ins = CommandBuilder::get_instance().build_instruction(type::INSTRUCTION_TYPE::HALT);
 
   std::list<Parameter *> params = ins->get_params();
 
-  while(!params.empty()) {
+  while (!params.empty())
+  {
     Parameter *param = params.front();
 
-    if(param->get_type() == type::SYMBOL) {
-      std::cout << "PARAM [simbol]: " << ((Symbol *) param)->get_name() << std::endl;
+    if (param->get_type() == type::PARAMETER_TYPE::SYMBOL)
+    {
+      std::cout << "PARAM [simbol]: " << ((Symbol *)param)->get_name() << std::endl;
     }
     else // TODO: see how will client know which data is set (maybe two separated classes NUMERIC_LITERAL && STRING_LITERAL?)
-      std::cout << "PARAM [literal]: " << ((Literal *) param)->get_num_value()  << " : " << ((Literal *) param)->get_str_value() << std::endl;
+      std::cout << "PARAM [literal]: " << ((Literal *)param)->get_num_value() << " : " << ((Literal *)param)->get_str_value() << std::endl;
 
     params.pop_front();
   }
@@ -102,17 +110,17 @@ void test2()
   CommandBuilder::get_instance().enque_param(new Symbol("dvrednost"));
   CommandBuilder::get_instance().enque_param(new Symbol("test_builder"));
   CommandBuilder::get_instance().enque_param(new Symbol(".working"));
-  Directive *dir = CommandBuilder::get_instance().build_directive(type::GLOBAL);
+  Directive *dir = CommandBuilder::get_instance().build_directive(type::DIRECTIVE_TYPE::GLOBAL);
   dir->execute();
   delete dir;
 
-  ins = CommandBuilder::get_instance().build_instruction(type::INT);
+  ins = CommandBuilder::get_instance().build_instruction(type::INSTRUCTION_TYPE::INT);
   ins->execute();
   delete ins;
 
   CommandBuilder::get_instance().enque_param(new Symbol(".extern.text"));
   CommandBuilder::get_instance().enque_param(new Symbol("_working_"));
-  dir = CommandBuilder::get_instance().build_directive(type::EXTERN);
+  dir = CommandBuilder::get_instance().build_directive(type::DIRECTIVE_TYPE::GLOBAL);
   dir->execute();
   delete dir;
 }

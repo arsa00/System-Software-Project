@@ -1,8 +1,26 @@
 %{
   #include <iostream>
   #include <string>
+  #include "../../inc/all_instructions.hpp"
+  #include "../../inc/all_directives.hpp"
+  #include "../../inc/symbol.hpp"
+  #include "../../inc/literal.hpp"
+  #include "../../inc/command_builder.hpp"
+
   extern int yylex (void);
   extern void yyerror(char* s);
+
+  void build_instruction(type::INSTRUCTION_TYPE ins_type)
+  {
+    if(!CommandBuilder::get_instance().build_instruction(ins_type)) 
+      yyerror("Error building instruction");
+  }
+
+  void build_directive(type::DIRECTIVE_TYPE dir_type)
+  {
+    if(!CommandBuilder::get_instance().build_directive(dir_type)) 
+      yyerror("Error building directive");
+  }
 %}
 
 
@@ -79,45 +97,45 @@ code:
 ;
 
 line:
-DIRECTIVE_WORD symbol_literal_list EOL { std::cout << ".word" << std::endl; }
-| DIRECTIVE_GLOBAL symbol_list EOL { std::cout << ".global" << std::endl; }
-| DIRECTIVE_EXTERN symbol_list EOL { std::cout << ".extern" << std::endl; }
-| DIRECTIVE_SECTION single_symbol EOL { std::cout << ".section" << std::endl; }
-| DIRECTIVE_SKIP all_num_literals EOL { std::cout << ".skip" << std::endl; }
-| DIRECTIVE_END EOL { std::cout << ".end" << std::endl; }
-| DIRECTIVE_ASCII string_literal EOL { std::cout << ".ascii" << std::endl; }
-| LABEL { std::cout << "labela: " << $1 << std::endl; }
-| INSTRUCTION_HALT EOL { std::cout << "halt" << std::endl; }
-| INSTRUCTION_INT EOL { std::cout << "int" << std::endl; }
-| INSTRUCTION_IRET EOL { std::cout << "iret" << std::endl; }
-| INSTRUCTION_RET EOL { std::cout << "ret" << std::endl; }
-| INSTRUCTION_CALL single_symbol EOL { std::cout << "call" << std::endl; }
-| INSTRUCTION_CALL all_num_literals EOL { std::cout << "call" << std::endl; }
-| INSTRUCTION_JMP single_symbol EOL { std::cout << "jmp" << std::endl; }
-| INSTRUCTION_JMP all_num_literals EOL { std::cout << "jmp" << std::endl; }
-| INSTRUCTION_BEQ single_gp_reg COMMA single_gp_reg COMMA single_symbol EOL { std::cout << "beq" << std::endl; }
-| INSTRUCTION_BEQ single_gp_reg COMMA single_gp_reg COMMA all_num_literals EOL { std::cout << "beq" << std::endl; }
-| INSTRUCTION_BNE single_gp_reg COMMA single_gp_reg COMMA single_symbol EOL { std::cout << "bne" << std::endl; }
-| INSTRUCTION_BNE single_gp_reg COMMA single_gp_reg COMMA all_num_literals EOL { std::cout << "bne" << std::endl; }
-| INSTRUCTION_BGT single_gp_reg COMMA single_gp_reg COMMA single_symbol EOL { std::cout << "bgt" << std::endl; }
-| INSTRUCTION_BGT single_gp_reg COMMA single_gp_reg COMMA all_num_literals EOL { std::cout << "bgt" << std::endl; }
-| INSTRUCTION_PUSH single_gp_reg EOL { std::cout << "push" << std::endl; }
-| INSTRUCTION_POP single_gp_reg EOL { std::cout << "pop" << std::endl; }
-| INSTRUCTION_XCHG single_gp_reg COMMA single_gp_reg EOL { std::cout << "xchg" << std::endl; }
-| INSTRUCTION_ADD single_gp_reg COMMA single_gp_reg EOL { std::cout << "add" << std::endl; }
-| INSTRUCTION_SUB single_gp_reg COMMA single_gp_reg EOL { std::cout << "sub" << std::endl; }
-| INSTRUCTION_MUL single_gp_reg COMMA single_gp_reg EOL { std::cout << "mul" << std::endl; }
-| INSTRUCTION_DIV single_gp_reg COMMA single_gp_reg EOL { std::cout << "div" << std::endl; }
-| INSTRUCTION_NOT single_gp_reg EOL { std::cout << "not" << std::endl; }
-| INSTRUCTION_AND single_gp_reg COMMA single_gp_reg EOL { std::cout << "and" << std::endl; }
-| INSTRUCTION_OR single_gp_reg COMMA single_gp_reg EOL { std::cout << "or" << std::endl; }
-| INSTRUCTION_XOR single_gp_reg COMMA single_gp_reg EOL { std::cout << "xor" << std::endl; }
-| INSTRUCTION_SHL single_gp_reg COMMA single_gp_reg EOL { std::cout << "shl" << std::endl; }
-| INSTRUCTION_SHR single_gp_reg COMMA single_gp_reg EOL { std::cout << "shr" << std::endl; }
-| INSTRUCTION_CSRRD single_cs_reg COMMA single_gp_reg EOL { std::cout << "csrrd" << std::endl; }
-| INSTRUCTION_CSRWR single_gp_reg COMMA single_cs_reg EOL { std::cout << "csrwr" << std::endl; }
-| INSTRUCTION_LD ld_st_operand COMMA single_gp_reg EOL { std::cout << "ld" << std::endl; }
-| INSTRUCTION_ST single_gp_reg COMMA ld_st_operand EOL { std::cout << "st" << std::endl; }
+DIRECTIVE_WORD symbol_literal_list EOL { std::cout << ".word" << std::endl; build_directive(type::DIRECTIVE_TYPE::WORD); }
+| DIRECTIVE_GLOBAL symbol_list EOL { std::cout << ".global" << std::endl; build_directive(type::DIRECTIVE_TYPE::GLOBAL); }
+| DIRECTIVE_EXTERN symbol_list EOL { std::cout << ".extern" << std::endl; build_directive(type::DIRECTIVE_TYPE::EXTERN); }
+| DIRECTIVE_SECTION single_symbol EOL { std::cout << ".section" << std::endl; build_directive(type::DIRECTIVE_TYPE::SECTION); }
+| DIRECTIVE_SKIP all_num_literals EOL { std::cout << ".skip" << std::endl; build_directive(type::DIRECTIVE_TYPE::SKIP); }
+| DIRECTIVE_END EOL { std::cout << ".end" << std::endl; build_directive(type::DIRECTIVE_TYPE::END); }
+| DIRECTIVE_ASCII string_literal EOL { std::cout << ".ascii" << std::endl; build_directive(type::DIRECTIVE_TYPE::ASCII); }
+| LABEL { std::cout << "labela: " << $1 << std::endl; /* TODO: implement label build */ }
+| INSTRUCTION_HALT EOL { std::cout << "halt" << std::endl; build_instruction(type::INSTRUCTION_TYPE::HALT); }
+| INSTRUCTION_INT EOL { std::cout << "int" << std::endl; build_instruction(type::INSTRUCTION_TYPE::INT); }
+| INSTRUCTION_IRET EOL { std::cout << "iret" << std::endl; build_instruction(type::INSTRUCTION_TYPE::IRET); }
+| INSTRUCTION_RET EOL { std::cout << "ret" << std::endl; build_instruction(type::INSTRUCTION_TYPE::RET); }
+| INSTRUCTION_CALL single_symbol EOL { std::cout << "call" << std::endl; build_instruction(type::INSTRUCTION_TYPE::CALL); }
+| INSTRUCTION_CALL all_num_literals EOL { std::cout << "call" << std::endl; build_instruction(type::INSTRUCTION_TYPE::CALL); }
+| INSTRUCTION_JMP single_symbol EOL { std::cout << "jmp" << std::endl; build_instruction(type::INSTRUCTION_TYPE::JMP); }
+| INSTRUCTION_JMP all_num_literals EOL { std::cout << "jmp" << std::endl; build_instruction(type::INSTRUCTION_TYPE::JMP); }
+| INSTRUCTION_BEQ single_gp_reg COMMA single_gp_reg COMMA single_symbol EOL { std::cout << "beq" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BEQ); }
+| INSTRUCTION_BEQ single_gp_reg COMMA single_gp_reg COMMA all_num_literals EOL { std::cout << "beq" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BEQ); }
+| INSTRUCTION_BNE single_gp_reg COMMA single_gp_reg COMMA single_symbol EOL { std::cout << "bne" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BNE); }
+| INSTRUCTION_BNE single_gp_reg COMMA single_gp_reg COMMA all_num_literals EOL { std::cout << "bne" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BNE); }
+| INSTRUCTION_BGT single_gp_reg COMMA single_gp_reg COMMA single_symbol EOL { std::cout << "bgt" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BGT); }
+| INSTRUCTION_BGT single_gp_reg COMMA single_gp_reg COMMA all_num_literals EOL { std::cout << "bgt" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BGT); }
+| INSTRUCTION_PUSH single_gp_reg EOL { std::cout << "push" << std::endl; build_instruction(type::INSTRUCTION_TYPE::PUSH); }
+| INSTRUCTION_POP single_gp_reg EOL { std::cout << "pop" << std::endl; build_instruction(type::INSTRUCTION_TYPE::POP); }
+| INSTRUCTION_XCHG single_gp_reg COMMA single_gp_reg EOL { std::cout << "xchg" << std::endl; build_instruction(type::INSTRUCTION_TYPE::XCHG); }
+| INSTRUCTION_ADD single_gp_reg COMMA single_gp_reg EOL { std::cout << "add" << std::endl; build_instruction(type::INSTRUCTION_TYPE::ADD); }
+| INSTRUCTION_SUB single_gp_reg COMMA single_gp_reg EOL { std::cout << "sub" << std::endl; build_instruction(type::INSTRUCTION_TYPE::SUB); }
+| INSTRUCTION_MUL single_gp_reg COMMA single_gp_reg EOL { std::cout << "mul" << std::endl; build_instruction(type::INSTRUCTION_TYPE::MUL); }
+| INSTRUCTION_DIV single_gp_reg COMMA single_gp_reg EOL { std::cout << "div" << std::endl; build_instruction(type::INSTRUCTION_TYPE::DIV); }
+| INSTRUCTION_NOT single_gp_reg EOL { std::cout << "not" << std::endl; build_instruction(type::INSTRUCTION_TYPE::NOT); }
+| INSTRUCTION_AND single_gp_reg COMMA single_gp_reg EOL { std::cout << "and" << std::endl; build_instruction(type::INSTRUCTION_TYPE::AND); }
+| INSTRUCTION_OR single_gp_reg COMMA single_gp_reg EOL { std::cout << "or" << std::endl; build_instruction(type::INSTRUCTION_TYPE::OR); }
+| INSTRUCTION_XOR single_gp_reg COMMA single_gp_reg EOL { std::cout << "xor" << std::endl; build_instruction(type::INSTRUCTION_TYPE::XOR); }
+| INSTRUCTION_SHL single_gp_reg COMMA single_gp_reg EOL { std::cout << "shl" << std::endl; build_instruction(type::INSTRUCTION_TYPE::SHL); }
+| INSTRUCTION_SHR single_gp_reg COMMA single_gp_reg EOL { std::cout << "shr" << std::endl; build_instruction(type::INSTRUCTION_TYPE::SHR); }
+| INSTRUCTION_CSRRD single_cs_reg COMMA single_gp_reg EOL { std::cout << "csrrd" << std::endl; build_instruction(type::INSTRUCTION_TYPE::CSRRD); }
+| INSTRUCTION_CSRWR single_gp_reg COMMA single_cs_reg EOL { std::cout << "csrwr" << std::endl; build_instruction(type::INSTRUCTION_TYPE::CSRWR); }
+| INSTRUCTION_LD ld_st_operand COMMA single_gp_reg EOL { std::cout << "ld" << std::endl; build_instruction(type::INSTRUCTION_TYPE::LD); }
+| INSTRUCTION_ST single_gp_reg COMMA ld_st_operand EOL { std::cout << "st" << std::endl; build_instruction(type::INSTRUCTION_TYPE::ST); }
 | EOL
 ;
 
@@ -133,40 +151,40 @@ symbol_literal_list COMMA symbol_literal_list
 ;
 
 single_symbol:
-SYMBOL { std::cout << "simbol: " << $1 << std::endl; }
+SYMBOL { std::cout << "simbol: " << $1 << std::endl;  CommandBuilder::get_instance().enque_param(new Symbol($1)); }
 ;
 
 all_num_literals:
-LITERAL_BIN { std::cout << "literal: " << std::stoi($1 + 2, 0, 2) << std::endl; }
-| LITERAL_OCT { std::cout << "literal: " << std::stoi($1, 0, 8) << std::endl; }
-| LITERAL_DEC { std::cout << "literal: " << std::stoi($1, 0, 10) << std::endl; }
-| LITERAL_HEX { std::cout << "literal: " << std::stoi($1, 0, 16) << std::endl; }
+LITERAL_BIN { std::cout << "literal: " << std::stoi($1 + 2, 0, 2) << std::endl; CommandBuilder::get_instance().enque_param(new Literal(std::stoi($1 + 2, 0, 2))); }
+| LITERAL_OCT { std::cout << "literal: " << std::stoi($1, 0, 8) << std::endl;   CommandBuilder::get_instance().enque_param(new Literal(std::stoi($1, 0, 8))); }
+| LITERAL_DEC { std::cout << "literal: " << std::stoi($1, 0, 10) << std::endl;  CommandBuilder::get_instance().enque_param(new Literal(std::stoi($1, 0, 10))); }
+| LITERAL_HEX { std::cout << "literal: " << std::stoi($1, 0, 16) << std::endl;  CommandBuilder::get_instance().enque_param(new Literal(std::stoi($1, 0, 16))); }
 ;
 
 string_literal:
-LITERAL_STRING { std::cout << "literal: " << $1 << std::endl; }
+LITERAL_STRING { std::cout << "literal: " << $1 << std::endl; CommandBuilder::get_instance().enque_param(new Literal($1)); }
 ;
 
 single_gp_reg:
-GP_REG { std::cout << "GP registar: " << $1 << std::endl; }
+GP_REG { std::cout << "GP registar: " << $1 << std::endl; CommandBuilder::get_instance().set_next_gp_reg(static_cast<type::GP_REG>($1)); }
 ;
 
 single_cs_reg:
-CS_REG { std::cout << "CS registar: " << $1 << std::endl; }
+CS_REG { std::cout << "CS registar: " << $1 << std::endl; CommandBuilder::get_instance().set_next_cs_reg(static_cast<type::CS_REG>($1)); }
 ;
 
 ld_st_operand:
-DOLLAR all_num_literals { std::cout << "immed" << std::endl; }
-| DOLLAR single_symbol { std::cout << "immed" << std::endl; }
-| all_num_literals { std::cout << "mem dir" << std::endl; }
-| single_symbol  { std::cout << "mem dir" << std::endl; }
-| single_cs_reg  { std::cout << "reg dir" << std::endl; }
-| single_gp_reg  { std::cout << "reg dir" << std::endl; }
-| SQUARE_BRACKET_L single_cs_reg SQUARE_BRACKET_R  { std::cout << "reg mem" << std::endl; }
-| SQUARE_BRACKET_L single_gp_reg SQUARE_BRACKET_R  { std::cout << "reg mem" << std::endl; }
-| SQUARE_BRACKET_L single_cs_reg PLUS all_num_literals SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; }
-| SQUARE_BRACKET_L single_gp_reg PLUS all_num_literals SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; }
-| SQUARE_BRACKET_L single_cs_reg PLUS single_symbol SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; }
-| SQUARE_BRACKET_L single_gp_reg PLUS single_symbol SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; }
+DOLLAR all_num_literals { std::cout << "immed" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::IMMED); }
+| DOLLAR single_symbol { std::cout << "immed" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::IMMED); }
+| all_num_literals { std::cout << "mem dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::MEM_DIR); }
+| single_symbol  { std::cout << "mem dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::MEM_DIR); }
+| single_cs_reg  { std::cout << "reg dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_DIR); }
+| single_gp_reg  { std::cout << "reg dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_DIR); }
+| SQUARE_BRACKET_L single_cs_reg SQUARE_BRACKET_R  { std::cout << "reg mem" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND); }
+| SQUARE_BRACKET_L single_gp_reg SQUARE_BRACKET_R  { std::cout << "reg mem" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND); }
+| SQUARE_BRACKET_L single_cs_reg PLUS all_num_literals SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
+| SQUARE_BRACKET_L single_gp_reg PLUS all_num_literals SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
+| SQUARE_BRACKET_L single_cs_reg PLUS single_symbol SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
+| SQUARE_BRACKET_L single_gp_reg PLUS single_symbol SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
 
 %%

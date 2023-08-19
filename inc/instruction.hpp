@@ -12,7 +12,7 @@ private:
   type::CS_REG cs_reg_0, cs_reg_1;
 
 public:
-  Instruction() : Command(type::INSTRUCTION) { }
+  Instruction() : Command(type::COMMAND_TYPE::INSTRUCTION) {}
 
   void set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES);
   type::MEMORY_ADDRESSING_MODES get_mem_addr_mode() const;
@@ -28,7 +28,6 @@ public:
   void set_cs_regs(type::CS_REG cs_reg_0, type::CS_REG cs_reg_1);
   type::CS_REG get_cs_reg_0() const; // XXX: maybe remove getters
   type::CS_REG get_cs_reg_1() const;
-
 };
 
 #endif
