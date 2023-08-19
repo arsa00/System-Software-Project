@@ -10,6 +10,10 @@ private:
   std::string name;
   uint32_t value;
 
+  // TODO: finish implementation
+  bool is_global = false;
+  // Section section; // TODO: add Section class
+
 public:
   Symbol(std::string name, uint32_t value = -1) : Parameter(type::PARAMETER_TYPE::SYMBOL)
   {
