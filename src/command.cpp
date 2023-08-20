@@ -31,9 +31,11 @@ void Command::move(Command &cmd)
   }
 }
 
-Command::Command(type::COMMAND_TYPE type) : type(type)
+Command::Command(type::COMMAND_TYPE type, unsigned int size)
 {
   // std::cout << "Def constructor..." << std::endl;
+  this->type = type;
+  this->size = size;
 }
 
 Command::Command(const Command &cmd)
@@ -106,4 +108,14 @@ Parameter *Command::deque_param()
   Parameter *param = this->params.front();
   this->params.pop_front();
   return param;
+}
+
+void Command::set_size(unsigned int size)
+{
+  this->size = size;
+}
+
+unsigned int Command::get_size() const
+{
+  return this->size;
 }

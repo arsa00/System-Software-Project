@@ -2,6 +2,7 @@
 #define SYMBOL_HPP
 
 #include "parameter.hpp"
+#include "section.hpp"
 #include <string>
 
 class Symbol : public Parameter
@@ -12,7 +13,7 @@ private:
 
   // TODO: finish implementation
   bool is_global = false;
-  // Section section; // TODO: add Section class
+  Section *section = nullptr;
 
 public:
   Symbol(std::string name, uint32_t value = -1) : Parameter(type::PARAMETER_TYPE::SYMBOL)
@@ -21,12 +22,18 @@ public:
     this->value = value;
   }
 
-  uint32_t get_value() const;
-  std::string get_name() const;
+  void set_section(Section *section);
+  Section *get_section() const;
 
+  void set_global_flag(bool global_flag);
+  bool get_global_flag() const;
+
+  uint32_t get_value() const;
   void set_value(uint32_t val);
+
   void set_name(std::string val);
   void set_name(char *val);
+  std::string get_name() const;
 
   Symbol *clone() const override;
 };

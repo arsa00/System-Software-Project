@@ -1,7 +1,8 @@
 ASSEMBLER_FILES = ./inc/*.hpp ./src/*.cpp
+AUXILIARY_FILES = ./auxiliary/inc/*.hpp ./auxiliary/src/*.cpp
 
 assembler:
-	g++ -g -o asembler $(ASSEMBLER_FILES) ./auxiliary/src/lexer.cpp ./auxiliary/src/parser.cpp ./auxiliary/inc/parser.hpp ./auxiliary/inc/exceptions.hpp
+	g++ -g -o asembler $(ASSEMBLER_FILES) $(AUXILIARY_FILES)
 
 
 clean: 

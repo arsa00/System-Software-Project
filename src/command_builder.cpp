@@ -1,6 +1,8 @@
 #include "../inc/command_builder.hpp"
 #include "../inc/all_instructions.hpp"
 #include "../inc/all_directives.hpp"
+#include "../inc/assembler.hpp"
+#include "../auxiliary/inc/converters.hpp"
 // TODO: maybe add validation in building process
 
 CommandBuilder &CommandBuilder::get_instance()
@@ -190,8 +192,10 @@ Instruction *CommandBuilder::build_instruction(type::INSTRUCTION_TYPE ins_alias)
 
   // if instruction is successfully created, clear builder's params list so that
   // builder can be again used without explicit call of clear_params method
-  if (ins)
-    this->clear_builder();
+  this->clear_builder();
+
+  if (!ins)
+    Assembler::get_instance().parse_error("Error occured while building " + converter::instruction_type_to_string(ins_alias) + " instruction");
 
   return ins;
 }
@@ -199,6 +203,7 @@ Instruction *CommandBuilder::build_instruction(type::INSTRUCTION_TYPE ins_alias)
 Directive *CommandBuilder::build_directive(type::DIRECTIVE_TYPE dir_alias)
 { // TODO: test build_directive
   Directive *dir = nullptr;
+  bool directive_executed = false; // for directives that are executed in the first round
 
   switch (dir_alias)
   {
@@ -209,15 +214,21 @@ Directive *CommandBuilder::build_directive(type::DIRECTIVE_TYPE dir_alias)
   }
   break;
   case type::DIRECTIVE_TYPE::EXTERN:
-  {
-    dir = new directive::EXTERN();
-    dir->set_params(this->get_params());
+  { // this directive is executed in first round of assembling
+    // XXX: maybe check if Parameter is instance of Symbol
+    Symbol *sym = (Symbol *)this->deque_param();
+    sym->set_global_flag(true);
+    Assembler::get_instance().add_symbol(sym);
+    directive_executed = true;
   }
   break;
   case type::DIRECTIVE_TYPE::SECTION:
-  {
-    dir = new directive::SECTION();
-    dir->set_params(this->get_params());
+  { // this directive is executed in first round of assembling
+    // XXX: maybe check if Parameter is instance of Symbol
+    Symbol *sym = (Symbol *)this->deque_param();
+    Assembler::get_instance().add_section(sym->get_name());
+    delete sym; // delete symbol, because it is no longer used (just it's name)
+    directive_executed = true;
   }
   break;
   case type::DIRECTIVE_TYPE::WORD:
@@ -246,10 +257,12 @@ Directive *CommandBuilder::build_directive(type::DIRECTIVE_TYPE dir_alias)
     // TODO: maybe add EQU?
   }
 
-  // if directive is successfully created, clear builder's params list so that
-  // builder can be again used without explicit call of clear_params method
-  if (dir)
-    this->clear_builder();
+  // clear builder's params list so that builder can be again used,
+  // without explicit call of clear_params method
+  this->clear_builder();
+
+  if (!dir && !directive_executed)
+    Assembler::get_instance().parse_error("Error occured while building " + converter::directive_type_to_string(dir_alias) + " directive");
 
   return dir;
 }

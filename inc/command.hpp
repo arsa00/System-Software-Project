@@ -3,7 +3,7 @@
 
 #include "types.hpp"
 #include "parameter.hpp"
-#include<list>
+#include <list>
 
 class Command
 {
@@ -13,24 +13,33 @@ private:
   void move(Command &);
 
 protected:
+  /* XXX:
+    params list have copies of symbols (orginal are in Assembler's symbol_table) and original literals,
+    so Command class is fully responsible for cleaning memory of it's parameters,
+    considering that instances of those parameters belong only to that Command.
+  */
+  std::list<Parameter *> params;
   type::COMMAND_TYPE type;
-  std::list<Parameter*> params;
+  unsigned int size = 0;
 
 public:
-  Command(type::COMMAND_TYPE type);
+  Command(type::COMMAND_TYPE type, unsigned int size = 0);
 
   Command(const Command &);
   Command(Command &&);
-  Command& operator=(const Command &);
-  Command& operator=(Command &&);
+  Command &operator=(const Command &);
+  Command &operator=(Command &&);
   ~Command();
-  
-  void set_params(const std::list<Parameter*> &params);
-  std::list<Parameter*> get_params() const;
+
+  void set_params(const std::list<Parameter *> &params);
+  std::list<Parameter *> get_params() const;
   void delete_params();
   void clear_params();
   void enque_param(Parameter *param);
-  Parameter* deque_param();
+  Parameter *deque_param();
+
+  void set_size(unsigned int);
+  unsigned int get_size() const;
 
   virtual void execute() const = 0;
 };
