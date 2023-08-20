@@ -22,8 +22,8 @@ public:
   ~Section();
 
   // no need for copying or moving operations
-  // Section(const Section &) = delete;
-  // Section &operator=(const Section &) = delete;
+  Section(const Section &) = delete;
+  Section &operator=(const Section &) = delete;
 
   unsigned int get_curr_loc_cnt() const;
   unsigned int get_length() const;

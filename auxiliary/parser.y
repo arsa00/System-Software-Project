@@ -14,14 +14,14 @@
   void build_instruction(type::INSTRUCTION_TYPE ins_type)
   {
     Instruction *ins = CommandBuilder::get_instance().build_instruction(ins_type);
-    if(!ins) 
+    if(ins) 
       Assembler::get_instance().add_command(ins);
   }
 
   void build_directive(type::DIRECTIVE_TYPE dir_type)
   {
     Directive *dir = CommandBuilder::get_instance().build_directive(dir_type);
-    if(!dir) 
+    if(dir) 
       Assembler::get_instance().add_command(dir);
   }
 %}

@@ -12,8 +12,9 @@ Section::Section(char *name)
 
 Section::~Section()
 {
-  while (auto cmd = this->commands.front())
+  while (!this->commands.empty())
   {
+    auto cmd = this->commands.front();
     this->commands.pop_front();
     delete cmd;
   }
