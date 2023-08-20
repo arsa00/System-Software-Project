@@ -36,7 +36,7 @@ void Assembler::add_symbol(Symbol *sym)
   if (this->symbol_table.find(sym->get_name()) != this->symbol_table.end())
     return;
 
-  sym->set_section(curr_section);
+  sym->set_section(this->curr_section);
   symbol_table[sym->get_name()] = sym;
 }
 
@@ -56,12 +56,16 @@ void Assembler::add_section(std::string section_name)
   {
     new_section = new Section(section_name);
     this->section_table[section_name] = new_section;
+    std::cout << "[ASSEMBLER]: "
+              << "created section with name: " << new_section->get_name() << std::endl;
   }
 
   if (!new_section)
-    new_section = section_table[section_name];
+    new_section = this->section_table[section_name];
 
-  curr_section = new_section;
+  this->curr_section = new_section;
+
+  std::cout << "[ASSEMBLER]: finished " << this->section_table[section_name]->get_name() << std::endl;
 }
 
 void Assembler::add_command(Command *cmd)

@@ -1,3 +1,4 @@
+#.section .text
 .word 0x0c, .abc, qwe, 22, 0b011, 0b1010, 017, 19
 #komentar 1
 .section .text
@@ -5,7 +6,7 @@
 .global t, m, d, lj, an, ak, j
 .extern _akiano_, .22
 #komentar 3
-.section .bss
+#.section .bss
    skok_labela: 
 .ascii "Proba definisanja stri\"nga 'navodi' 9876543210#@!~`=+*&\-_-/=?%$w \
 *** nov red! ***"

@@ -106,7 +106,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 27 "./auxiliary/parser.y"
+#line 30 "./auxiliary/parser.y"
 
   char *symbol_name;
   char *literal_value;

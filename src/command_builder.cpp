@@ -3,6 +3,7 @@
 #include "../inc/all_directives.hpp"
 #include "../inc/assembler.hpp"
 #include "../auxiliary/inc/converters.hpp"
+#include <iostream>
 // TODO: maybe add validation in building process
 
 CommandBuilder &CommandBuilder::get_instance()
@@ -229,6 +230,7 @@ Directive *CommandBuilder::build_directive(type::DIRECTIVE_TYPE dir_alias)
   { // this directive is executed in first round of assembling
     // XXX: maybe check if Parameter is instance of Symbol
     Symbol *sym = (Symbol *)this->deque_param();
+    std::cout << "[CMD_BUILDER->.section]: " << sym->get_name() << std::endl;
     Assembler::get_instance().add_section(sym->get_name());
     delete sym; // delete symbol, because it is no longer used (just it's name)
     directive_executed = true;
@@ -267,6 +269,7 @@ Directive *CommandBuilder::build_directive(type::DIRECTIVE_TYPE dir_alias)
   if (!dir && !directive_executed)
     Assembler::get_instance().parse_error("Error occured while building " + converter::directive_type_to_string(dir_alias) + " directive");
 
+  std::cout << "[CMD_BUILDER]: finished" << std::endl;
   return dir;
 }
 
