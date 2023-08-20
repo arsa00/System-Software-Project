@@ -172,6 +172,9 @@ Instruction *CommandBuilder::build_instruction(type::INSTRUCTION_TYPE ins_alias)
     ins->set_mem_addr_mode(this->mem_addr_mode);
     ins->set_gp_reg_0(this->gp_reg_0);
     ins->set_params(this->get_params());
+    if (this->mem_addr_mode == type::MEMORY_ADDRESSING_MODES::IMMED)
+      Assembler::get_instance().parse_error("Error occured while building " + converter::instruction_type_to_string(ins_alias) + " instruction. \
+Unallowed combination of memory addressing mode and instruction parameters.");
   }
   break;
   case type::INSTRUCTION_TYPE::CSRRD:
