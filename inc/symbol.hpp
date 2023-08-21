@@ -13,20 +13,20 @@ private:
 
   // TODO: finish implementation
   bool is_global = false;
+  bool is_defined = false;
   Section *section = nullptr;
 
 public:
-  Symbol(std::string name, uint32_t value = -1) : Parameter(type::PARAMETER_TYPE::SYMBOL)
-  {
-    this->name = name;
-    this->value = value;
-  }
+  Symbol(std::string name, uint32_t value = -1);
 
   void set_section(Section *section);
   Section *get_section() const;
 
   void set_global_flag(bool global_flag);
   bool get_global_flag() const;
+
+  void set_defined_flag(bool defined_flag);
+  bool get_defined_flag() const;
 
   uint32_t get_value() const;
   void set_value(uint32_t val);

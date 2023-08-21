@@ -20,7 +20,8 @@ private:
   Section *curr_section;
 
   bool is_first_round = false;
-  bool parsing_error = false;
+  bool parsing_err = false;
+  bool internal_err = false;
 
   // TODO: add object file field and (maybe?) ObjectFile class
 
@@ -33,11 +34,21 @@ public:
   static Assembler &get_instance();
 
   bool run();
-  void add_symbol(Symbol *);
+
+  // create and define symbol if symbol is not alredy created
+  // if it is created, set section and value (and defined flag) ==> define symbol
+  Symbol *add_symbol(std::string name);
+  Symbol *add_symbol(char *name);
+
+  // create/declare not-defined symbol
+  Symbol *create_symbol(std::string name);
+  Symbol *create_symbol(char *name);
+
   void add_section(std::string section_name);
-  void add_command(Command *);
+  void add_command(Command *cmd);
 
   void parse_error(std::string err_msg);
+  void internal_error(std::string err_msg);
 };
 
 #endif

@@ -1554,7 +1554,7 @@ yyreduce:
 
   case 11:
 #line 110 "./auxiliary/parser.y"
-        { std::cout << "labela: " << (yyvsp[0].symbol_name) << std::endl; Assembler::get_instance().add_symbol(new Symbol((yyvsp[0].symbol_name))); }
+        { std::cout << "labela: " << (yyvsp[0].symbol_name) << std::endl; Assembler::get_instance().add_symbol((yyvsp[0].symbol_name)); }
 #line 1559 "./auxiliary/src/parser.cpp"
     break;
 
@@ -1746,7 +1746,7 @@ yyreduce:
 
   case 49:
 #line 157 "./auxiliary/parser.y"
-       { std::cout << "simbol: " << (yyvsp[0].symbol_name) << std::endl;  CommandBuilder::get_instance().enque_param(new Symbol((yyvsp[0].symbol_name))); }
+       { std::cout << "simbol: " << (yyvsp[0].symbol_name) << std::endl;  CommandBuilder::get_instance().enque_param(Assembler::get_instance().create_symbol((yyvsp[0].symbol_name))); }
 #line 1751 "./auxiliary/src/parser.cpp"
     break;
 

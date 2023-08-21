@@ -222,7 +222,7 @@ Directive *CommandBuilder::build_directive(type::DIRECTIVE_TYPE dir_alias)
     // XXX: maybe check if Parameter is instance of Symbol
     Symbol *sym = (Symbol *)this->deque_param();
     sym->set_global_flag(true);
-    Assembler::get_instance().add_symbol(sym);
+    sym->set_defined_flag(true);
     directive_executed = true;
   }
   break;
@@ -232,7 +232,6 @@ Directive *CommandBuilder::build_directive(type::DIRECTIVE_TYPE dir_alias)
     Symbol *sym = (Symbol *)this->deque_param();
     std::cout << "[CMD_BUILDER->.section]: " << sym->get_name() << std::endl;
     Assembler::get_instance().add_section(sym->get_name());
-    delete sym; // delete symbol, because it is no longer used (just it's name)
     directive_executed = true;
   }
   break;

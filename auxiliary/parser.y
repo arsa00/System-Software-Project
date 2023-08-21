@@ -107,7 +107,7 @@ DIRECTIVE_WORD symbol_literal_list EOL { std::cout << ".word" << std::endl; buil
 | DIRECTIVE_SKIP all_num_literals EOL { std::cout << ".skip" << std::endl; build_directive(type::DIRECTIVE_TYPE::SKIP); }
 | DIRECTIVE_END EOL { std::cout << ".end" << std::endl; build_directive(type::DIRECTIVE_TYPE::END); }
 | DIRECTIVE_ASCII string_literal EOL { std::cout << ".ascii" << std::endl; build_directive(type::DIRECTIVE_TYPE::ASCII); }
-| LABEL { std::cout << "labela: " << $1 << std::endl; Assembler::get_instance().add_symbol(new Symbol($1)); }
+| LABEL { std::cout << "labela: " << $1 << std::endl; Assembler::get_instance().add_symbol($1); }
 | INSTRUCTION_HALT EOL { std::cout << "halt" << std::endl; build_instruction(type::INSTRUCTION_TYPE::HALT); }
 | INSTRUCTION_INT EOL { std::cout << "int" << std::endl; build_instruction(type::INSTRUCTION_TYPE::INT); }
 | INSTRUCTION_IRET EOL { std::cout << "iret" << std::endl; build_instruction(type::INSTRUCTION_TYPE::IRET); }
@@ -154,7 +154,7 @@ symbol_literal_list COMMA symbol_literal_list
 ;
 
 single_symbol:
-SYMBOL { std::cout << "simbol: " << $1 << std::endl;  CommandBuilder::get_instance().enque_param(new Symbol($1)); }
+SYMBOL { std::cout << "simbol: " << $1 << std::endl;  CommandBuilder::get_instance().enque_param(Assembler::get_instance().create_symbol($1)); }
 ;
 
 all_num_literals:

@@ -14,9 +14,9 @@ private:
 
 protected:
   /* XXX:
-    params list have copies of symbols (orginal are in Assembler's symbol_table) and original literals,
-    so Command class is fully responsible for cleaning memory of it's parameters,
-    considering that instances of those parameters belong only to that Command.
+    params list have original symbols (pointers) from Assembler's symbol_table,
+    so Command class is NOT responsible for cleaning memory of symbols in params list.
+    However, Command class is fully responsible cleaning memory of all literals in it's params list.
   */
   std::list<Parameter *> params;
   type::COMMAND_TYPE type;

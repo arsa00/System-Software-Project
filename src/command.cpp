@@ -7,7 +7,8 @@ void Command::destroy()
   while ((param = this->deque_param()))
   {
     // std::cout << "Deleting parameter..." << std::endl;
-    delete param;
+    if (param->get_type() == type::PARAMETER_TYPE::LITERAL)
+      delete param;
   }
 }
 
