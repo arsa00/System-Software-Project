@@ -7,7 +7,8 @@ namespace type
   enum class PARAMETER_TYPE
   {
     SYMBOL = 0,
-    LITERAL
+    LITERAL,
+    SECTION
   };
   enum class COMMAND_TYPE
   {

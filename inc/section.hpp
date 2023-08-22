@@ -8,7 +8,7 @@
 #include <string>
 #include <list>
 
-class Section
+class Section : public Parameter
 {
 private:
   std::string name;

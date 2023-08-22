@@ -1,11 +1,11 @@
 #include "../inc/section.hpp"
 
-Section::Section(std::string name)
+Section::Section(std::string name) : Parameter(type::PARAMETER_TYPE::SECTION)
 {
   this->name = name;
 }
 
-Section::Section(char *name)
+Section::Section(char *name) : Parameter(type::PARAMETER_TYPE::SECTION)
 {
   this->name.assign(name);
 }

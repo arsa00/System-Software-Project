@@ -45,6 +45,13 @@ void Assembler::internal_error(std::string err_msg)
   std::cerr << "[ASSEMBLER]: { INTERNAL ERROR: " << err_msg << " }" << std::endl;
 }
 
+void Assembler::set_id_to_sym(Parameter *param)
+{
+  bool res = param->set_id(this->symbol_id);
+  if (res)
+    this->symbol_id++;
+}
+
 Symbol *Assembler::add_symbol(std::string name)
 {
   if (!this->curr_section)
@@ -72,6 +79,7 @@ Symbol *Assembler::add_symbol(std::string name)
   sym->set_section(this->curr_section);
   sym->set_value(this->curr_section->get_curr_loc_cnt());
   sym->set_defined_flag(true);
+  this->set_id_to_sym(sym);
 
   return sym;
 }
@@ -109,6 +117,7 @@ void Assembler::add_section(std::string section_name)
   if (this->section_table.find(section_name) == this->section_table.end())
   {
     new_section = new Section(section_name);
+    this->set_id_to_sym(new_section);
     this->section_table[section_name] = new_section;
     std::cout << "[ASSEMBLER]: "
               << "created section with name: " << new_section->get_name() << std::endl;

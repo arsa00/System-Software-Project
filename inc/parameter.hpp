@@ -7,12 +7,17 @@ class Parameter
 {
 private:
   type::PARAMETER_TYPE type;
-  
-public:
-  Parameter(type::PARAMETER_TYPE type) : type(type) { }
+  int id = -1;
 
-  virtual Parameter* clone() const;
+public:
+  Parameter(type::PARAMETER_TYPE type) : type(type) {}
+
+  virtual Parameter *clone() const;
   type::PARAMETER_TYPE get_type() const { return type; }
+
+  // this methods are not supported for literals, therefor are virtual
+  virtual bool set_id(int id);
+  virtual int get_id();
 };
 
 #endif

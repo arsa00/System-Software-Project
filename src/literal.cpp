@@ -13,3 +13,6 @@ void Literal::set_str_value(std::string val) { this->str_value = val; }
 void Literal::set_str_value(char *val) { this->str_value.assign(val); }
 
 Literal *Literal::clone() const { return new Literal(*this); }
+
+bool Literal::set_id(int id) { return false; }
+int Literal::get_id() { return -1; }

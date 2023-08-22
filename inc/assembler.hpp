@@ -23,6 +23,7 @@ private:
   bool is_first_round = false;
   bool parsing_err = false;
   bool internal_err = false;
+  int symbol_id = 0;
 
   // TODO: add object file field and (maybe?) ObjectFile class
 
@@ -30,6 +31,8 @@ private:
   Assembler(const Assembler &) = delete;
   Assembler &operator=(const Assembler &) = delete;
   ~Assembler();
+
+  void set_id_to_sym(Parameter *param);
 
 public:
   static Assembler &get_instance();
