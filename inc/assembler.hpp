@@ -18,6 +18,7 @@ private:
   std::unordered_map<std::string, Section *> section_table;
 
   Section *curr_section;
+  Section *no_data_section;
 
   bool is_first_round = false;
   bool parsing_err = false;
@@ -25,7 +26,7 @@ private:
 
   // TODO: add object file field and (maybe?) ObjectFile class
 
-  Assembler() {}
+  Assembler();
   Assembler(const Assembler &) = delete;
   Assembler &operator=(const Assembler &) = delete;
   ~Assembler();

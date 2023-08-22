@@ -120,3 +120,13 @@ unsigned int Command::get_size() const
 {
   return this->size;
 }
+
+void Command::set_generate_data_flag(bool flag_value)
+{
+  this->is_generating_data = flag_value;
+}
+
+bool Command::get_generate_data_flag()
+{
+  return this->is_generating_data;
+}

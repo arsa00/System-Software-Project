@@ -7,6 +7,12 @@ Assembler &Assembler::get_instance()
   return assembler_instance;
 }
 
+Assembler::Assembler()
+{
+  std::cout << "[ASSEMBLER]: Created Assembler instance." << std::endl;
+  this->no_data_section = new Section("__NO_DATA_SECTION__");
+}
+
 Assembler::~Assembler()
 {
   while (!this->symbol_table.empty())
@@ -22,6 +28,8 @@ Assembler::~Assembler()
     this->section_table.erase(iter_begin);
     delete iter_begin->second;
   }
+
+  delete this->no_data_section;
 }
 
 void Assembler::parse_error(std::string err_msg)
@@ -116,6 +124,14 @@ void Assembler::add_section(std::string section_name)
 
 void Assembler::add_command(Command *cmd)
 {
+  // if there is no active section and command doesn't emit any data
+  // add it to the __NO_DATA_SECTION__
+  if (!this->curr_section && !cmd->get_generate_data_flag())
+  {
+    this->no_data_section->add_command(cmd);
+    return;
+  }
+
   if (!this->curr_section)
   {
     this->parse_error("No section opened. Cannot add command.");

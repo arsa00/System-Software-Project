@@ -21,6 +21,7 @@ protected:
   std::list<Parameter *> params;
   type::COMMAND_TYPE type;
   unsigned int size = 0;
+  bool is_generating_data = true;
 
 public:
   Command(type::COMMAND_TYPE type, unsigned int size = 0);
@@ -40,6 +41,9 @@ public:
 
   void set_size(unsigned int);
   unsigned int get_size() const;
+
+  void set_generate_data_flag(bool flag_value);
+  bool get_generate_data_flag();
 
   virtual void execute() const = 0;
 };
