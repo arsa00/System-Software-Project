@@ -27,12 +27,29 @@ void instruction::INT::execute(Section *dest_section) const
 }
 
 instruction::IRET::IRET()
-{ // TODO: implement constructor
+{
+  this->size = 8;
+  this->is_generating_data = true;
 }
 
 void instruction::IRET::execute(Section *dest_section) const
-{
-  // TODO: implement IRET execute
+{ // TODO: create auxiliary functions for bitwise operations
+  // pop pc:
+  type::byte byte1 = 0b10010011; // OC=1001, MMMM = 0011
+  type::byte byte2 = ((static_cast<type::byte>(type::GP_REG::PC) << 4) & 0xF0) | (static_cast<type::byte>(type::GP_REG::SP) & 0x0F);
+  byte2 &= 0xFF;
+
+  int temp = (-4) & 0x0FFF; // disp = -4
+  type::byte byte3 = (temp >> 8) & 0x00FF;
+  type::byte byte4 = temp & 0x00FF;
+  dest_section->write_byte_arr({byte1, byte2, byte3, byte4});
+
+  // pop status
+  byte1 = 0b10010111; // OC=1001, MMMM = 0111
+  byte2 = ((static_cast<type::byte>(type::CS_REG::STATUS_REG) << 4) & 0xF0) | (static_cast<type::byte>(type::GP_REG::SP) & 0x0F);
+  byte2 &= 0xFF;
+  // byte3 and byte4 are same (disp is same)
+  dest_section->write_byte_arr({byte1, byte2, byte3, byte4});
 }
 
 instruction::CALL::CALL()

@@ -136,8 +136,10 @@ void test3()
   Section *section = new Section(".test3");
   Command *halt_cmd = new instruction::HALT();
   Command *int_cmd = new instruction::INT();
+  Command *iret_cmd = new instruction::IRET();
 
   int_cmd->execute(section);
+  iret_cmd->execute(section);
   halt_cmd->execute(section);
 
   section->print_output_file();
