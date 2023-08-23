@@ -3,136 +3,240 @@
 #include "../inc/literal.hpp"
 #include <iostream>
 
-void instruction::HALT::execute() const
+instruction::HALT::HALT()
+{ // TODO: implement constructor
+}
+
+void instruction::HALT::execute(Section *dest_section) const
 { // TODO: implement HALT execute
   std::cout << "-----------------------------" << std::endl;
   std::cout << "HALT INSTRUCTION EXECUTED" << std::endl;
   std::cout << "-----------------------------" << std::endl;
 }
 
-void instruction::INT::execute() const
+instruction::INT::INT()
+{ // TODO: implement constructor
+}
+
+void instruction::INT::execute(Section *dest_section) const
 { // TODO: implement INT execute
   std::cout << "-----------------------------" << std::endl;
   std::cout << "INT INSTRUCTION EXECUTED" << std::endl;
   std::cout << "-----------------------------" << std::endl;
 }
 
-void instruction::IRET::execute() const 
+instruction::IRET::IRET()
+{ // TODO: implement constructor
+}
+
+void instruction::IRET::execute(Section *dest_section) const
 {
   // TODO: implement IRET execute
 }
 
-void instruction::CALL::execute() const 
+instruction::CALL::CALL()
+{ // TODO: implement constructor
+}
+
+void instruction::CALL::execute(Section *dest_section) const
 {
   // TODO: implement CALL execute
 }
 
-void instruction::RET::execute() const 
+instruction::RET::RET()
+{ // TODO: implement constructor
+}
+
+void instruction::RET::execute(Section *dest_section) const
 {
   // TODO: implement RET execute
 }
 
-void instruction::JMP::execute() const 
+instruction::JMP::JMP()
+{ // TODO: implement constructor
+}
+
+void instruction::JMP::execute(Section *dest_section) const
 {
   // TODO: implement JMP execute
 }
 
-void instruction::BEQ::execute() const 
+instruction::BEQ::BEQ()
+{ // TODO: implement constructor
+}
+
+void instruction::BEQ::execute(Section *dest_section) const
 {
   // TODO: implement BEQ execute
 }
 
-void instruction::BNE::execute() const 
+instruction::BNE::BNE()
+{ // TODO: implement constructor
+}
+
+void instruction::BNE::execute(Section *dest_section) const
 {
   // TODO: implement BNE execute
 }
 
-void instruction::BGT::execute() const 
+instruction::BGT::BGT()
+{ // TODO: implement constructor
+}
+
+void instruction::BGT::execute(Section *dest_section) const
 {
   // TODO: implement BGT execute
 }
 
-void instruction::PUSH::execute() const 
+instruction::PUSH::PUSH()
+{ // TODO: implement constructor
+}
+
+void instruction::PUSH::execute(Section *dest_section) const
 {
   // TODO: implement PUSH execute
 }
 
-void instruction::POP::execute() const 
+instruction::POP::POP()
+{ // TODO: implement constructor
+}
+
+void instruction::POP::execute(Section *dest_section) const
 {
   // TODO: implement POP execute
 }
 
-void instruction::XCHG::execute() const 
+instruction::XCHG::XCHG()
+{ // TODO: implement constructor
+}
+
+void instruction::XCHG::execute(Section *dest_section) const
 {
   // TODO: implement XCHG execute
 }
 
-void instruction::ADD::execute() const 
+instruction::ADD::ADD()
+{ // TODO: implement constructor
+}
+
+void instruction::ADD::execute(Section *dest_section) const
 {
   // TODO: implement ADD execute
 }
 
-void instruction::SUB::execute() const 
+instruction::SUB::SUB()
+{ // TODO: implement constructor
+}
+
+void instruction::SUB::execute(Section *dest_section) const
 {
   // TODO: implement SUB execute
 }
 
-void instruction::MUL::execute() const 
+instruction::MUL::MUL()
+{ // TODO: implement constructor
+}
+
+void instruction::MUL::execute(Section *dest_section) const
 {
   // TODO: implement MUL execute
 }
 
-void instruction::DIV::execute() const 
+instruction::DIV::DIV()
+{ // TODO: implement constructor
+}
+
+void instruction::DIV::execute(Section *dest_section) const
 {
   // TODO: implement DIV execute
 }
 
-void instruction::NOT::execute() const 
+instruction::NOT::NOT()
+{ // TODO: implement constructor
+}
+
+void instruction::NOT::execute(Section *dest_section) const
 {
   // TODO: implement NOT execute
 }
 
-void instruction::AND::execute() const 
+instruction::AND::AND()
+{ // TODO: implement constructor
+}
+
+void instruction::AND::execute(Section *dest_section) const
 {
   // TODO: implement AND execute
 }
 
-void instruction::OR::execute() const 
+instruction::OR::OR()
+{ // TODO: implement constructor
+}
+
+void instruction::OR::execute(Section *dest_section) const
 {
   // TODO: implement OR execute
 }
 
-void instruction::XOR::execute() const 
+instruction::XOR::XOR()
+{ // TODO: implement constructor
+}
+
+void instruction::XOR::execute(Section *dest_section) const
 {
   // TODO: implement XOR execute
 }
 
-void instruction::SHL::execute() const 
+instruction::SHL::SHL()
+{ // TODO: implement constructor
+}
+
+void instruction::SHL::execute(Section *dest_section) const
 {
   // TODO: implement SHL execute
 }
 
-void instruction::SHR::execute() const 
+instruction::SHR::SHR()
+{ // TODO: implement constructor
+}
+
+void instruction::SHR::execute(Section *dest_section) const
 {
   // TODO: implement SHR execute
 }
 
-void instruction::LD::execute() const 
+instruction::LD::LD()
+{ // TODO: implement constructor
+}
+
+void instruction::LD::execute(Section *dest_section) const
 {
   // TODO: implement LD execute
 }
 
-void instruction::ST::execute() const 
+instruction::ST::ST()
+{ // TODO: implement constructor
+}
+
+void instruction::ST::execute(Section *dest_section) const
 {
   // TODO: implement ST execute
 }
 
-void instruction::CSRRD::execute() const 
+instruction::CSRRD::CSRRD()
+{ // TODO: implement constructor
+}
+
+void instruction::CSRRD::execute(Section *dest_section) const
 {
   // TODO: implement CSRRD execute
 }
 
-void instruction::CSRWR::execute() const 
+instruction::CSRWR::CSRWR()
+{ // TODO: implement constructor
+}
+
+void instruction::CSRWR::execute(Section *dest_section) const
 {
   // TODO: implement CSRWR execute
 }

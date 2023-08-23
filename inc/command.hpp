@@ -3,6 +3,7 @@
 
 #include "types.hpp"
 #include "parameter.hpp"
+#include "section.hpp"
 #include <list>
 
 class Command
@@ -45,7 +46,7 @@ public:
   void set_generate_data_flag(bool flag_value);
   bool get_generate_data_flag();
 
-  virtual void execute() const = 0;
+  virtual void execute(Section *dest_section) const = 0;
 };
 
 #endif
