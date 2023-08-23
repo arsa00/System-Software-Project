@@ -39,6 +39,9 @@ public:
   std::list<Command *> get_all_commands() const;
   void execute_all_commands();
 
+  std::vector<type::byte> get_output_file() const;
+  void print_output_file(type::byte line_width = 4, type::byte mode = 0) const;
+
   void write_byte_arr(std::vector<type::byte> arr);
   void write_byte(type::byte single_byte);
 };

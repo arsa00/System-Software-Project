@@ -2,27 +2,28 @@
 #include "../inc/symbol.hpp"
 #include "../inc/literal.hpp"
 #include <iostream>
+#include <vector>
 
 instruction::HALT::HALT()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::HALT::execute(Section *dest_section) const
-{ // TODO: implement HALT execute
-  std::cout << "-----------------------------" << std::endl;
-  std::cout << "HALT INSTRUCTION EXECUTED" << std::endl;
-  std::cout << "-----------------------------" << std::endl;
+{
+  std::vector<type::byte> ins_data = {0, 0, 0, 0};
+  dest_section->write_byte_arr(ins_data);
 }
 
 instruction::INT::INT()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::INT::execute(Section *dest_section) const
-{ // TODO: implement INT execute
-  std::cout << "-----------------------------" << std::endl;
-  std::cout << "INT INSTRUCTION EXECUTED" << std::endl;
-  std::cout << "-----------------------------" << std::endl;
+{
+  std::vector<type::byte> ins_data = {0x10, 0, 0, 0};
+  dest_section->write_byte_arr(ins_data);
 }
 
 instruction::IRET::IRET()

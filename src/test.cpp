@@ -5,6 +5,8 @@
 #include "../inc/instruction.hpp"
 #include <iostream>
 #include "../inc/command_builder.hpp"
+#include "../inc/section.hpp"
+#include <vector>
 
 void test1()
 {
@@ -123,4 +125,20 @@ void test2()
   dir = CommandBuilder::get_instance().build_directive(type::DIRECTIVE_TYPE::GLOBAL);
   dir->execute(nullptr);
   delete dir;
+}
+
+void test3()
+{
+  std::cout << std::endl
+            << "----------- TEST 3 ----------- " << std::endl
+            << std::endl;
+
+  Section *section = new Section(".test3");
+  Command *halt_cmd = new instruction::HALT();
+  Command *int_cmd = new instruction::INT();
+
+  int_cmd->execute(section);
+  halt_cmd->execute(section);
+
+  section->print_output_file();
 }
