@@ -38,7 +38,7 @@ void test1()
     params.pop_front();
   }
 
-  ins->execute();
+  ins->execute(nullptr);
 
   // test copy constructor and destructor for instructions
   instruction::HALT halt_ins = (instruction::HALT &)(*ins);
@@ -46,7 +46,7 @@ void test1()
 
   delete ins;
 
-  ins2->execute();
+  ins2->execute(nullptr);
 
   Command *ins3 = new instruction::HALT();
   ins3->set_params(ins2->get_params());
@@ -103,7 +103,7 @@ void test2()
     params.pop_front();
   }
 
-  ins->execute();
+  ins->execute(nullptr);
   delete ins;
 
   // CommandBuilder::get_instance().enque_param(symbol);
@@ -111,16 +111,16 @@ void test2()
   CommandBuilder::get_instance().enque_param(new Symbol("test_builder"));
   CommandBuilder::get_instance().enque_param(new Symbol(".working"));
   Directive *dir = CommandBuilder::get_instance().build_directive(type::DIRECTIVE_TYPE::GLOBAL);
-  dir->execute();
+  dir->execute(nullptr);
   delete dir;
 
   ins = CommandBuilder::get_instance().build_instruction(type::INSTRUCTION_TYPE::INT);
-  ins->execute();
+  ins->execute(nullptr);
   delete ins;
 
   CommandBuilder::get_instance().enque_param(new Symbol(".extern.text"));
   CommandBuilder::get_instance().enque_param(new Symbol("_working_"));
   dir = CommandBuilder::get_instance().build_directive(type::DIRECTIVE_TYPE::GLOBAL);
-  dir->execute();
+  dir->execute(nullptr);
   delete dir;
 }

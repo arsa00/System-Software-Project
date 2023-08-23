@@ -7,7 +7,7 @@ directive::GLOBAL::GLOBAL()
 { // TODO: implement constructor
 }
 
-void directive::GLOBAL::execute() const
+void directive::GLOBAL::execute(Section *dest_section) const
 { // TODO: implement GLOBAL execute
   std::cout << "-----------------------------" << std::endl;
   std::cout << "GLOBAL DIRECTIVE EXECUTED. Symbol list: " << std::endl;
@@ -25,7 +25,7 @@ directive::EXTERN::EXTERN()
 { // TODO: implement constructor
 }
 
-void directive::EXTERN::execute() const
+void directive::EXTERN::execute(Section *dest_section) const
 { // TODO: implement EXTERN execute
   std::cout << "-----------------------------" << std::endl;
   std::cout << "EXTERN DIRECTIVE EXECUTED. Symbol list: " << std::endl;
@@ -43,7 +43,7 @@ directive::SECTION::SECTION()
 { // TODO: implement constructor
 }
 
-void directive::SECTION::execute() const
+void directive::SECTION::execute(Section *dest_section) const
 {
   // TODO: implement SECTION execute
 }
@@ -52,7 +52,7 @@ directive::WORD::WORD()
 { // TODO: implement constructor
 }
 
-void directive::WORD::execute() const
+void directive::WORD::execute(Section *dest_section) const
 {
   // TODO: implement WORD execute
 }
@@ -61,7 +61,7 @@ directive::SKIP::SKIP()
 { // TODO: implement constructor
 }
 
-void directive::SKIP::execute() const
+void directive::SKIP::execute(Section *dest_section) const
 {
   // TODO: implement SKIP execute
 }
@@ -70,7 +70,7 @@ directive::ASCII::ASCII()
 { // TODO: implement constructor
 }
 
-void directive::ASCII::execute() const
+void directive::ASCII::execute(Section *dest_section) const
 {
   // TODO: implement ASCII execute
 }
@@ -79,7 +79,7 @@ directive::END::END()
 { // TODO: implement constructor
 }
 
-void directive::END::execute() const
+void directive::END::execute(Section *dest_section) const
 {
   // TODO: implement END execute
 }

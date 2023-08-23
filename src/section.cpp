@@ -62,3 +62,18 @@ void Section::execute_all_commands()
   this->location_counter = 0;
   // TODO: finish implementation
 }
+
+void Section::write_byte_arr(std::vector<type::byte> arr)
+{
+  for (type::byte single_byte : arr)
+  {
+    this->output_file.push_back(single_byte);
+    this->location_counter++;
+  }
+}
+
+void Section::write_byte(type::byte single_byte)
+{
+  this->output_file.push_back(single_byte);
+  this->location_counter++;
+}

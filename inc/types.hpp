@@ -4,6 +4,8 @@
 namespace type
 {
 
+  using byte = unsigned char;
+
   enum class PARAMETER_TYPE
   {
     SYMBOL = 0,

@@ -3,8 +3,9 @@
 
 #include "types.hpp"
 #include "parameter.hpp"
-#include "section.hpp"
 #include <list>
+
+class Section;
 
 class Command
 {

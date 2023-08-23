@@ -7,6 +7,7 @@
 
 #include <string>
 #include <list>
+#include <vector>
 
 class Section : public Parameter
 {
@@ -15,6 +16,8 @@ private:
   std::list<Command *> commands;
   unsigned int length = 0;
   unsigned int location_counter = 0;
+
+  std::vector<type::byte> output_file;
 
 public:
   Section(std::string name);
@@ -35,6 +38,9 @@ public:
   void add_command(Command *);
   std::list<Command *> get_all_commands() const;
   void execute_all_commands();
+
+  void write_byte_arr(std::vector<type::byte> arr);
+  void write_byte(type::byte single_byte);
 };
 
 #endif
