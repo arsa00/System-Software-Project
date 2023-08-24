@@ -22,7 +22,7 @@ protected:
   */
   std::list<Parameter *> params;
   type::COMMAND_TYPE type;
-  unsigned int size = 0;
+  unsigned int size = 0; // represent fixed size of command
   bool is_generating_data = true;
 
 public:

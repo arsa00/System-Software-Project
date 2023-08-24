@@ -1,6 +1,7 @@
 #include "../inc/all_instructions.hpp"
 #include "../inc/symbol.hpp"
 #include "../inc/literal.hpp"
+#include "../auxiliary/inc/converters.hpp"
 #include <iostream>
 #include <vector>
 
@@ -33,21 +34,21 @@ instruction::IRET::IRET()
 }
 
 void instruction::IRET::execute(Section *dest_section) const
-{ // TODO: create auxiliary functions for bitwise operations
-  // pop pc:
+{
+  // pop pc: // FIXME: isn't it going to return from func immediately after this instruction?
   type::byte byte1 = 0b10010011; // OC=1001, MMMM = 0011
-  type::byte byte2 = ((static_cast<type::byte>(type::GP_REG::PC) << 4) & 0xF0) | (static_cast<type::byte>(type::GP_REG::SP) & 0x0F);
-  byte2 &= 0xFF;
+  type::byte byte2 = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), static_cast<type::byte>(type::GP_REG::SP));
 
-  int temp = (-4) & 0x0FFF; // disp = -4
-  type::byte byte3 = (temp >> 8) & 0x00FF;
-  type::byte byte4 = temp & 0x00FF;
+  std::array<type::byte, 2> disp = converter::disp_to_byte_arr(-4);
+  type::byte byte3 = disp[0]; // <==> converter::write_to_upper_byte_half(0x00, disp[0]);
+  type::byte byte4 = disp[1];
   dest_section->write_byte_arr({byte1, byte2, byte3, byte4});
+
+  // std::cout << converter::get_disp_from_instruction(converter::create_instruction_of_bytes(byte4, byte3, byte2, byte1)) << std::endl;
 
   // pop status
   byte1 = 0b10010111; // OC=1001, MMMM = 0111
-  byte2 = ((static_cast<type::byte>(type::CS_REG::STATUS_REG) << 4) & 0xF0) | (static_cast<type::byte>(type::GP_REG::SP) & 0x0F);
-  byte2 &= 0xFF;
+  byte2 = converter::create_byte_of_two_halves(static_cast<type::byte>(type::CS_REG::STATUS_REG), static_cast<type::byte>(type::GP_REG::SP));
   // byte3 and byte4 are same (disp is same)
   dest_section->write_byte_arr({byte1, byte2, byte3, byte4});
 }
