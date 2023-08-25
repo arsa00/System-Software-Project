@@ -2,6 +2,7 @@
 #include "../inc/symbol.hpp"
 #include "../inc/literal.hpp"
 #include "../auxiliary/inc/converters.hpp"
+#include "../inc/assembler.hpp"
 #include <iostream>
 #include <vector>
 
@@ -76,6 +77,92 @@ instruction::CALL::CALL()
 void instruction::CALL::execute(Section *dest_section) const
 {
   // TODO: implement CALL execute
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+  std::list<Parameter *> params = this->get_params();
+
+  if (params.empty())
+  {
+    Assembler::get_instance().internal_error("No parameter given to call instruction.");
+    return;
+  }
+
+  if (params.size() > 1)
+  {
+    Assembler::get_instance().internal_error("Too parameters given to call instruction.");
+    return;
+  }
+
+  Parameter *param = params.front();
+
+  if (param->get_type() == type::PARAMETER_TYPE::LITERAL)
+  {
+    // literal passed as parameter
+    uint32_t value = ((Literal *)param)->get_num_value();
+    if (value <= type::MAX_UNSIGNED_DISP)
+    {
+      // literal addr can fit in 12 bits
+      ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::CALL_1);
+      ins_bytes[1] = 0;
+      displacement = converter::disp_to_byte_arr(value);
+      ins_bytes[2] = displacement[0];
+      ins_bytes[3] = displacement[1];
+      dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+    }
+    else
+    {
+      // literal addr can't fit in 12 bits, write in pool literal
+      // TODO: implement in section pool literal and it's methods
+    }
+  }
+  else if (param->get_type() == type::PARAMETER_TYPE::SYMBOL)
+  {
+    // symbol passed as parameter
+    Symbol *sym = (Symbol *)param;
+
+    if (!sym->get_defined_flag())
+    {
+      Assembler::get_instance().internal_error("Using undefined symbol within call instruction.");
+      return;
+    }
+
+    if (!sym->has_set_value())
+    {
+      // extern symbol is used
+      // TODO: implement realocation records
+    }
+    else
+    {
+      uint32_t value = sym->get_value();
+      if (sym->get_section()->get_id() == dest_section->get_id())
+      {
+        // symbol is in the same section
+        if (value <= type::MAX_UNSIGNED_DISP)
+        { // symbol's value can fit in 12 bits
+          ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::CALL_1);
+          ins_bytes[1] = 0;
+          displacement = converter::disp_to_byte_arr(value);
+          ins_bytes[2] = displacement[0];
+          ins_bytes[3] = displacement[1];
+          dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+        }
+        else
+        { // symbol's value can't fit in 12 bits
+          // TODO: implement in section pool literal and it's methods
+        }
+      }
+      else
+      {
+        // symbol is not in same section
+        // TODO: implement realocation records
+      }
+    }
+  }
+  else
+  {
+    Assembler::get_instance().internal_error("Wrong parameter given to call instruction.");
+    return;
+  }
 }
 
 instruction::RET::RET()

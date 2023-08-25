@@ -14,10 +14,11 @@ private:
   // TODO: finish implementation
   bool is_global = false;
   bool is_defined = false;
+  bool has_value = false;
   Section *section = nullptr;
 
 public:
-  Symbol(std::string name, uint32_t value = -1);
+  Symbol(std::string name);
 
   void set_section(Section *section);
   Section *get_section() const;
@@ -30,6 +31,7 @@ public:
 
   uint32_t get_value() const;
   void set_value(uint32_t val);
+  bool has_set_value() const;
 
   void set_name(std::string val);
   void set_name(char *val);
