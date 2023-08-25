@@ -29,28 +29,44 @@ void instruction::INT::execute(Section *dest_section) const
 
 instruction::IRET::IRET()
 {
-  this->size = 8;
+  this->size = 12;
   this->is_generating_data = true;
 }
 
 void instruction::IRET::execute(Section *dest_section) const
 {
-  // pop pc: // FIXME: isn't it going to return from func immediately after this instruction?
-  type::byte byte1 = 0b10010011; // OC=1001, MMMM = 0011
-  type::byte byte2 = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), static_cast<type::byte>(type::GP_REG::SP));
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
 
-  std::array<type::byte, 2> disp = converter::disp_to_byte_arr(-4);
-  type::byte byte3 = disp[0]; // <==> converter::write_to_upper_byte_half(0x00, disp[0]);
-  type::byte byte4 = disp[1];
-  dest_section->write_byte_arr({byte1, byte2, byte3, byte4});
+  // sp = sp + 8; ==> move sp 2 places backwards
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_1);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::SP), static_cast<type::byte>(type::GP_REG::SP));
 
-  // std::cout << converter::get_disp_from_instruction(converter::create_instruction_of_bytes(byte4, byte3, byte2, byte1)) << std::endl;
+  displacement = converter::disp_to_byte_arr(8); // no need to call converter::write_to_upper_byte_half(0x00, displacement[0]);
+                                                 // because higher 4bits of displacement[0] are already set to 0
+  ins_bytes[2] = displacement[0];
+  ins_bytes[3] = displacement[1];
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 
-  // pop status
-  byte1 = 0b10010111; // OC=1001, MMMM = 0111
-  byte2 = converter::create_byte_of_two_halves(static_cast<type::byte>(type::CS_REG::STATUS_REG), static_cast<type::byte>(type::GP_REG::SP));
-  // byte3 and byte4 are same (disp is same)
-  dest_section->write_byte_arr({byte1, byte2, byte3, byte4});
+  // pop status first:
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_6);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::CS_REG::STATUS_REG), static_cast<type::byte>(type::GP_REG::SP));
+
+  displacement = converter::disp_to_byte_arr(-4); // no need to call converter::write_to_upper_byte_half(0x00, displacement[0]);
+                                                  // because higher 4bits of displacement[0] are already set to 0
+  ins_bytes[2] = displacement[0];
+  ins_bytes[3] = displacement[1];
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+
+  // pop pc:
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_2);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), static_cast<type::byte>(type::GP_REG::SP));
+
+  displacement = converter::disp_to_byte_arr(-8); // no need to call converter::write_to_upper_byte_half(0x00, displacement[0]);
+                                                  // because higher 4bits of displacement[0] are already set to 0
+  ins_bytes[2] = displacement[0];
+  ins_bytes[3] = displacement[1];
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 }
 
 instruction::CALL::CALL()

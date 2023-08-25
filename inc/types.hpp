@@ -103,6 +103,18 @@ namespace type
     CAUSE_REG,
     NO_REG = -1
   };
+
+  enum class CPU_INSTRUCTIONS
+  {
+    LD_DATA_0 = 0b10010000, // gpr[A] <= csr[B];
+    LD_DATA_1 = 0b10010001, // gpr[A] <= gpr[B]+D;
+    LD_DATA_2 = 0b10010010, // gpr[A] <= mem32[gpr[B]+gpr[C]+D];
+    LD_DATA_3 = 0b10010011, // gpr[A] <= mem32[gpr[B]]; gpr[B]<=gpr[B]+D;
+    LD_DATA_4 = 0b10010100, // csr[A] <= gpr[B];
+    LD_DATA_5 = 0b10010101, // csr[A] <= csr[B]|D;
+    LD_DATA_6 = 0b10010110, // csr[A] <= mem32[gpr[B]+gpr[C]+D];
+    LD_DATA_7 = 0b10010111  // csr[A] <= mem32[gpr[B]]; gpr[B]<=gpr[B]+D;
+  };
 }
 
 #endif

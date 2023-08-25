@@ -143,4 +143,5 @@ void test3()
   halt_cmd->execute(section);
 
   section->print_output_file();
+  std::cout << std::dec << "Location counter = " << section->get_curr_loc_cnt() << std::endl;
 }
