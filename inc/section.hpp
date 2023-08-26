@@ -3,19 +3,23 @@
 
 #include "instruction.hpp"
 #include "directive.hpp"
+#include "literal_pool_record.hpp"
 #include "types.hpp"
 
 #include <string>
 #include <list>
 #include <vector>
+#include <unordered_map>
 
 class Section : public Parameter
 {
 private:
   std::string name;
   std::list<Command *> commands;
-  unsigned int length = 0;
-  unsigned int location_counter = 0;
+  uint32_t length = 0;
+  uint32_t location_counter = 0;
+
+  std::unordered_map<LiteralPoolKey, LiteralPoolRecord *, LiteralPoolKeyHasher> literal_pool;
 
   std::vector<type::byte> output_file;
 
@@ -28,8 +32,8 @@ public:
   Section(const Section &) = delete;
   Section &operator=(const Section &) = delete;
 
-  unsigned int get_curr_loc_cnt() const;
-  unsigned int get_length() const;
+  uint32_t get_curr_loc_cnt() const;
+  uint32_t get_length() const;
 
   void set_name(std::string);
   void set_name(char *);
@@ -44,6 +48,9 @@ public:
 
   void write_byte_arr(std::vector<type::byte> arr);
   void write_byte(type::byte single_byte);
+
+  void literal_pool_insert_new(LiteralPoolRecord *record);
+  LiteralPoolRecord *literal_pool_get(uint32_t liter_value, bool relocation_flag = false);
 };
 
 #endif

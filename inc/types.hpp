@@ -8,6 +8,7 @@ namespace type
 
   using byte = unsigned char;
   using instruction_size = uint32_t;
+  using addr_size = uint32_t;
 
   const static int MAX_NEG_DISP = -2048;          // -2^11
   const static int MAX_POS_DISP = 2047;           // 2^11 - 1
@@ -107,8 +108,8 @@ namespace type
 
   enum class CPU_INSTRUCTIONS
   {
-    CALL_1 = 0b00100000,    // push pc; pc<=gpr[A]+gpr[B]+D;
-    CALL_2 = 0b00100001,    // push pc; pc<=mem32[gpr[A]+gpr[B]+D];
+    CALL_0 = 0b00100000,    // push pc; pc<=gpr[A]+gpr[B]+D;
+    CALL_1 = 0b00100001,    // push pc; pc<=mem32[gpr[A]+gpr[B]+D];
     LD_DATA_0 = 0b10010000, // gpr[A] <= csr[B];
     LD_DATA_1 = 0b10010001, // gpr[A] <= gpr[B]+D;
     LD_DATA_2 = 0b10010010, // gpr[A] <= mem32[gpr[B]+gpr[C]+D];

@@ -18,8 +18,8 @@ namespace converter
   type::byte get_upper_half_byte(type::byte single_byte); // TODO: test
   type::byte get_lower_half_byte(type::byte single_byte); // TODO: test
 
-  type::byte write_to_upper_byte_half(type::byte new_value, type::byte original_byte); // TODO: test
-  type::byte write_to_lower_byte_half(type::byte new_value, type::byte original_byte); // TODO: test
+  void write_to_upper_byte_half(type::byte new_value, type::byte *original_byte); // TODO: test
+  void write_to_lower_byte_half(type::byte new_value, type::byte *original_byte); // TODO: test
   type::byte create_byte_of_two_halves(type::byte upper_half, type::byte lower_half);
 
   type::instruction_size create_instruction_of_bytes(type::byte b3, type::byte b2, type::byte b1, type::byte b0);

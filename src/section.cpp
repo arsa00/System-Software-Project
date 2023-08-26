@@ -38,12 +38,12 @@ std::string Section::get_name() const
   return this->name;
 }
 
-unsigned int Section::get_curr_loc_cnt() const
+uint32_t Section::get_curr_loc_cnt() const
 {
   return this->location_counter;
 }
 
-unsigned int Section::get_length() const
+uint32_t Section::get_length() const
 {
   return this->length;
 }
@@ -101,14 +101,37 @@ void Section::print_output_file(type::byte line_width, type::byte mode) const
 void Section::write_byte_arr(std::vector<type::byte> arr)
 {
   for (type::byte single_byte : arr)
-  {
-    this->output_file.push_back(single_byte);
-    this->location_counter++;
-  }
+    this->write_byte(single_byte);
 }
 
 void Section::write_byte(type::byte single_byte)
 {
   this->output_file.push_back(single_byte);
   this->location_counter++;
+  // TODO: ^^^ Double check if this is the way to go. Maybe add full instruction size (to loc. cnt.) before execution and just check after (compare value of loc. cnt. and size of output_file)?
+}
+
+// adds literal to pool and set it's address
+void Section::literal_pool_insert_new(LiteralPoolRecord *record)
+{
+  LiteralPoolKey key(record->get_value(), record->get_relocation_flag());
+
+  // check if record already exists
+  if (this->literal_pool.find(key) != this->literal_pool.end())
+    return;
+
+  record->set_address(this->get_length() + this->literal_pool.size());
+
+  this->literal_pool[key] = record;
+}
+
+LiteralPoolRecord *Section::literal_pool_get(uint32_t liter_value, bool relocation_flag)
+{
+  LiteralPoolKey key(liter_value, relocation_flag);
+
+  // check if record exists
+  if (this->literal_pool.find(key) == this->literal_pool.end())
+    return nullptr;
+
+  return this->literal_pool[key];
 }

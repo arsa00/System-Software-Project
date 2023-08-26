@@ -3,6 +3,7 @@
 #include "../inc/literal.hpp"
 #include "../auxiliary/inc/converters.hpp"
 #include "../inc/assembler.hpp"
+#include "../inc/literal_pool_record.hpp"
 #include <iostream>
 #include <vector>
 
@@ -43,7 +44,7 @@ void instruction::IRET::execute(Section *dest_section) const
   ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_1);
   ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::SP), static_cast<type::byte>(type::GP_REG::SP));
 
-  displacement = converter::disp_to_byte_arr(8); // no need to call converter::write_to_upper_byte_half(0x00, displacement[0]);
+  displacement = converter::disp_to_byte_arr(8); // no need to call converter::write_to_upper_byte_half(0x00, &displacement[0]);
                                                  // because higher 4bits of displacement[0] are already set to 0
   ins_bytes[2] = displacement[0];
   ins_bytes[3] = displacement[1];
@@ -53,7 +54,7 @@ void instruction::IRET::execute(Section *dest_section) const
   ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_6);
   ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::CS_REG::STATUS_REG), static_cast<type::byte>(type::GP_REG::SP));
 
-  displacement = converter::disp_to_byte_arr(-4); // no need to call converter::write_to_upper_byte_half(0x00, displacement[0]);
+  displacement = converter::disp_to_byte_arr(-4); // no need to call converter::write_to_upper_byte_half(0x00, &displacement[0]);
                                                   // because higher 4bits of displacement[0] are already set to 0
   ins_bytes[2] = displacement[0];
   ins_bytes[3] = displacement[1];
@@ -63,7 +64,7 @@ void instruction::IRET::execute(Section *dest_section) const
   ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_2);
   ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), static_cast<type::byte>(type::GP_REG::SP));
 
-  displacement = converter::disp_to_byte_arr(-8); // no need to call converter::write_to_upper_byte_half(0x00, displacement[0]);
+  displacement = converter::disp_to_byte_arr(-8); // no need to call converter::write_to_upper_byte_half(0x00, &displacement[0]);
                                                   // because higher 4bits of displacement[0] are already set to 0
   ins_bytes[2] = displacement[0];
   ins_bytes[3] = displacement[1];
@@ -102,7 +103,7 @@ void instruction::CALL::execute(Section *dest_section) const
     if (value <= type::MAX_UNSIGNED_DISP)
     {
       // literal addr can fit in 12 bits
-      ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::CALL_1);
+      ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::CALL_0);
       ins_bytes[1] = 0;
       displacement = converter::disp_to_byte_arr(value);
       ins_bytes[2] = displacement[0];
@@ -111,8 +112,17 @@ void instruction::CALL::execute(Section *dest_section) const
     }
     else
     {
-      // literal addr can't fit in 12 bits, write in pool literal
-      // TODO: implement in section pool literal and it's methods
+      // literal addr can't fit in 12 bits, write in pool literal and, later, read from mem address to jump on
+      // TODO: test
+      LiteralPoolRecord *literal_from_pool = new LiteralPoolRecord(value, false);
+      dest_section->literal_pool_insert_new(literal_from_pool);
+
+      ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::CALL_1);
+      ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), 0);
+      displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt()); // FIXME: see section's TODO
+      ins_bytes[2] = displacement[0];
+      ins_bytes[3] = displacement[1];
+      dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
     }
   }
   else if (param->get_type() == type::PARAMETER_TYPE::SYMBOL)
@@ -137,19 +147,19 @@ void instruction::CALL::execute(Section *dest_section) const
       if (sym->get_section()->get_id() == dest_section->get_id())
       {
         // symbol is in the same section
-        if (value <= type::MAX_UNSIGNED_DISP)
-        { // symbol's value can fit in 12 bits
-          ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::CALL_1);
-          ins_bytes[1] = 0;
-          displacement = converter::disp_to_byte_arr(value);
-          ins_bytes[2] = displacement[0];
-          ins_bytes[3] = displacement[1];
-          dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+        int disp_value = value - dest_section->get_curr_loc_cnt(); // FIXME: see section's TODO
+        if (disp_value < type::MAX_NEG_DISP || disp_value > type::MAX_POS_DISP)
+        {
+          Assembler::get_instance().internal_error("Destination symbol is too far away to be called from call instruction.");
+          return;
         }
-        else
-        { // symbol's value can't fit in 12 bits
-          // TODO: implement in section pool literal and it's methods
-        }
+
+        ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::CALL_0);
+        ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), 0);
+        displacement = converter::disp_to_byte_arr(disp_value);
+        ins_bytes[2] = displacement[0];
+        ins_bytes[3] = displacement[1];
+        dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
       }
       else
       {

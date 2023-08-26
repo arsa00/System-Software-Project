@@ -48,7 +48,8 @@
     "list": "cpp",
     "bitset": "cpp",
     "ctime": "cpp",
-    "iomanip": "cpp"
+    "iomanip": "cpp",
+    "typeindex": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }

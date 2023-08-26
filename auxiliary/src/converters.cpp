@@ -92,8 +92,8 @@ std::string converter::instruction_type_to_string(type::INSTRUCTION_TYPE ins_ali
 std::array<type::byte, 2> converter::disp_to_byte_arr(int displacement)
 {
   std::array<type::byte, 2> byte_arr;
-  byte_arr[0] = displacement & 0x000F;
-  byte_arr[1] = (displacement >> 4) & 0x00FF; // get higher 4 bits and 4 zero padding
+  byte_arr[0] = displacement & 0x000F; // lowest 4 bits and 4 zeros padding at upper half
+  byte_arr[1] = (displacement >> 4) & 0x00FF;
 
   return byte_arr;
 }
@@ -123,7 +123,7 @@ int converter::get_negative_val_disp(uint16_t disp_val)
 
 type::byte converter::get_upper_half_byte(type::byte single_byte)
 {
-  return single_byte & 0xF0;
+  return (single_byte & 0xF0) >> 4;
 }
 
 type::byte converter::get_lower_half_byte(type::byte single_byte)
@@ -131,21 +131,21 @@ type::byte converter::get_lower_half_byte(type::byte single_byte)
   return single_byte & 0x0F;
 }
 
-type::byte converter::write_to_upper_byte_half(type::byte new_value, type::byte original_byte)
+void converter::write_to_upper_byte_half(type::byte new_value, type::byte *original_byte)
 {
-  original_byte &= 0x0F; // clear upper 4 bits
-  new_value <<= 4;       // shift lower 4 bits to upper position
-  new_value &= 0xF0;     // clear lower 4 bits
+  (*original_byte) &= 0x0F; // clear upper 4 bits
+  new_value <<= 4;          // shift lower 4 bits to upper position
+  new_value &= 0xF0;        // clear lower 4 bits (just in case)
 
-  return original_byte | new_value; // write new 4 bits to higher 4 bits of original value
+  (*original_byte) |= new_value; // write new 4 bits to higher 4 bits of original value
 }
 
-type::byte converter::write_to_lower_byte_half(type::byte new_value, type::byte original_byte)
+void converter::write_to_lower_byte_half(type::byte new_value, type::byte *original_byte)
 {
-  original_byte &= 0xF0; // clear lower 4 bits
-  new_value &= 0x0F;     // clear upper 4 bits
+  (*original_byte) &= 0xF0; // clear lower 4 bits
+  new_value &= 0x0F;        // clear upper 4 bits
 
-  return original_byte | new_value; // write new 4 bits to lower 4 bits of original value
+  (*original_byte) |= new_value; // write new 4 bits to lower 4 bits of original value
 }
 
 type::byte converter::create_byte_of_two_halves(type::byte upper_half, type::byte lower_half)
