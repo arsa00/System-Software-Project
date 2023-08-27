@@ -134,12 +134,21 @@ void test3()
             << std::endl;
 
   Section *section = new Section(".test3");
+  Symbol *test_sym = new Symbol(".test");
+  test_sym->set_value(0x022);
+  test_sym->set_section(section);
+  test_sym->set_defined_flag(true);
+  test_sym->set_id(1);
+
   Command *halt_cmd = new instruction::HALT();
   Command *int_cmd = new instruction::INT();
   Command *iret_cmd = new instruction::IRET();
+  Command *call_cmd = new instruction::CALL();
+  call_cmd->enque_param(test_sym);
 
   int_cmd->execute(section);
   iret_cmd->execute(section);
+  call_cmd->execute(section); // TODO: test this!
   halt_cmd->execute(section);
 
   section->print_output_file();

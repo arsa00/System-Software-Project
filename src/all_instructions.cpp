@@ -80,7 +80,6 @@ instruction::CALL::CALL()
 
 void instruction::CALL::execute(Section *dest_section) const
 {
-  // TODO: implement CALL execute
   std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
   std::array<type::byte, 2> displacement;
   std::list<Parameter *> params = this->get_params();
@@ -122,7 +121,7 @@ void instruction::CALL::execute(Section *dest_section) const
 
       ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::CALL_1);
       ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), 0);
-      displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt()); // FIXME: see section's TODO
+      displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt() - this->get_size()); // XXX: test
       ins_bytes[2] = displacement[0];
       ins_bytes[3] = displacement[1];
       dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
@@ -151,18 +150,17 @@ void instruction::CALL::execute(Section *dest_section) const
 
       ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::CALL_1);
       ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), 0);
-      displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt()); // FIXME: see section's TODO
+      displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt() - this->get_size()); // XXX: test
       ins_bytes[2] = displacement[0];
       ins_bytes[3] = displacement[1];
       dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
     }
     else
     {
-      uint32_t value = sym->get_value();
       if (sym->get_section()->get_id() == dest_section->get_id())
       {
         // symbol is in the same section
-        int32_t disp_value = value - dest_section->get_curr_loc_cnt(); // FIXME: see section's TODO
+        int32_t disp_value = sym->get_value() - dest_section->get_curr_loc_cnt() - this->get_size(); // XXX: test
         if (disp_value < type::MAX_NEG_DISP || disp_value > type::MAX_POS_DISP)
         {
           Assembler::get_instance().internal_error("Destination symbol is too far away to be called from call instruction.");
@@ -190,7 +188,7 @@ void instruction::CALL::execute(Section *dest_section) const
 
         ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::CALL_1);
         ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), 0);
-        displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt()); // FIXME: see section's TODO
+        displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt() - this->get_size()); // XXX: test
         ins_bytes[2] = displacement[0];
         ins_bytes[3] = displacement[1];
         dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
