@@ -89,7 +89,7 @@ std::string converter::instruction_type_to_string(type::INSTRUCTION_TYPE ins_ali
 
 // displacement is 12bit value, so higher 4 bits of arr[0] are always zero and must be overwritten
 // to use value needed in instruction
-std::array<type::byte, 2> converter::disp_to_byte_arr(int displacement)
+std::array<type::byte, 2> converter::disp_to_byte_arr(int16_t displacement)
 {
   std::array<type::byte, 2> byte_arr;
   byte_arr[0] = displacement & 0x000F; // lowest 4 bits and 4 zeros padding at upper half
@@ -98,13 +98,13 @@ std::array<type::byte, 2> converter::disp_to_byte_arr(int displacement)
   return byte_arr;
 }
 
-int converter::get_disp_from_instruction(type::instruction_size instruction_record)
+int16_t converter::get_disp_from_instruction(type::instruction_size instruction_record)
 {
   type::byte byte4 = (instruction_record >> 24) & 0x000000FF; // get 4th byte of ins
   type::byte byte3 = (instruction_record >> 16) & 0x000000FF; // get 3rd byte of ins
 
   uint16_t disp_val = ((byte4 << 4) & 0xFFF0) | (byte3 & 0x0F); // combine 4th byte and lower 4 bits of 3rd byte
-  int disp_singed_val;
+  int16_t disp_singed_val;
 
   // check if displacement value is negative
   if (disp_val & 0x0800)
@@ -115,9 +115,9 @@ int converter::get_disp_from_instruction(type::instruction_size instruction_reco
   return disp_singed_val;
 }
 
-int converter::get_negative_val_disp(uint16_t disp_val)
+int16_t converter::get_negative_val_disp(uint16_t disp_val)
 {
-  int singed_val = 0xFFFFFFFFFFFFF000 | disp_val;
+  int16_t singed_val = 0xF000 | disp_val;
   return singed_val;
 }
 

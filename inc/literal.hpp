@@ -24,8 +24,8 @@ public:
   void set_str_value(char *val);
 
   Literal *clone() const override;
-  bool set_id(int id);
-  int get_id();
+  bool set_id(int32_t id);
+  int32_t get_id();
 };
 
 #endif

@@ -10,8 +10,8 @@ namespace type
   using instruction_size = uint32_t;
   using addr_size = uint32_t;
 
-  const static int MAX_NEG_DISP = -2048;          // -2^11
-  const static int MAX_POS_DISP = 2047;           // 2^11 - 1
+  const static int32_t MAX_NEG_DISP = -2048;      // -2^11
+  const static int32_t MAX_POS_DISP = 2047;       // 2^11 - 1
   const static uint16_t MAX_UNSIGNED_DISP = 4095; // 2^12 - 1
 
   enum class PARAMETER_TYPE
@@ -104,6 +104,12 @@ namespace type
     HANDLER_REG,
     CAUSE_REG,
     NO_REG = -1
+  };
+
+  enum class RELOCATIONS
+  {
+    ABS_32S, // absolute value, 32bit long, signed
+    ABS_32U  // absolute value, 32bit long, unsigned
   };
 
   enum class CPU_INSTRUCTIONS

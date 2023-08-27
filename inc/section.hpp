@@ -4,6 +4,7 @@
 #include "instruction.hpp"
 #include "directive.hpp"
 #include "literal_pool_record.hpp"
+#include "relocation_record.hpp"
 #include "types.hpp"
 
 #include <string>
@@ -20,6 +21,7 @@ private:
   uint32_t location_counter = 0;
 
   std::unordered_map<LiteralPoolKey, LiteralPoolRecord *, LiteralPoolKeyHasher> literal_pool;
+  std::list<RelocationRecord *> relocations;
 
   std::vector<type::byte> output_file;
 
@@ -41,7 +43,7 @@ public:
 
   void add_command(Command *);
   std::list<Command *> get_all_commands() const;
-  void execute_all_commands();
+  void create_output_file();
 
   std::vector<type::byte> get_output_file() const;
   void print_output_file(type::byte line_width = 4, type::byte mode = 0) const;
@@ -51,6 +53,9 @@ public:
 
   void literal_pool_insert_new(LiteralPoolRecord *record);
   LiteralPoolRecord *literal_pool_get(uint32_t liter_value, bool relocation_flag = false);
+
+  void add_new_relocation(RelocationRecord *rela_record);
+  std::list<RelocationRecord *> get_all_relocations() const;
 };
 
 #endif

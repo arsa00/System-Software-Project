@@ -14,5 +14,5 @@ void Literal::set_str_value(char *val) { this->str_value.assign(val); }
 
 Literal *Literal::clone() const { return new Literal(*this); }
 
-bool Literal::set_id(int id) { return false; }
-int Literal::get_id() { return -1; }
+bool Literal::set_id(int32_t id) { return false; }
+int32_t Literal::get_id() { return -1; }

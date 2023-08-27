@@ -22,11 +22,11 @@ protected:
   */
   std::list<Parameter *> params;
   type::COMMAND_TYPE type;
-  unsigned int size = 0; // represent fixed size of command
+  uint32_t size = 0; // represent fixed size of command
   bool is_generating_data = true;
 
 public:
-  Command(type::COMMAND_TYPE type, unsigned int size = 0);
+  Command(type::COMMAND_TYPE type, uint32_t size = 0);
 
   Command(const Command &);
   Command(Command &&);
@@ -41,8 +41,8 @@ public:
   void enque_param(Parameter *param);
   Parameter *deque_param();
 
-  void set_size(unsigned int);
-  unsigned int get_size() const; // TODO: change to be virtual for commands with param list (size dynamically calculated)
+  void set_size(uint32_t size);
+  uint32_t get_size() const; // TODO: change to be virtual for commands with param list (size dynamically calculated)
 
   void set_generate_data_flag(bool flag_value);
   bool get_generate_data_flag();

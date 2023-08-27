@@ -15,11 +15,28 @@ Section::Section(char *name) : Parameter(type::PARAMETER_TYPE::SECTION)
 
 Section::~Section()
 {
+  // free memory fo all commands
   while (!this->commands.empty())
   {
     auto cmd = this->commands.front();
     this->commands.pop_front();
     delete cmd;
+  }
+
+  // free memory for all literal pool records
+  while (!this->literal_pool.empty())
+  {
+    auto iter = this->literal_pool.begin();
+    this->literal_pool.erase(iter);
+    delete iter->second;
+  }
+
+  // free memory for all relocation records
+  while (!this->relocations.empty())
+  {
+    auto relocation_record = this->relocations.front();
+    this->relocations.pop_front();
+    delete relocation_record;
   }
 }
 
@@ -60,10 +77,12 @@ std::list<Command *> Section::get_all_commands() const
   return this->commands;
 }
 
-void Section::execute_all_commands()
-{
+void Section::create_output_file()
+{ // TODO: finish implementation
   this->location_counter = 0;
-  // TODO: finish implementation
+  // TODO: execute all commands
+  // TODO: after executing all commands, insert literal pool records in output file
+  // TODO: at the end, create section's relocation table
 }
 
 std::vector<type::byte> Section::get_output_file() const
@@ -134,4 +153,14 @@ LiteralPoolRecord *Section::literal_pool_get(uint32_t liter_value, bool relocati
     return nullptr;
 
   return this->literal_pool[key];
+}
+
+void Section::add_new_relocation(RelocationRecord *rela_record)
+{
+  this->relocations.push_back(rela_record);
+}
+
+std::list<RelocationRecord *> Section::get_all_relocations() const
+{
+  return this->relocations;
 }

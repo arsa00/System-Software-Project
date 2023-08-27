@@ -23,7 +23,7 @@ private:
   bool is_first_round = false;
   bool parsing_err = false;
   bool internal_err = false;
-  int symbol_id = 0;
+  int32_t symbol_id = 0;
 
   // TODO: add object file field and (maybe?) ObjectFile class
 

@@ -1,6 +1,6 @@
 #include "../inc/literal_pool_record.hpp"
 
-LiteralPoolRecord::LiteralPoolRecord(uint32_t value, bool realocation_flag) : literal_value(value), is_relocatable(realocation_flag) {}
+LiteralPoolRecord::LiteralPoolRecord(uint32_t value, bool relocation_flag) : literal_value(value), is_relocatable(relocation_flag) {}
 
 void LiteralPoolRecord::set_value(uint32_t value) { this->literal_value = value; }
 uint32_t LiteralPoolRecord::get_value() const { return this->literal_value; }

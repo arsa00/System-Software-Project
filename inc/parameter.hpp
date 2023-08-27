@@ -7,7 +7,7 @@ class Parameter
 {
 private:
   type::PARAMETER_TYPE type;
-  int id = -1;
+  int32_t id = -1;
 
 public:
   Parameter(type::PARAMETER_TYPE type) : type(type) {}
@@ -15,9 +15,9 @@ public:
   virtual Parameter *clone() const;
   type::PARAMETER_TYPE get_type() const { return type; }
 
-  // this methods are not supported for literals, therefor are virtual
-  virtual bool set_id(int id);
-  virtual int get_id();
+  // this methods are not supported for literals, therefore are virtual
+  virtual bool set_id(int32_t id);
+  virtual int32_t get_id();
 };
 
 #endif
