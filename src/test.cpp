@@ -153,12 +153,14 @@ void test3()
   Command *int_cmd = new instruction::INT();
   Command *iret_cmd = new instruction::IRET();
   Command *call_cmd = new instruction::CALL();
-  call_cmd->enque_param(literal0);
+  call_cmd->enque_param(test_sym);
+  Command *ret_cmd = new instruction::RET();
 
   section->add_command(int_cmd);
   section->add_command(iret_cmd);
   section->add_command(call_cmd);
-  section->add_command(halt_cmd);
+  section->add_command(ret_cmd);
+  section->add_command(halt_cmd); // add new above this line, so halt is last one
   section->create_output_file();
 
   section->print_output_file();

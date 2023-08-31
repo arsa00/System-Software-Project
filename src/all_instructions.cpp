@@ -74,7 +74,6 @@ void instruction::IRET::execute(Section *dest_section) const
 
 instruction::CALL::CALL()
 {
-  // this->size = 4;  <-- this is default value, so not needed
   this->is_generating_data = true;
 }
 
@@ -115,13 +114,12 @@ void instruction::CALL::execute(Section *dest_section) const
     else
     {
       // literal addr can't fit in 12 bits, write in pool literal and, later, read from mem address to jump on
-      // TODO: test
       LiteralPoolRecord *literal_from_pool = new LiteralPoolRecord(value, false);
       dest_section->literal_pool_insert_new(literal_from_pool);
 
       ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::CALL_1);
       ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), 0);
-      displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt() - this->get_size()); // XXX: test
+      displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt() - this->get_size());
       ins_bytes[2] = displacement[0];
       ins_bytes[3] = displacement[1];
       dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
@@ -205,12 +203,21 @@ void instruction::CALL::execute(Section *dest_section) const
 }
 
 instruction::RET::RET()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::RET::execute(Section *dest_section) const
 {
-  // TODO: implement RET execute
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_3);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), static_cast<type::byte>(type::GP_REG::SP));
+  displacement = converter::disp_to_byte_arr(4);
+  ins_bytes[2] = displacement[0];
+  ins_bytes[3] = displacement[1];
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 }
 
 instruction::JMP::JMP()
