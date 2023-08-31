@@ -134,22 +134,32 @@ void test3()
             << std::endl;
 
   Section *section = new Section(".test3");
+  section->set_id(0);
+  section->print_output_file();
+
+  Section *section2 = new Section(".test2");
+  section2->set_id(1);
+
   Symbol *test_sym = new Symbol(".test");
-  test_sym->set_value(0x022);
-  test_sym->set_section(section);
+  test_sym->set_id(3);
+  // test_sym->set_value(0x022);
+  test_sym->set_section(section2);
   test_sym->set_defined_flag(true);
-  test_sym->set_id(1);
+  test_sym->set_global_flag(true);
+
+  Literal *literal0 = new Literal(0xABCD);
 
   Command *halt_cmd = new instruction::HALT();
   Command *int_cmd = new instruction::INT();
   Command *iret_cmd = new instruction::IRET();
   Command *call_cmd = new instruction::CALL();
-  call_cmd->enque_param(test_sym);
+  call_cmd->enque_param(literal0);
 
-  int_cmd->execute(section);
-  iret_cmd->execute(section);
-  call_cmd->execute(section); // TODO: test this!
-  halt_cmd->execute(section);
+  section->add_command(int_cmd);
+  section->add_command(iret_cmd);
+  section->add_command(call_cmd);
+  section->add_command(halt_cmd);
+  section->create_output_file();
 
   section->print_output_file();
   std::cout << std::dec << "Location counter = " << section->get_curr_loc_cnt() << std::endl;

@@ -144,13 +144,14 @@ void instruction::CALL::execute(Section *dest_section) const
       // get address to jump on from literal pool, and mark it (record in literal pool) as relocatable
       LiteralPoolRecord *literal_from_pool = new LiteralPoolRecord(0, true);
       dest_section->literal_pool_insert_new(literal_from_pool);
+
       // create relocation record for literal in pool, and add it to section's relocations list
       RelocationRecord *rel_record = new RelocationRecord(literal_from_pool->get_address(), sym->get_id(), type::RELOCATIONS::ABS_32U);
       dest_section->add_new_relocation(rel_record);
 
       ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::CALL_1);
       ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), 0);
-      displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt() - this->get_size()); // XXX: test
+      displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt() - this->get_size());
       ins_bytes[2] = displacement[0];
       ins_bytes[3] = displacement[1];
       dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
@@ -160,7 +161,7 @@ void instruction::CALL::execute(Section *dest_section) const
       if (sym->get_section()->get_id() == dest_section->get_id())
       {
         // symbol is in the same section
-        int32_t disp_value = sym->get_value() - dest_section->get_curr_loc_cnt() - this->get_size(); // XXX: test
+        int32_t disp_value = sym->get_value() - dest_section->get_curr_loc_cnt() - this->get_size();
         if (disp_value < type::MAX_NEG_DISP || disp_value > type::MAX_POS_DISP)
         {
           Assembler::get_instance().internal_error("Destination symbol is too far away to be called from call instruction.");
@@ -180,6 +181,7 @@ void instruction::CALL::execute(Section *dest_section) const
         // get address to jump on from literal pool, and mark it (record in literal pool) as relocatable
         LiteralPoolRecord *literal_from_pool = new LiteralPoolRecord(0, true);
         dest_section->literal_pool_insert_new(literal_from_pool);
+
         // create relocation record for literal in pool, and add it to section's relocations list
         int32_t sym_id = sym->get_global_flag() ? sym->get_id() : sym->get_section()->get_id();
         uint32_t addend = sym->get_global_flag() ? 0 : sym->get_value();
@@ -188,7 +190,7 @@ void instruction::CALL::execute(Section *dest_section) const
 
         ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::CALL_1);
         ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), 0);
-        displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt() - this->get_size()); // XXX: test
+        displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt() - this->get_size());
         ins_bytes[2] = displacement[0];
         ins_bytes[3] = displacement[1];
         dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});

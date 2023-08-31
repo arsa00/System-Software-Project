@@ -80,7 +80,13 @@ std::list<Command *> Section::get_all_commands() const
 void Section::create_output_file()
 { // TODO: finish implementation
   this->location_counter = 0;
-  // TODO: execute all commands
+
+  // TODO: execute all commands - test
+  for (Command *cmd : this->commands)
+  {
+    cmd->execute(this);
+  }
+
   // TODO: after executing all commands, insert literal pool records in output file
   // TODO: at the end, create section's relocation table
 }
@@ -95,7 +101,9 @@ void Section::print_output_file(type::byte line_width, type::byte mode) const
   if (!line_width)
     line_width = 1;
 
-  std::cout << " | ";
+  std::cout << "SIZE: " << this->get_length() << " Lit_pool size: " << this->literal_pool.size() << std::endl;
+
+  std::cout << "0x00: | ";
   type::byte new_line_cnt = 0;
   for (type::byte single_byte : this->output_file)
   {
@@ -109,8 +117,53 @@ void Section::print_output_file(type::byte line_width, type::byte mode) const
       std::cout << std::endl;
 
       if (new_line_cnt < this->output_file.size())
-        std::cout << " | ";
+        std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)new_line_cnt << ": | ";
     }
+  }
+
+  std::cout << std::endl
+            << "Literal pool: " << std::endl;
+  type::byte new_line_cnt2 = 0;
+  for (auto &iter : this->literal_pool)
+  {
+    LiteralPoolRecord *literal_from_pool = iter.second;
+
+    if (!new_line_cnt2)
+      std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)(new_line_cnt + new_line_cnt2)
+                << "/" << literal_from_pool->get_address() << ": | ";
+
+    std::array<type::byte, 4> byte_arr;
+    byte_arr[0] = literal_from_pool->get_value() & 0x000000FF;
+    byte_arr[1] = (literal_from_pool->get_value() >> 8) & 0x000000FF;
+    byte_arr[2] = (literal_from_pool->get_value() >> 16) & 0x000000FF;
+    byte_arr[3] = (literal_from_pool->get_value() >> 24) & 0x000000FF;
+
+    for (type::byte single_byte : byte_arr)
+    {
+      if (!mode)
+        std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)single_byte << " | ";
+      else if (mode == 1)
+        std::cout << "0b" << std::setfill('0') << std::setw(8) << std::bitset<8>(single_byte) << " | ";
+
+      if (++new_line_cnt2 % line_width == 0)
+      {
+        std::cout << std::endl;
+
+        if ((new_line_cnt2 >> 2) < this->literal_pool.size())
+          std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)(new_line_cnt + new_line_cnt2) << ": | ";
+      }
+    }
+  }
+
+  std::cout << std::endl
+            << "Relocations: " << std::endl;
+  for (RelocationRecord *rel : this->relocations)
+  {
+    std::cout << "Offset: " << rel->get_offset()
+              << " | Addend: " << rel->get_addend()
+              << " | Sym_id: " << rel->get_symbol_id()
+              << " | Addend sign: " << rel->get_addend_signed_flag()
+              << std::endl;
   }
 
   if (new_line_cnt < line_width)
