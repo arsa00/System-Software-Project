@@ -72,6 +72,121 @@ void instruction::IRET::execute(Section *dest_section) const
   dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 }
 
+void create_jump_ins(Section *dest_section, Parameter *param, type::CPU_INSTRUCTIONS ins_direct, type::CPU_INSTRUCTIONS ins_indirect, uint32_t ins_size, type::GP_REG gprB, type::GP_REG gprC)
+{
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+
+  if (param->get_type() == type::PARAMETER_TYPE::LITERAL)
+  {
+    // literal passed as parameter
+    uint32_t value = ((Literal *)param)->get_num_value();
+    if (value <= type::MAX_UNSIGNED_DISP)
+    {
+      // literal addr can fit in 12 bits
+      ins_bytes[0] = static_cast<type::byte>(ins_direct);
+      ins_bytes[1] = converter::create_byte_of_two_halves(0, static_cast<type::byte>(gprB));
+      displacement = converter::disp_to_byte_arr(value);
+      converter::write_to_upper_byte_half(static_cast<type::byte>(gprC), &displacement[0]);
+      ins_bytes[2] = displacement[0];
+      ins_bytes[3] = displacement[1];
+      dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+    }
+    else
+    {
+      // literal addr can't fit in 12 bits, write in pool literal and, later, read from mem address to jump on
+      LiteralPoolRecord *literal_from_pool = new LiteralPoolRecord(value, false);
+      dest_section->literal_pool_insert_new(literal_from_pool);
+
+      ins_bytes[0] = static_cast<type::byte>(ins_indirect);
+      ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), static_cast<type::byte>(gprB));
+      displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt() - ins_size);
+      converter::write_to_upper_byte_half(static_cast<type::byte>(gprC), &displacement[0]);
+      ins_bytes[2] = displacement[0];
+      ins_bytes[3] = displacement[1];
+      dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+    }
+  }
+  else if (param->get_type() == type::PARAMETER_TYPE::SYMBOL)
+  {
+    // symbol passed as parameter
+    Symbol *sym = (Symbol *)param;
+
+    if (!sym->get_defined_flag())
+    {
+      Assembler::get_instance().internal_error("Using undefined symbol within call instruction.");
+      return;
+    }
+
+    if (!sym->has_set_value())
+    {
+      // extern symbol is used
+      // get address to jump on from literal pool, and mark it (record in literal pool) as relocatable
+      LiteralPoolRecord *literal_from_pool = new LiteralPoolRecord(sym->get_id(), true);
+      dest_section->literal_pool_insert_new(literal_from_pool);
+
+      // create relocation record for literal in pool, and add it to section's relocations list
+      RelocationRecord *rel_record = new RelocationRecord(literal_from_pool->get_address(), sym->get_id(), type::RELOCATIONS::ABS_32U);
+      dest_section->add_new_relocation(rel_record);
+
+      ins_bytes[0] = static_cast<type::byte>(ins_indirect);
+      ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), static_cast<type::byte>(gprB));
+      displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt() - ins_size);
+      converter::write_to_upper_byte_half(static_cast<type::byte>(gprC), &displacement[0]);
+      ins_bytes[2] = displacement[0];
+      ins_bytes[3] = displacement[1];
+      dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+    }
+    else
+    {
+      if (sym->get_section()->get_id() == dest_section->get_id())
+      {
+        // symbol is in the same section
+        int32_t disp_value = sym->get_value() - dest_section->get_curr_loc_cnt() - ins_size;
+        if (disp_value < type::MAX_NEG_DISP || disp_value > type::MAX_POS_DISP)
+        {
+          Assembler::get_instance().internal_error("Destination symbol is too far away to be called from call instruction.");
+          return;
+        }
+
+        ins_bytes[0] = static_cast<type::byte>(ins_direct);
+        ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), static_cast<type::byte>(gprB));
+        displacement = converter::disp_to_byte_arr(disp_value);
+        converter::write_to_upper_byte_half(static_cast<type::byte>(gprC), &displacement[0]);
+        ins_bytes[2] = displacement[0];
+        ins_bytes[3] = displacement[1];
+        dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+      }
+      else
+      {
+        // symbol is not in the same section
+        // get address to jump on from literal pool, and mark it (record in literal pool) as relocatable
+        LiteralPoolRecord *literal_from_pool = new LiteralPoolRecord(sym->get_id(), true);
+        dest_section->literal_pool_insert_new(literal_from_pool);
+
+        // create relocation record for literal in pool, and add it to section's relocations list
+        int32_t sym_id = sym->get_global_flag() ? sym->get_id() : sym->get_section()->get_id();
+        uint32_t addend = sym->get_global_flag() ? 0 : sym->get_value();
+        RelocationRecord *rel_record = new RelocationRecord(literal_from_pool->get_address(), sym_id, type::RELOCATIONS::ABS_32U, addend);
+        dest_section->add_new_relocation(rel_record);
+
+        ins_bytes[0] = static_cast<type::byte>(ins_indirect);
+        ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), static_cast<type::byte>(gprB));
+        displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt() - ins_size);
+        converter::write_to_upper_byte_half(static_cast<type::byte>(gprC), &displacement[0]);
+        ins_bytes[2] = displacement[0];
+        ins_bytes[3] = displacement[1];
+        dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+      }
+    }
+  }
+  else
+  {
+    Assembler::get_instance().internal_error("Wrong parameter given to call instruction.");
+    return;
+  }
+}
+
 instruction::CALL::CALL()
 {
   this->is_generating_data = true;
