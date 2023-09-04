@@ -142,10 +142,10 @@ void test3()
 
   Symbol *test_sym = new Symbol(".test");
   test_sym->set_id(3);
-  // test_sym->set_value(0x022);
+  test_sym->set_value(0x022);
   test_sym->set_section(section2);
   test_sym->set_defined_flag(true);
-  test_sym->set_global_flag(true);
+  // test_sym->set_global_flag(true);
 
   Literal *literal0 = new Literal(0xABCD);
 
@@ -153,12 +153,15 @@ void test3()
   Command *int_cmd = new instruction::INT();
   Command *iret_cmd = new instruction::IRET();
   Command *call_cmd = new instruction::CALL();
-  call_cmd->enque_param(test_sym);
+  call_cmd->enque_param(literal0);
   Command *ret_cmd = new instruction::RET();
+  Command *jmp_cmd = new instruction::JMP();
+  jmp_cmd->enque_param(literal0);
 
   section->add_command(int_cmd);
   section->add_command(iret_cmd);
   section->add_command(call_cmd);
+  section->add_command(jmp_cmd);
   section->add_command(ret_cmd);
   section->add_command(halt_cmd); // add new above this line, so halt is last one
   section->create_output_file();

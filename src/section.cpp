@@ -97,11 +97,11 @@ std::vector<type::byte> Section::get_output_file() const
 }
 
 void Section::print_output_file(type::byte line_width, type::byte mode) const
-{ // TODO: maybe add memory address printing?
+{
   if (!line_width)
     line_width = 1;
 
-  std::cout << "SIZE: " << this->get_length() << " Lit_pool size: " << this->literal_pool.size() << std::endl;
+  std::cout << "SIZE: " << this->get_length() << " Lit_pool size: " << this->literal_pool.size() * 4 << std::endl;
 
   std::cout << "0x00: | ";
   type::byte new_line_cnt = 0;
@@ -125,10 +125,10 @@ void Section::print_output_file(type::byte line_width, type::byte mode) const
             << "Literal pool: " << std::endl;
   type::byte new_line_cnt2 = 0;
   for (auto &iter : this->literal_pool)
-  {
+  { // XXX: addresses don't go with asc order, 'cause it is unordered_map!!!
     LiteralPoolRecord *literal_from_pool = iter.second;
 
-    if (!new_line_cnt2)
+    if (new_line_cnt2 >= 0)
       std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)(new_line_cnt + new_line_cnt2)
                 << "/" << literal_from_pool->get_address() << ": | ";
 
@@ -148,9 +148,6 @@ void Section::print_output_file(type::byte line_width, type::byte mode) const
       if (++new_line_cnt2 % line_width == 0)
       {
         std::cout << std::endl;
-
-        if ((new_line_cnt2 >> 2) < this->literal_pool.size())
-          std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)(new_line_cnt + new_line_cnt2) << ": | ";
       }
     }
   }
@@ -190,10 +187,12 @@ void Section::literal_pool_insert_new(LiteralPoolRecord *record)
 
   // check if record already exists
   if (this->literal_pool.find(key) != this->literal_pool.end())
+  {
+    *record = *(this->literal_pool[key]);
     return;
+  }
 
-  record->set_address(this->get_length() + this->literal_pool.size());
-
+  record->set_address(this->get_length() + this->literal_pool.size() * 4); // XXX: check if 4 can be hardcoded
   this->literal_pool[key] = record;
 }
 

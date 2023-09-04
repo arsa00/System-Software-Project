@@ -21,7 +21,7 @@ private:
   uint32_t location_counter = 0;
 
   std::unordered_map<LiteralPoolKey, LiteralPoolRecord *, LiteralPoolKeyHasher> literal_pool;
-  std::list<RelocationRecord *> relocations;
+  std::list<RelocationRecord *> relocations; // TODO: change to unordered_set, because currently it is allowed to have duplicate relocations
 
   std::vector<type::byte> output_file;
 
