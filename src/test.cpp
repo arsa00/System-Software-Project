@@ -153,10 +153,10 @@ void test3()
   Command *int_cmd = new instruction::INT();
   Command *iret_cmd = new instruction::IRET();
   Command *call_cmd = new instruction::CALL();
-  call_cmd->enque_param(literal0);
+  call_cmd->enque_param(test_sym);
   Command *ret_cmd = new instruction::RET();
   Command *jmp_cmd = new instruction::JMP();
-  jmp_cmd->enque_param(literal0);
+  jmp_cmd->enque_param(test_sym);
 
   section->add_command(int_cmd);
   section->add_command(iret_cmd);

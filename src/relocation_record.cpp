@@ -1,4 +1,5 @@
 #include "../inc/relocation_record.hpp"
+#include <iostream>
 
 bool RelocationRecord::get_signed_flag_from_type(type::RELOCATIONS type)
 {
@@ -45,4 +46,9 @@ type::RELOCATIONS RelocationRecord::get_type() const
 bool RelocationRecord::get_addend_signed_flag() const
 {
   return this->is_addend_signed;
+}
+
+bool RelocationRecord::operator==(const RelocationRecord &rel_record) const
+{
+  return rel_record.offset == this->offset && rel_record.type == this->type && rel_record.symbol_id == this->symbol_id && rel_record.addend == this->addend;
 }

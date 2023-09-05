@@ -34,9 +34,9 @@ Section::~Section()
   // free memory for all relocation records
   while (!this->relocations.empty())
   {
-    auto relocation_record = this->relocations.front();
-    this->relocations.pop_front();
-    delete relocation_record;
+    auto iter = this->relocations.begin();
+    this->relocations.erase(iter);
+    delete *iter;
   }
 }
 
@@ -177,7 +177,6 @@ void Section::write_byte(type::byte single_byte)
 {
   this->output_file.push_back(single_byte);
   this->location_counter++;
-  // TODO: ^^^ Double check if this is the way to go. Maybe add full instruction size (to loc. cnt.) before execution and just check after (compare value of loc. cnt. and size of output_file)?
 }
 
 // adds literal to pool and set it's address
@@ -192,7 +191,7 @@ void Section::literal_pool_insert_new(LiteralPoolRecord *record)
     return;
   }
 
-  record->set_address(this->get_length() + this->literal_pool.size() * 4); // XXX: check if 4 can be hardcoded
+  record->set_address(this->get_length() + this->literal_pool.size() * 4); // XXX: check if 4 should be hardcoded
   this->literal_pool[key] = record;
 }
 
@@ -207,12 +206,17 @@ LiteralPoolRecord *Section::literal_pool_get(uint32_t liter_value, bool relocati
   return this->literal_pool[key];
 }
 
-void Section::add_new_relocation(RelocationRecord *rela_record)
+void Section::add_new_relocation(RelocationRecord *rel_record)
 {
-  this->relocations.push_back(rela_record);
+  this->relocations.insert(rel_record);
 }
 
 std::list<RelocationRecord *> Section::get_all_relocations() const
 {
-  return this->relocations;
+  std::list<RelocationRecord *> ret_list;
+
+  for (RelocationRecord *rel : this->relocations)
+    ret_list.push_back(rel);
+
+  return ret_list;
 }

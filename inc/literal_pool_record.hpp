@@ -14,10 +14,7 @@ struct LiteralPoolKey
 
   bool operator==(const LiteralPoolKey &key) const
   {
-    if (key.literal_value == this->literal_value && key.is_record_relocatable == this->is_record_relocatable)
-      return true;
-    else
-      return false;
+    return key.literal_value == this->literal_value && key.is_record_relocatable == this->is_record_relocatable;
   }
 };
 

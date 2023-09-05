@@ -11,7 +11,6 @@ private:
   std::string name;
   uint32_t value;
 
-  // TODO: finish implementation
   bool is_global = false;
   bool is_defined = false;
   bool has_value = false;

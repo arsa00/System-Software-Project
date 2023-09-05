@@ -11,6 +11,7 @@
 #include <list>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 class Section : public Parameter
 {
@@ -21,7 +22,7 @@ private:
   uint32_t location_counter = 0;
 
   std::unordered_map<LiteralPoolKey, LiteralPoolRecord *, LiteralPoolKeyHasher> literal_pool;
-  std::list<RelocationRecord *> relocations; // TODO: change to unordered_set, because currently it is allowed to have duplicate relocations
+  std::unordered_set<RelocationRecord *, RelocationRecordHasher, PointedObjEq> relocations; // TODO: test this
 
   std::vector<type::byte> output_file;
 
@@ -54,7 +55,7 @@ public:
   void literal_pool_insert_new(LiteralPoolRecord *record);
   LiteralPoolRecord *literal_pool_get(uint32_t liter_value, bool relocation_flag = false);
 
-  void add_new_relocation(RelocationRecord *rela_record);
+  void add_new_relocation(RelocationRecord *rel_record);
   std::list<RelocationRecord *> get_all_relocations() const;
 };
 
