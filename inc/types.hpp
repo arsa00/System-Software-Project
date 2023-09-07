@@ -114,6 +114,8 @@ namespace type
 
   enum class CPU_INSTRUCTIONS
   {
+    HALT = 0b00000000,      // stops CPU
+    INT = 0b00010000,       // push status; push pc; cause<=4; status<=status&(~0x1); pc<=handle;
     CALL_0 = 0b00100000,    // push pc; pc<=gpr[A]+gpr[B]+D;
     CALL_1 = 0b00100001,    // push pc; pc<=mem32[gpr[A]+gpr[B]+D];
     JMP_0 = 0b00110000,     // pc<=gpr[A]+D;

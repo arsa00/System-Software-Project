@@ -15,7 +15,7 @@ instruction::HALT::HALT()
 
 void instruction::HALT::execute(Section *dest_section) const
 {
-  std::vector<type::byte> ins_data = {0, 0, 0, 0};
+  std::vector<type::byte> ins_data = {static_cast<type::byte>(type::CPU_INSTRUCTIONS::HALT), 0, 0, 0};
   dest_section->write_byte_arr(ins_data);
 }
 
@@ -26,7 +26,7 @@ instruction::INT::INT()
 
 void instruction::INT::execute(Section *dest_section) const
 {
-  std::vector<type::byte> ins_data = {0x10, 0, 0, 0};
+  std::vector<type::byte> ins_data = {static_cast<type::byte>(type::CPU_INSTRUCTIONS::INT), 0, 0, 0};
   dest_section->write_byte_arr(ins_data);
 }
 
