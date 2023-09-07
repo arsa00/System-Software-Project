@@ -261,57 +261,190 @@ void instruction::JMP::execute(Section *dest_section) const
 }
 
 instruction::BEQ::BEQ()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::BEQ::execute(Section *dest_section) const
 {
-  // TODO: implement BEQ execute
+  // TODO: test BEQ instruction
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+  std::list<Parameter *> params = this->get_params();
+
+  if (params.empty())
+  {
+    Assembler::get_instance().internal_error("No parameter given to beq instruction.");
+    return;
+  }
+
+  if (params.size() > 1)
+  {
+    Assembler::get_instance().internal_error("Too many parameters given to beq instruction.");
+    return;
+  }
+
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG || this->get_gp_reg_1() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP registers must be set to execute beq instruction.");
+    return;
+  }
+
+  // XXX: is validation if any of gp regs is set to special gp registers (PC or SP) needed?
+
+  Parameter *param = params.front();
+  create_jump_ins(dest_section, param, type::CPU_INSTRUCTIONS::JMP_1, type::CPU_INSTRUCTIONS::JMP_5, this->get_size(), this->get_gp_reg_0(), this->get_gp_reg_1());
 }
 
 instruction::BNE::BNE()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::BNE::execute(Section *dest_section) const
 {
-  // TODO: implement BNE execute
+  // TODO: test BNE instruction
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+  std::list<Parameter *> params = this->get_params();
+
+  if (params.empty())
+  {
+    Assembler::get_instance().internal_error("No parameter given to bne instruction.");
+    return;
+  }
+
+  if (params.size() > 1)
+  {
+    Assembler::get_instance().internal_error("Too many parameters given to bne instruction.");
+    return;
+  }
+
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG || this->get_gp_reg_1() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP registers must be set to execute bne instruction.");
+    return;
+  }
+
+  // XXX: is validation if any of gp regs is set to special gp registers (PC or SP) needed?
+
+  Parameter *param = params.front();
+  create_jump_ins(dest_section, param, type::CPU_INSTRUCTIONS::JMP_2, type::CPU_INSTRUCTIONS::JMP_6, this->get_size(), this->get_gp_reg_0(), this->get_gp_reg_1());
 }
 
 instruction::BGT::BGT()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::BGT::execute(Section *dest_section) const
 {
-  // TODO: implement BGT execute
+  // TODO: test BGT instruction
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+  std::list<Parameter *> params = this->get_params();
+
+  if (params.empty())
+  {
+    Assembler::get_instance().internal_error("No parameter given to bgt instruction.");
+    return;
+  }
+
+  if (params.size() > 1)
+  {
+    Assembler::get_instance().internal_error("Too many parameters given to bgt instruction.");
+    return;
+  }
+
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG || this->get_gp_reg_1() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP registers must be set to execute bgt instruction.");
+    return;
+  }
+
+  // XXX: is validation if any of gp regs is set to special gp registers (PC or SP) needed?
+
+  Parameter *param = params.front();
+  create_jump_ins(dest_section, param, type::CPU_INSTRUCTIONS::JMP_3, type::CPU_INSTRUCTIONS::JMP_7, this->get_size(), this->get_gp_reg_0(), this->get_gp_reg_1());
 }
 
 instruction::PUSH::PUSH()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::PUSH::execute(Section *dest_section) const
 {
-  // TODO: implement PUSH execute
+  // TODO: test PUSH instruction
+  // push %gpr ==> sp <= sp - 4; mem32[sp] <= gpr; [use gp_reg0]
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP register must be set to execute push instruction.");
+    return;
+  }
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::ST_DATA_2);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::SP), 0);
+  displacement = converter::disp_to_byte_arr(-4);
+  converter::write_to_upper_byte_half(static_cast<type::byte>(this->get_gp_reg_0()), &displacement[0]);
+  ins_bytes[2] = displacement[0];
+  ins_bytes[3] = displacement[1];
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 }
 
 instruction::POP::POP()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::POP::execute(Section *dest_section) const
 {
-  // TODO: implement POP execute
+  // TODO: test POP instruction
+  // pop %gpr ===> gpr <= mem32[sp]; sp <= sp + 4; [use gp_reg0]
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP register must be set to execute pop instruction.");
+    return;
+  }
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_3);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), static_cast<type::byte>(type::GP_REG::SP));
+  displacement = converter::disp_to_byte_arr(4);
+  ins_bytes[2] = displacement[0];
+  ins_bytes[3] = displacement[1];
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 }
 
 instruction::XCHG::XCHG()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::XCHG::execute(Section *dest_section) const
 {
-  // TODO: implement XCHG execute
+  // TODO: test XCHG instruction
+  // xchg %gprS, %gprD ==> temp <= gprD; gprD <= gprS; gprS <= temp; [gprS = gp_reg_0 | gprD = gp_reg_1]
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG || this->get_gp_reg_1() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP registers must be set to execute xchg instruction.");
+    return;
+  }
+
+  // XXX: is validation if any of gp regs is set to special gp registers (PC or SP) needed?
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::XCHG);
+  ins_bytes[1] = converter::create_byte_of_two_halves(0, static_cast<type::byte>(this->get_gp_reg_1()));
+  ins_bytes[2] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), 0);
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 }
 
 instruction::ADD::ADD()

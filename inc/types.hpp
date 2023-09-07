@@ -126,6 +126,10 @@ namespace type
     JMP_5 = 0b00111001,     // if (gpr[B] == gpr[C]) pc<=mem32[gpr[A]+D];
     JMP_6 = 0b00111010,     // if (gpr[B] != gpr[C]) pc<=mem32[gpr[A]+D];
     JMP_7 = 0b00111011,     // if (gpr[B] signed> gpr[C]) pc<=mem32[gpr[A]+D];
+    XCHG = 0b01000000,      // temp<=gpr[B]; gpr[B]<=gpr[C]; gpr[C]<=temp; #atomic
+    ST_DATA_0 = 0b10000000, // mem32[gpr[A]+gpr[B]+D]<=gpr[C];
+    ST_DATA_1 = 0b10000010, // mem32[mem32[gpr[A]+gpr[B]+D]]<=gpr[C];
+    ST_DATA_2 = 0b10000001, // gpr[A]<=gpr[A]+D; mem32[gpr[A]]<=gpr[C];
     LD_DATA_0 = 0b10010000, // gpr[A] <= csr[B];
     LD_DATA_1 = 0b10010001, // gpr[A] <= gpr[B]+D;
     LD_DATA_2 = 0b10010010, // gpr[A] <= mem32[gpr[B]+gpr[C]+D];
