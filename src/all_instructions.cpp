@@ -447,40 +447,135 @@ void instruction::XCHG::execute(Section *dest_section) const
   dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 }
 
+void create_arith_instruction(Section *dest_section, type::CPU_INSTRUCTIONS ins, type::GP_REG gprD, type::GP_REG gprS, std::string ins_name)
+{
+  if (gprS == type::GP_REG::NO_REG || gprD == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP registers must be set to execute " + ins_name + " instruction.");
+    return;
+  }
+
+  // XXX: is validation if any of gp regs is set to special gp registers (PC or SP) needed?
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+
+  ins_bytes[0] = static_cast<type::byte>(ins);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(gprD), static_cast<type::byte>(gprD));
+  ins_bytes[2] = converter::create_byte_of_two_halves(static_cast<type::byte>(gprS), 0);
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+}
+
 instruction::ADD::ADD()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::ADD::execute(Section *dest_section) const
 {
-  // TODO: implement ADD execute
+  // TODO: test ADD instruction
+  // add %gprS, %gprD ==> gprD <= gprD + gprS; [gprS = gp_reg_0 | gprD = gp_reg_1]
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG || this->get_gp_reg_1() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP registers must be set to execute add instruction.");
+    return;
+  }
+
+  // XXX: is validation if any of gp regs is set to special gp registers (PC or SP) needed?
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::ARITH_OP_0);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(this->get_gp_reg_1()));
+  ins_bytes[2] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), 0);
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+
+  // create_arith_instruction(dest_section, type::CPU_INSTRUCTIONS::ARITH_OP_0, this->get_gp_reg_1(), this->get_gp_reg_0(), "add"); // TODO: test this
 }
 
 instruction::SUB::SUB()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::SUB::execute(Section *dest_section) const
 {
-  // TODO: implement SUB execute
+  // TODO: test SUB instruction
+  // sub %gprS, %gprD ==> gprD <= gprD - gprS; [gprS = gp_reg_0 | gprD = gp_reg_1]
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG || this->get_gp_reg_1() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP registers must be set to execute sub instruction.");
+    return;
+  }
+
+  // XXX: is validation if any of gp regs is set to special gp registers (PC or SP) needed?
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::ARITH_OP_1);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(this->get_gp_reg_1()));
+  ins_bytes[2] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), 0);
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+
+  // create_arith_instruction(dest_section, type::CPU_INSTRUCTIONS::ARITH_OP_1, this->get_gp_reg_1(), this->get_gp_reg_0(), "sub"); // TODO: test this
 }
 
 instruction::MUL::MUL()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::MUL::execute(Section *dest_section) const
 {
-  // TODO: implement MUL execute
+  // TODO: test MUL instruction
+  // mul %gprS, %gprD ==> gprD <= gprD * gprS; [gprS = gp_reg_0 | gprD = gp_reg_1]
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG || this->get_gp_reg_1() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP registers must be set to execute mul instruction.");
+    return;
+  }
+
+  // XXX: is validation if any of gp regs is set to special gp registers (PC or SP) needed?
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::ARITH_OP_2);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(this->get_gp_reg_1()));
+  ins_bytes[2] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), 0);
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+
+  // create_arith_instruction(dest_section, type::CPU_INSTRUCTIONS::ARITH_OP_2, this->get_gp_reg_1(), this->get_gp_reg_0(), "mul"); // TODO: test this
 }
 
 instruction::DIV::DIV()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::DIV::execute(Section *dest_section) const
 {
-  // TODO: implement DIV execute
+  // TODO: test DIV instruction
+  // div %gprS, %gprD ==> gprD <= gprD / gprS; [gprS = gp_reg_0 | gprD = gp_reg_1]
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG || this->get_gp_reg_1() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP registers must be set to execute div instruction.");
+    return;
+  }
+
+  // XXX: is validation if any of gp regs is set to special gp registers (PC or SP) needed?
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::ARITH_OP_3);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(this->get_gp_reg_1()));
+  ins_bytes[2] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), 0);
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+
+  // create_arith_instruction(dest_section, type::CPU_INSTRUCTIONS::ARITH_OP_3, this->get_gp_reg_1(), this->get_gp_reg_0(), "div"); // TODO: test this
 }
 
 instruction::NOT::NOT()

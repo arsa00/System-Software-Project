@@ -114,30 +114,38 @@ namespace type
 
   enum class CPU_INSTRUCTIONS
   {
-    HALT = 0b00000000,      // stops CPU
-    INT = 0b00010000,       // push status; push pc; cause<=4; status<=status&(~0x1); pc<=handle;
-    CALL_0 = 0b00100000,    // push pc; pc<=gpr[A]+gpr[B]+D;
-    CALL_1 = 0b00100001,    // push pc; pc<=mem32[gpr[A]+gpr[B]+D];
-    JMP_0 = 0b00110000,     // pc<=gpr[A]+D;
-    JMP_1 = 0b00110001,     // if (gpr[B] == gpr[C]) pc<=gpr[A]+D;
-    JMP_2 = 0b00110010,     // if (gpr[B] != gpr[C]) pc<=gpr[A]+D;
-    JMP_3 = 0b00110011,     // if (gpr[B] signed> gpr[C]) pc<=gpr[A]+D;
-    JMP_4 = 0b00111000,     // pc<=mem32[gpr[A]+D];
-    JMP_5 = 0b00111001,     // if (gpr[B] == gpr[C]) pc<=mem32[gpr[A]+D];
-    JMP_6 = 0b00111010,     // if (gpr[B] != gpr[C]) pc<=mem32[gpr[A]+D];
-    JMP_7 = 0b00111011,     // if (gpr[B] signed> gpr[C]) pc<=mem32[gpr[A]+D];
-    XCHG = 0b01000000,      // temp<=gpr[B]; gpr[B]<=gpr[C]; gpr[C]<=temp; #atomic
-    ST_DATA_0 = 0b10000000, // mem32[gpr[A]+gpr[B]+D]<=gpr[C];
-    ST_DATA_1 = 0b10000010, // mem32[mem32[gpr[A]+gpr[B]+D]]<=gpr[C];
-    ST_DATA_2 = 0b10000001, // gpr[A]<=gpr[A]+D; mem32[gpr[A]]<=gpr[C];
-    LD_DATA_0 = 0b10010000, // gpr[A] <= csr[B];
-    LD_DATA_1 = 0b10010001, // gpr[A] <= gpr[B]+D;
-    LD_DATA_2 = 0b10010010, // gpr[A] <= mem32[gpr[B]+gpr[C]+D];
-    LD_DATA_3 = 0b10010011, // gpr[A] <= mem32[gpr[B]]; gpr[B]<=gpr[B]+D;
-    LD_DATA_4 = 0b10010100, // csr[A] <= gpr[B];
-    LD_DATA_5 = 0b10010101, // csr[A] <= csr[B]|D;
-    LD_DATA_6 = 0b10010110, // csr[A] <= mem32[gpr[B]+gpr[C]+D];
-    LD_DATA_7 = 0b10010111  // csr[A] <= mem32[gpr[B]]; gpr[B]<=gpr[B]+D;
+    HALT = 0b00000000,       // stops CPU
+    INT = 0b00010000,        // push status; push pc; cause<=4; status<=status&(~0x1); pc<=handle;
+    CALL_0 = 0b00100000,     // push pc; pc<=gpr[A]+gpr[B]+D;
+    CALL_1 = 0b00100001,     // push pc; pc<=mem32[gpr[A]+gpr[B]+D];
+    JMP_0 = 0b00110000,      // pc<=gpr[A]+D;
+    JMP_1 = 0b00110001,      // if (gpr[B] == gpr[C]) pc<=gpr[A]+D;
+    JMP_2 = 0b00110010,      // if (gpr[B] != gpr[C]) pc<=gpr[A]+D;
+    JMP_3 = 0b00110011,      // if (gpr[B] signed> gpr[C]) pc<=gpr[A]+D;
+    JMP_4 = 0b00111000,      // pc<=mem32[gpr[A]+D];
+    JMP_5 = 0b00111001,      // if (gpr[B] == gpr[C]) pc<=mem32[gpr[A]+D];
+    JMP_6 = 0b00111010,      // if (gpr[B] != gpr[C]) pc<=mem32[gpr[A]+D];
+    JMP_7 = 0b00111011,      // if (gpr[B] signed> gpr[C]) pc<=mem32[gpr[A]+D];
+    XCHG = 0b01000000,       // temp<=gpr[B]; gpr[B]<=gpr[C]; gpr[C]<=temp; #atomic
+    ARITH_OP_0 = 0b01010000, // gpr[A]<=gpr[B] + gpr[C];
+    ARITH_OP_1 = 0b01010001, // gpr[A]<=gpr[B] - gpr[C];
+    ARITH_OP_2 = 0b01010010, // gpr[A]<=gpr[B] * gpr[C];
+    ARITH_OP_3 = 0b01010011, // gpr[A]<=gpr[B] / gpr[C];
+    LOGIC_OP_0 = 0b01100000, // gpr[A]<=~gpr[B];
+    LOGIC_OP_1 = 0b01100001, // gpr[A]<=gpr[B] & gpr[C];
+    LOGIC_OP_2 = 0b01100010, // gpr[A]<=gpr[B] | gpr[C];
+    LOGIC_OP_3 = 0b01100011, // gpr[A]<=gpr[B] ^ gpr[C];
+    ST_DATA_0 = 0b10000000,  // mem32[gpr[A]+gpr[B]+D]<=gpr[C];
+    ST_DATA_1 = 0b10000010,  // mem32[mem32[gpr[A]+gpr[B]+D]]<=gpr[C];
+    ST_DATA_2 = 0b10000001,  // gpr[A]<=gpr[A]+D; mem32[gpr[A]]<=gpr[C];
+    LD_DATA_0 = 0b10010000,  // gpr[A] <= csr[B];
+    LD_DATA_1 = 0b10010001,  // gpr[A] <= gpr[B]+D;
+    LD_DATA_2 = 0b10010010,  // gpr[A] <= mem32[gpr[B]+gpr[C]+D];
+    LD_DATA_3 = 0b10010011,  // gpr[A] <= mem32[gpr[B]]; gpr[B]<=gpr[B]+D;
+    LD_DATA_4 = 0b10010100,  // csr[A] <= gpr[B];
+    LD_DATA_5 = 0b10010101,  // csr[A] <= csr[B]|D;
+    LD_DATA_6 = 0b10010110,  // csr[A] <= mem32[gpr[B]+gpr[C]+D];
+    LD_DATA_7 = 0b10010111   // csr[A] <= mem32[gpr[B]]; gpr[B]<=gpr[B]+D;
   };
 }
 
