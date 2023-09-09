@@ -447,22 +447,30 @@ void instruction::XCHG::execute(Section *dest_section) const
   dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 }
 
-void create_arith_instruction(Section *dest_section, type::CPU_INSTRUCTIONS ins, type::GP_REG gprD, type::GP_REG gprS, std::string ins_name)
+void create_operation_instruction(Section *dest_section, type::CPU_INSTRUCTIONS ins, type::GP_REG gprA, type::GP_REG gprB, type::GP_REG gprC = type::GP_REG::R0, int16_t disp = 0)
 {
-  if (gprS == type::GP_REG::NO_REG || gprD == type::GP_REG::NO_REG)
+  if (gprA == type::GP_REG::NO_REG || gprB == type::GP_REG::NO_REG || gprC == type::GP_REG::NO_REG)
   {
-    Assembler::get_instance().internal_error("GP registers must be set to execute " + ins_name + " instruction.");
+    std::string msg = "GP registers have non-consistent values: \n{";
+    msg += "section name: \"" + dest_section->get_name() + std::string("\",\n");
+    msg += "cpu instruction: \"" + converter::cpu_instruction_type_to_string(ins) + std::string("\",\n");
+    msg += "gprA: " + static_cast<int16_t>(gprA) + std::string(",\n");
+    msg += "gprB: " + static_cast<int16_t>(gprB) + std::string(",\n");
+    msg += "gprC: " + static_cast<int16_t>(gprC) + std::string("\n}");
+    Assembler::get_instance().internal_error(msg);
     return;
   }
 
-  // XXX: is validation if any of gp regs is set to special gp registers (PC or SP) needed?
-
   std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
-  std::array<type::byte, 2> displacement;
+  std::array<type::byte, 2> displacement = converter::disp_to_byte_arr(disp);
+
+  if (gprC != type::GP_REG::R0)
+    converter::write_to_upper_byte_half(static_cast<type::byte>(gprC), &displacement[0]);
 
   ins_bytes[0] = static_cast<type::byte>(ins);
-  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(gprD), static_cast<type::byte>(gprD));
-  ins_bytes[2] = converter::create_byte_of_two_halves(static_cast<type::byte>(gprS), 0);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(gprA), static_cast<type::byte>(gprB));
+  ins_bytes[2] = displacement[0];
+  ins_bytes[3] = displacement[1];
   dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 }
 
@@ -491,7 +499,7 @@ void instruction::ADD::execute(Section *dest_section) const
   ins_bytes[2] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), 0);
   dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 
-  // create_arith_instruction(dest_section, type::CPU_INSTRUCTIONS::ARITH_OP_0, this->get_gp_reg_1(), this->get_gp_reg_0(), "add"); // TODO: test this
+  // create_operation_instruction(dest_section, type::CPU_INSTRUCTIONS::ARITH_OP_0, this->get_gp_reg_1(), this->get_gp_reg_1(), this->get_gp_reg_0()); // TODO: test this
 }
 
 instruction::SUB::SUB()
@@ -519,7 +527,7 @@ void instruction::SUB::execute(Section *dest_section) const
   ins_bytes[2] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), 0);
   dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 
-  // create_arith_instruction(dest_section, type::CPU_INSTRUCTIONS::ARITH_OP_1, this->get_gp_reg_1(), this->get_gp_reg_0(), "sub"); // TODO: test this
+  // create_operation_instruction(dest_section, type::CPU_INSTRUCTIONS::ARITH_OP_1, this->get_gp_reg_1(), this->get_gp_reg_1(), this->get_gp_reg_0()); // TODO: test this
 }
 
 instruction::MUL::MUL()
@@ -547,7 +555,7 @@ void instruction::MUL::execute(Section *dest_section) const
   ins_bytes[2] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), 0);
   dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 
-  // create_arith_instruction(dest_section, type::CPU_INSTRUCTIONS::ARITH_OP_2, this->get_gp_reg_1(), this->get_gp_reg_0(), "mul"); // TODO: test this
+  // create_operation_instruction(dest_section, type::CPU_INSTRUCTIONS::ARITH_OP_2, this->get_gp_reg_1(), this->get_gp_reg_1(), this->get_gp_reg_0()); // TODO: test this
 }
 
 instruction::DIV::DIV()
@@ -575,34 +583,91 @@ void instruction::DIV::execute(Section *dest_section) const
   ins_bytes[2] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), 0);
   dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 
-  // create_arith_instruction(dest_section, type::CPU_INSTRUCTIONS::ARITH_OP_3, this->get_gp_reg_1(), this->get_gp_reg_0(), "div"); // TODO: test this
+  // create_operation_instruction(dest_section, type::CPU_INSTRUCTIONS::ARITH_OP_3, this->get_gp_reg_1(), this->get_gp_reg_1(), this->get_gp_reg_0()); // TODO: test this
 }
 
 instruction::NOT::NOT()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::NOT::execute(Section *dest_section) const
 {
-  // TODO: implement NOT execute
+  // TODO: test NOT instruction
+  // not %gpr ==> gpr <= ~gpr; [grp = gp_reg_0]
+
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP register must be set to execute not instruction.");
+    return;
+  }
+
+  // XXX: is validation if gp reg is set to special gp registers (PC or SP) needed?
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LOGIC_OP_0);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), static_cast<type::byte>(this->get_gp_reg_0()));
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+
+  // create_operation_instruction(dest_section, type::CPU_INSTRUCTIONS::LOGIC_OP_0, this->get_gp_reg_0(), this->get_gp_reg_0()); // TODO: test this
 }
 
 instruction::AND::AND()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::AND::execute(Section *dest_section) const
 {
-  // TODO: implement AND execute
+  // TODO: test AND instruction
+  // and %gprS, %gprD ==> gprD <= gprD & gprS; [gprS = gp_reg_0 | gprD = gp_reg_1]
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG || this->get_gp_reg_1() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP registers must be set to execute and instruction.");
+    return;
+  }
+
+  // XXX: is validation if any of gp regs is set to special gp registers (PC or SP) needed?
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LOGIC_OP_1);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(this->get_gp_reg_1()));
+  ins_bytes[2] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), 0);
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+
+  // create_operation_instruction(dest_section, type::CPU_INSTRUCTIONS::LOGIC_OP_1, this->get_gp_reg_1(), this->get_gp_reg_1(), this->get_gp_reg_0()); // TODO: test this
 }
 
 instruction::OR::OR()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::OR::execute(Section *dest_section) const
 {
-  // TODO: implement OR execute
+  // TODO: test OR instruction
+  // or %gprS, %gprD ==> gprD <= gprD | gprS; [gprS = gp_reg_0 | gprD = gp_reg_1]
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG || this->get_gp_reg_1() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP registers must be set to execute or instruction.");
+    return;
+  }
+
+  // XXX: is validation if any of gp regs is set to special gp registers (PC or SP) needed?
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LOGIC_OP_2);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(this->get_gp_reg_1()));
+  ins_bytes[2] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), 0);
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+
+  // create_operation_instruction(dest_section, type::CPU_INSTRUCTIONS::LOGIC_OP_2, this->get_gp_reg_1(), this->get_gp_reg_1(), this->get_gp_reg_0()); // TODO: test this
 }
 
 instruction::XOR::XOR()
@@ -611,7 +676,25 @@ instruction::XOR::XOR()
 
 void instruction::XOR::execute(Section *dest_section) const
 {
-  // TODO: implement XOR execute
+  // TODO: test XOR instruction
+  // xor %gprS, %gprD ==> gprD <= gprD ^ gprS; [gprS = gp_reg_0 | gprD = gp_reg_1]
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG || this->get_gp_reg_1() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP registers must be set to execute xor instruction.");
+    return;
+  }
+
+  // XXX: is validation if any of gp regs is set to special gp registers (PC or SP) needed?
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LOGIC_OP_3);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(this->get_gp_reg_1()));
+  ins_bytes[2] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), 0);
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+
+  // create_operation_instruction(dest_section, type::CPU_INSTRUCTIONS::LOGIC_OP_3, this->get_gp_reg_1(), this->get_gp_reg_1(), this->get_gp_reg_0()); // TODO: test this
 }
 
 instruction::SHL::SHL()

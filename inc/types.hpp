@@ -112,6 +112,7 @@ namespace type
     ABS_32U  // absolute value, 32bit long, unsigned
   };
 
+  // NOTE: after adding new type, add it also to converter::cpu_nstruction_type_to_string functon
   enum class CPU_INSTRUCTIONS
   {
     HALT = 0b00000000,       // stops CPU

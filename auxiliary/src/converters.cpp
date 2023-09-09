@@ -87,6 +87,79 @@ std::string converter::instruction_type_to_string(type::INSTRUCTION_TYPE ins_ali
   }
 }
 
+std::string converter::cpu_instruction_type_to_string(type::CPU_INSTRUCTIONS ins_alias)
+{
+  switch (ins_alias)
+  {
+  case type::CPU_INSTRUCTIONS::HALT:
+    return "HALT";
+  case type::CPU_INSTRUCTIONS::INT:
+    return "INT";
+  case type::CPU_INSTRUCTIONS::CALL_0:
+    return "CALL_0";
+  case type::CPU_INSTRUCTIONS::CALL_1:
+    return "CALL_1";
+  case type::CPU_INSTRUCTIONS::JMP_0:
+    return "JMP_0";
+  case type::CPU_INSTRUCTIONS::JMP_1:
+    return "JMP_1";
+  case type::CPU_INSTRUCTIONS::JMP_2:
+    return "JMP_2";
+  case type::CPU_INSTRUCTIONS::JMP_3:
+    return "JMP_3";
+  case type::CPU_INSTRUCTIONS::JMP_4:
+    return "JMP_4";
+  case type::CPU_INSTRUCTIONS::JMP_5:
+    return "JMP_5";
+  case type::CPU_INSTRUCTIONS::JMP_6:
+    return "JMP_6";
+  case type::CPU_INSTRUCTIONS::JMP_7:
+    return "JMP_7";
+  case type::CPU_INSTRUCTIONS::XCHG:
+    return "XCHG";
+  case type::CPU_INSTRUCTIONS::ARITH_OP_0:
+    return "ARITH_OP_0";
+  case type::CPU_INSTRUCTIONS::ARITH_OP_1:
+    return "ARITH_OP_1";
+  case type::CPU_INSTRUCTIONS::ARITH_OP_2:
+    return "ARITH_OP_2";
+  case type::CPU_INSTRUCTIONS::ARITH_OP_3:
+    return "ARITH_OP_3";
+  case type::CPU_INSTRUCTIONS::LOGIC_OP_0:
+    return "LOGIC_OP_0";
+  case type::CPU_INSTRUCTIONS::LOGIC_OP_1:
+    return "LOGIC_OP_1";
+  case type::CPU_INSTRUCTIONS::LOGIC_OP_2:
+    return "LOGIC_OP_2";
+  case type::CPU_INSTRUCTIONS::LOGIC_OP_3:
+    return "LOGIC_OP_3";
+  case type::CPU_INSTRUCTIONS::ST_DATA_0:
+    return "ST_DATA_0";
+  case type::CPU_INSTRUCTIONS::ST_DATA_1:
+    return "ST_DATA_1";
+  case type::CPU_INSTRUCTIONS::ST_DATA_2:
+    return "ST_DATA_2";
+  case type::CPU_INSTRUCTIONS::LD_DATA_0:
+    return "LD_DATA_0";
+  case type::CPU_INSTRUCTIONS::LD_DATA_1:
+    return "LD_DATA_1";
+  case type::CPU_INSTRUCTIONS::LD_DATA_2:
+    return "LD_DATA_2";
+  case type::CPU_INSTRUCTIONS::LD_DATA_3:
+    return "LD_DATA_3";
+  case type::CPU_INSTRUCTIONS::LD_DATA_4:
+    return "LD_DATA_4";
+  case type::CPU_INSTRUCTIONS::LD_DATA_5:
+    return "LD_DATA_5";
+  case type::CPU_INSTRUCTIONS::LD_DATA_6:
+    return "LD_DATA_6";
+  case type::CPU_INSTRUCTIONS::LD_DATA_7:
+    return "LD_DATA_7";
+  default:
+    return "";
+  }
+}
+
 // displacement is 12bit value, so higher 4 bits of arr[0] are always zero and must be overwritten
 // to use value needed in instruction
 std::array<type::byte, 2> converter::disp_to_byte_arr(int16_t displacement)
