@@ -133,6 +133,10 @@ std::string converter::cpu_instruction_type_to_string(type::CPU_INSTRUCTIONS ins
     return "LOGIC_OP_2";
   case type::CPU_INSTRUCTIONS::LOGIC_OP_3:
     return "LOGIC_OP_3";
+  case type::CPU_INSTRUCTIONS::SHIFT_OP_0:
+    return "SHIFT_OP_0";
+  case type::CPU_INSTRUCTIONS::SHIFT_OP_1:
+    return "SHIFT_OP_1";
   case type::CPU_INSTRUCTIONS::ST_DATA_0:
     return "ST_DATA_0";
   case type::CPU_INSTRUCTIONS::ST_DATA_1:

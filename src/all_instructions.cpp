@@ -671,7 +671,8 @@ void instruction::OR::execute(Section *dest_section) const
 }
 
 instruction::XOR::XOR()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::XOR::execute(Section *dest_section) const
@@ -698,21 +699,29 @@ void instruction::XOR::execute(Section *dest_section) const
 }
 
 instruction::SHL::SHL()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::SHL::execute(Section *dest_section) const
 {
-  // TODO: implement SHL execute
+  // TODO: test SHL instruction
+  // shl %gprS, %gprD ==> gprD <= gprD << gprS; [gprS = gp_reg_0 | gprD = gp_reg_1]
+
+  create_operation_instruction(dest_section, type::CPU_INSTRUCTIONS::SHIFT_OP_0, this->get_gp_reg_1(), this->get_gp_reg_1(), this->get_gp_reg_0());
 }
 
 instruction::SHR::SHR()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::SHR::execute(Section *dest_section) const
 {
-  // TODO: implement SHR execute
+  // TODO: test SHR instruction
+  // shr %gprS, %gprD ==> gprD <= gprD >> gprS; [gprS = gp_reg_0 | gprD = gp_reg_1]
+
+  create_operation_instruction(dest_section, type::CPU_INSTRUCTIONS::SHIFT_OP_1, this->get_gp_reg_1(), this->get_gp_reg_1(), this->get_gp_reg_0());
 }
 
 instruction::LD::LD()

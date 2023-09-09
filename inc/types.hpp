@@ -136,6 +136,8 @@ namespace type
     LOGIC_OP_1 = 0b01100001, // gpr[A]<=gpr[B] & gpr[C];
     LOGIC_OP_2 = 0b01100010, // gpr[A]<=gpr[B] | gpr[C];
     LOGIC_OP_3 = 0b01100011, // gpr[A]<=gpr[B] ^ gpr[C];
+    SHIFT_OP_0 = 0b01110000, // gpr[A]<=gpr[B] << gpr[C];
+    SHIFT_OP_1 = 0b01110001, // gpr[A]<=gpr[B] >> gpr[C];
     ST_DATA_0 = 0b10000000,  // mem32[gpr[A]+gpr[B]+D]<=gpr[C];
     ST_DATA_1 = 0b10000010,  // mem32[mem32[gpr[A]+gpr[B]+D]]<=gpr[C];
     ST_DATA_2 = 0b10000001,  // gpr[A]<=gpr[A]+D; mem32[gpr[A]]<=gpr[C];
