@@ -7,7 +7,7 @@
 class Instruction : public Command
 {
 private:
-  type::MEMORY_ADDRESSING_MODES mem_addr_mode;
+  type::MEMORY_ADDRESSING_MODES mem_addr_mode = type::MEMORY_ADDRESSING_MODES::NO_MODE;
   type::GP_REG gp_reg_0, gp_reg_1;
   type::CS_REG cs_reg_0, cs_reg_1;
 

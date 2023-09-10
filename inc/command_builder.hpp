@@ -9,9 +9,9 @@ class CommandBuilder
 {
 private:
   std::list<Parameter *> params;
-  type::MEMORY_ADDRESSING_MODES mem_addr_mode;
-  type::GP_REG gp_reg_0, gp_reg_1;
-  type::CS_REG cs_reg_0, cs_reg_1;
+  type::MEMORY_ADDRESSING_MODES mem_addr_mode = type::MEMORY_ADDRESSING_MODES::NO_MODE;
+  type::GP_REG gp_reg_0 = type::GP_REG::NO_REG, gp_reg_1 = type::GP_REG::NO_REG;
+  type::CS_REG cs_reg_0 = type::CS_REG::NO_REG, cs_reg_1 = type::CS_REG::NO_REG;
 
   CommandBuilder() {}
   CommandBuilder(const CommandBuilder &) = delete;

@@ -70,6 +70,7 @@ namespace type
 
   enum class MEMORY_ADDRESSING_MODES
   {
+    NO_MODE = -1,
     IMMED,
     MEM_DIR,
     REG_DIR,
@@ -79,6 +80,7 @@ namespace type
 
   enum class GP_REG
   {
+    NO_REG = -1,
     R0 = 0,
     R1,
     R2,
@@ -94,16 +96,15 @@ namespace type
     R12,
     R13,
     SP,
-    PC,
-    NO_REG = -1
+    PC
   };
 
   enum class CS_REG
   {
+    NO_REG = -1,
     STATUS_REG = 0,
     HANDLER_REG,
-    CAUSE_REG,
-    NO_REG = -1
+    CAUSE_REG
   };
 
   enum class RELOCATIONS

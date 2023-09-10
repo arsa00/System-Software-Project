@@ -18,6 +18,7 @@ void CommandBuilder::clear_builder()
   this->gp_reg_1 = type::GP_REG::NO_REG;
   this->cs_reg_0 = type::CS_REG::NO_REG;
   this->cs_reg_1 = type::CS_REG::NO_REG;
+  this->mem_addr_mode = type::MEMORY_ADDRESSING_MODES::NO_MODE;
   this->clear_params();
 }
 
@@ -164,15 +165,18 @@ Instruction *CommandBuilder::build_instruction(type::INSTRUCTION_TYPE ins_alias)
     ins = new instruction::LD();
     ins->set_mem_addr_mode(this->mem_addr_mode);
     ins->set_gp_reg_0(this->gp_reg_0);
+    ins->set_gp_reg_1(this->gp_reg_1); // only for REG_DIR, REG_IND & REG_IND_WITH_DISP, but it will not hurt to set it every time
     ins->set_params(this->get_params());
   }
   break;
   case type::INSTRUCTION_TYPE::ST:
-  { // TODO: call yyerror if unallowed combination of mem_addr_mode is set
+  {
     ins = new instruction::ST();
     ins->set_mem_addr_mode(this->mem_addr_mode);
     ins->set_gp_reg_0(this->gp_reg_0);
     ins->set_params(this->get_params());
+
+    // unallowed mem_addr_mode is set
     if (this->mem_addr_mode == type::MEMORY_ADDRESSING_MODES::IMMED)
       Assembler::get_instance().parse_error("Error occured while building " + converter::instruction_type_to_string(ins_alias) + " instruction. \
 Unallowed combination of memory addressing mode and instruction parameters.");
