@@ -181,13 +181,9 @@ DOLLAR all_num_literals { std::cout << "immed" << std::endl; CommandBuilder::get
 | DOLLAR single_symbol { std::cout << "immed" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::IMMED); }
 | all_num_literals { std::cout << "mem dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::MEM_DIR); }
 | single_symbol  { std::cout << "mem dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::MEM_DIR); }
-| single_cs_reg  { std::cout << "reg dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_DIR); }
 | single_gp_reg  { std::cout << "reg dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_DIR); }
-| SQUARE_BRACKET_L single_cs_reg SQUARE_BRACKET_R  { std::cout << "reg mem" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND); }
 | SQUARE_BRACKET_L single_gp_reg SQUARE_BRACKET_R  { std::cout << "reg mem" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND); }
-| SQUARE_BRACKET_L single_cs_reg PLUS all_num_literals SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
 | SQUARE_BRACKET_L single_gp_reg PLUS all_num_literals SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
-| SQUARE_BRACKET_L single_cs_reg PLUS single_symbol SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
 | SQUARE_BRACKET_L single_gp_reg PLUS single_symbol SQUARE_BRACKET_R { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
 
 %%
