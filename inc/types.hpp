@@ -10,9 +10,11 @@ namespace type
   using instruction_size = uint32_t;
   using addr_size = uint32_t;
 
-  const static int32_t MAX_NEG_DISP = -2048;      // -2^11
-  const static int32_t MAX_POS_DISP = 2047;       // 2^11 - 1
-  const static uint16_t MAX_UNSIGNED_DISP = 4095; // 2^12 - 1
+  static const int32_t MAX_NEG_DISP = -2048;      // -2^11
+  static const int32_t MAX_POS_DISP = 2047;       // 2^11 - 1
+  static const uint16_t MAX_UNSIGNED_DISP = 4095; // 2^12 - 1
+
+  static const uint32_t DEFAULT_INSTRUCTION_SIZE = 4;
 
   enum class PARAMETER_TYPE
   {

@@ -12,7 +12,7 @@ private:
   type::CS_REG cs_reg_0, cs_reg_1;
 
 public:
-  Instruction() : Command(type::COMMAND_TYPE::INSTRUCTION) { this->size = 4; }
+  Instruction() : Command(type::COMMAND_TYPE::INSTRUCTION, type::DEFAULT_INSTRUCTION_SIZE) {}
 
   void set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES);
   type::MEMORY_ADDRESSING_MODES get_mem_addr_mode() const;

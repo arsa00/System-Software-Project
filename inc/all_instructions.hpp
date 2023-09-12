@@ -165,6 +165,7 @@ namespace instruction
   public:
     LD();
     void execute(Section *dest_section) const override;
+    uint32_t get_size() const override;
   };
 
   class ST : public Instruction

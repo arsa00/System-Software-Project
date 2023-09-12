@@ -13,7 +13,8 @@ private:
 
   bool is_global = false;
   bool is_defined = false;
-  bool has_value = false;
+  bool is_final = false;  // indicates if symbol has final value
+  bool has_value = false; // indicates if symbol has any value set
   Section *section = nullptr;
 
 public:
@@ -27,6 +28,9 @@ public:
 
   void set_defined_flag(bool defined_flag);
   bool get_defined_flag() const;
+
+  void set_final_flag(bool final_flag);
+  bool get_final_flag() const;
 
   uint32_t get_value() const;
   void set_value(uint32_t val);

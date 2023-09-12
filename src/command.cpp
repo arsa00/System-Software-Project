@@ -116,6 +116,8 @@ void Command::set_size(uint32_t size)
   this->size = size;
 }
 
+// This method must not be called before all arguments (params, registers, etc.) are set.
+// In other case, it's value is not reliable.
 uint32_t Command::get_size() const
 {
   return this->size;

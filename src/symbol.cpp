@@ -35,6 +35,16 @@ bool Symbol::get_defined_flag() const
   return this->is_defined;
 }
 
+void Symbol::set_final_flag(bool final_flag)
+{
+  this->is_final = final_flag;
+}
+
+bool Symbol::get_final_flag() const
+{
+  return this->is_final;
+}
+
 uint32_t Symbol::get_value() const
 {
   return this->value;

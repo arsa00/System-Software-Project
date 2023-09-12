@@ -42,7 +42,7 @@ public:
   Parameter *deque_param();
 
   void set_size(uint32_t size);
-  uint32_t get_size() const; // TODO: change to be virtual for commands with param list (size dynamically calculated)
+  virtual uint32_t get_size() const; // virtual needed for commands with param list (size dynamically calculated)
 
   void set_generate_data_flag(bool flag_value);
   bool get_generate_data_flag();
