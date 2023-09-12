@@ -793,7 +793,7 @@ void instruction::LD::execute(Section *dest_section) const
       }
 
       // insert new relocation record, because final value of symbol is needed
-      // TODO: only time this is not needed is if symbol is defined with .equ directive [can be checked with symbol's get_final_flag method]
+      // TODO: only time this is potentially not needed is if symbol is defined with .equ directive [can be checked with symbol's get_final_flag method]
       LiteralPoolRecord *literal_from_pool = new LiteralPoolRecord(sym->get_id(), true);
       dest_section->literal_pool_insert_new(literal_from_pool);
 
@@ -860,15 +860,15 @@ void instruction::LD::execute(Section *dest_section) const
       return;
     }
 
-    // create temp call instruction to load symbol/litreal value in passed GP register
+    // create temp ld instruction to load symbol/litreal value in passed GP register
     // temp_param is needed because Instruction's destructor deletes all literals in it's params list. Symbols are not deleted.
     Parameter *temp_param = param->get_type() == type::PARAMETER_TYPE::SYMBOL ? param : ((Literal *)param)->clone();
-    instruction::CALL *call_temp = new instruction::CALL();
-    call_temp->set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::IMMED);
-    call_temp->set_gp_reg_0(this->get_gp_reg_0());
-    call_temp->enque_param(temp_param);
-    call_temp->execute(dest_section); // this should generate instrcution that loads param's value in passed GPR
-    delete call_temp;
+    instruction::LD *ld_temp = new instruction::LD();
+    ld_temp->set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::IMMED);
+    ld_temp->set_gp_reg_0(this->get_gp_reg_0());
+    ld_temp->enque_param(temp_param);
+    ld_temp->execute(dest_section); // this should generate instrcution that loads param's value in passed GPR
+    delete ld_temp;
 
     // now we can assume that value of parameter is stored in passed GRP
     // create following instruction: gpr <= mem32[gpr]
@@ -983,6 +983,200 @@ instruction::ST::ST()
 void instruction::ST::execute(Section *dest_section) const
 {
   // TODO: implement ST execute
+  // st %gpr, operand ==> operand <= gpr; [gpr = grp_reg_0]  OR  [gpr = gpr_reg_0 | operand = gpr_reg_1]
+
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP register must be set to execute ld instruction.");
+    return;
+  }
+
+  // XXX: is validation if gp reg is set to special gp registers (PC or SP) needed?
+
+  if (this->get_mem_addr_mode() == type::MEMORY_ADDRESSING_MODES::NO_MODE)
+  {
+    Assembler::get_instance().internal_error("Memory addressing mode must be set to execute ld instruction.");
+    return;
+  }
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+  std::array<type::byte, 2> displacement;
+  Parameter *param = this->params.empty() ? nullptr : this->params.front();
+
+  switch (this->get_mem_addr_mode())
+  {
+  case type::MEMORY_ADDRESSING_MODES::MEM_DIR: // TODO: verify
+  {                                            // generates one instructions ==> 4B
+    if (!param)
+    {
+      Assembler::get_instance().internal_error("Parameter is needed when mem dir addr mode is used with st instruction.");
+      return;
+    }
+
+    if (param->get_type() == type::PARAMETER_TYPE::SYMBOL)
+    {
+      Symbol *sym = (Symbol *)param;
+      if (!sym->get_defined_flag())
+      {
+        Assembler::get_instance().internal_error("Using undefined symbol: \"" + sym->get_name() + std::string(". Cannot generate ld instruction [immed mem addr mode]."));
+        return;
+      }
+
+      // insert new relocation record, because final value of symbol is needed
+      /* TODO:
+          if symbol is defined with .equ directive [can be checked with symbol's get_final_flag method],
+          relocatable_flag (in LiteralPoolRecord) is false and there's no need for relocation
+          or, if it can fit, place it in displacement of instruction
+      */
+      LiteralPoolRecord *literal_from_pool = new LiteralPoolRecord(sym->get_id(), true);
+      dest_section->literal_pool_insert_new(literal_from_pool);
+
+      // create relocation record for literal in pool, and add it to section's relocations collection
+      int32_t sym_id = sym->get_global_flag() ? sym->get_id() : sym->get_section()->get_id();
+      uint32_t addend = sym->get_global_flag() ? 0 : sym->get_value();
+      RelocationRecord *rel_record = new RelocationRecord(literal_from_pool->get_address(), sym_id, type::RELOCATIONS::ABS_32U, addend);
+      dest_section->add_new_relocation(rel_record);
+
+      ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::ST_DATA_1);
+      ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), static_cast<type::byte>(type::GP_REG::R0));
+      displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt() - this->get_size());
+      converter::write_to_upper_byte_half(static_cast<type::byte>(this->get_gp_reg_0()), &displacement[0]);
+      ins_bytes[2] = displacement[0];
+      ins_bytes[3] = displacement[1];
+      dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+    }
+    else if (param->get_type() == type::PARAMETER_TYPE::LITERAL)
+    {
+      // literal passed as parameter
+      uint32_t value = ((Literal *)param)->get_num_value();
+      if (value <= type::MAX_UNSIGNED_DISP)
+      {
+        // literal value can fit in 12 bits
+        ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::ST_DATA_0);
+        ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::R0), static_cast<type::byte>(type::GP_REG::R0));
+        displacement = converter::disp_to_byte_arr(value);
+        converter::write_to_upper_byte_half(static_cast<type::byte>(this->get_gp_reg_0()), &displacement[0]);
+        ins_bytes[2] = displacement[0];
+        ins_bytes[3] = displacement[1];
+        dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+      }
+      else
+      {
+        // literal value can't fit in 12 bits, write in pool literal and, later, read from it
+        LiteralPoolRecord *literal_from_pool = new LiteralPoolRecord(value, false);
+        dest_section->literal_pool_insert_new(literal_from_pool);
+
+        ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::ST_DATA_1);
+        ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(type::GP_REG::PC), static_cast<type::byte>(type::GP_REG::R0));
+        displacement = converter::disp_to_byte_arr(literal_from_pool->get_address() - dest_section->get_curr_loc_cnt() - this->get_size());
+        converter::write_to_upper_byte_half(static_cast<type::byte>(this->get_gp_reg_0()), &displacement[0]);
+        ins_bytes[2] = displacement[0];
+        ins_bytes[3] = displacement[1];
+        dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+      }
+    }
+    else
+    {
+      Assembler::get_instance().internal_error("Wrong parameter passed to ld instruction [immed mem addr mode].");
+      return;
+    }
+  }
+  break;
+
+  // XXX: just copied from LD
+  case type::MEMORY_ADDRESSING_MODES::REG_DIR:
+  { // generates one instruction ==> 4B
+    if (this->get_gp_reg_1() == type::GP_REG::NO_REG)
+    {
+      Assembler::get_instance().internal_error("Both GP registers must be set when reg dir mem addr mode is used with ld instruction.");
+      return;
+    }
+
+    ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_1);
+    ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(this->get_gp_reg_0()));
+    displacement = converter::disp_to_byte_arr(0);
+    ins_bytes[2] = displacement[0];
+    ins_bytes[3] = displacement[1];
+    dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+  }
+  break;
+
+  case type::MEMORY_ADDRESSING_MODES::REG_IND:
+  { // generates one instruction ==> 4B
+    if (this->get_gp_reg_1() == type::GP_REG::NO_REG)
+    {
+      Assembler::get_instance().internal_error("Both GP registers must be set when reg ind mem addr mode is used with ld instruction.");
+      return;
+    }
+
+    ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_2);
+    ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(this->get_gp_reg_0()));
+    displacement = converter::disp_to_byte_arr(0);
+    ins_bytes[2] = displacement[0];
+    ins_bytes[3] = displacement[1];
+    dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+  }
+  break;
+
+  case type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP:
+  { // generates one instruction ==> 4B
+    if (this->get_gp_reg_1() == type::GP_REG::NO_REG)
+    {
+      Assembler::get_instance().internal_error("Both GP registers must be set when reg ind with disp mem addr mode is used with ld instruction.");
+      return;
+    }
+
+    if (!param)
+    {
+      Assembler::get_instance().internal_error("Parameter is needed when reg ind with disp mem addr mode is used with ld instruction.");
+      return;
+    }
+
+    int32_t reg_disp = 0;
+
+    if (param->get_type() == type::PARAMETER_TYPE::SYMBOL)
+    {
+      Symbol *sym = (Symbol *)param;
+      if (!sym->get_final_flag())
+      {
+        Assembler::get_instance().internal_error("Used symbol: \"" + sym->get_name() + std::string("\" doesn't have final value and can't be used as displacement within ld instruction."));
+        return;
+      }
+
+      reg_disp = sym->get_value();
+    }
+    else if (param->get_type() == type::PARAMETER_TYPE::LITERAL)
+    {
+      reg_disp = ((Literal *)param)->get_num_value();
+    }
+    else
+    {
+      Assembler::get_instance().internal_error("Wrong parameter passed to ld instruction [reg ind with disp mem addr mode].");
+      return;
+    }
+
+    // check if displacement (signed) value can be written in 12bit instruction field
+    if (reg_disp < type::MAX_NEG_DISP || reg_disp > type::MAX_POS_DISP)
+    {
+      Assembler::get_instance().internal_error("Given displacement: " + reg_disp + std::string(", can't fit in 12bits wide instruction field. Cannot generate ld instruction [reg ind with disp mem addr mode]."));
+      return;
+    }
+
+    ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_2);
+    ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(this->get_gp_reg_0()));
+    displacement = converter::disp_to_byte_arr(reg_disp);
+    ins_bytes[2] = displacement[0];
+    ins_bytes[3] = displacement[1];
+    dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
+  }
+  break;
+
+  default:
+  {
+    Assembler::get_instance().internal_error("Wrong mem addr mode set for ld instruction.");
+    return;
+  }
+  }
 }
 
 instruction::CSRRD::CSRRD()
