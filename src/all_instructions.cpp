@@ -977,13 +977,13 @@ void instruction::LD::execute(Section *dest_section) const
 }
 
 instruction::ST::ST()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::ST::execute(Section *dest_section) const
-{
-  // TODO: implement ST execute
-  // st %gpr, operand ==> operand <= gpr; [gpr = grp_reg_0]  OR  [gpr = gpr_reg_0 | operand = gpr_reg_1]
+{ // TODO: test ST
+  // st %gpr, operand ==> operand <= gpr; [gpr = gp_reg_0]  OR  [gpr = gp_reg_0 | operand = gp_reg_1]
 
   if (this->get_gp_reg_0() == type::GP_REG::NO_REG)
   {
@@ -1005,8 +1005,8 @@ void instruction::ST::execute(Section *dest_section) const
 
   switch (this->get_mem_addr_mode())
   {
-  case type::MEMORY_ADDRESSING_MODES::MEM_DIR: // TODO: verify
-  {                                            // generates one instructions ==> 4B
+  case type::MEMORY_ADDRESSING_MODES::MEM_DIR:
+  { // generates one instructions ==> 4B
     if (!param)
     {
       Assembler::get_instance().internal_error("Parameter is needed when mem dir addr mode is used with st instruction.");
@@ -1083,12 +1083,11 @@ void instruction::ST::execute(Section *dest_section) const
   }
   break;
 
-  // XXX: just copied from LD
-  case type::MEMORY_ADDRESSING_MODES::REG_DIR:
-  { // generates one instruction ==> 4B
+  case type::MEMORY_ADDRESSING_MODES::REG_DIR: // FIXME: this possibly shouldn't be allowed for ST instruction
+  {                                            // generates one instruction ==> 4B
     if (this->get_gp_reg_1() == type::GP_REG::NO_REG)
     {
-      Assembler::get_instance().internal_error("Both GP registers must be set when reg dir mem addr mode is used with ld instruction.");
+      Assembler::get_instance().internal_error("Both GP registers must be set when reg dir mem addr mode is used with st instruction.");
       return;
     }
 
@@ -1105,13 +1104,14 @@ void instruction::ST::execute(Section *dest_section) const
   { // generates one instruction ==> 4B
     if (this->get_gp_reg_1() == type::GP_REG::NO_REG)
     {
-      Assembler::get_instance().internal_error("Both GP registers must be set when reg ind mem addr mode is used with ld instruction.");
+      Assembler::get_instance().internal_error("Both GP registers must be set when reg ind mem addr mode is used with st instruction.");
       return;
     }
 
-    ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_2);
-    ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(this->get_gp_reg_0()));
+    ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::ST_DATA_0);
+    ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(type::GP_REG::R0));
     displacement = converter::disp_to_byte_arr(0);
+    converter::write_to_upper_byte_half(static_cast<type::byte>(this->get_gp_reg_0()), &displacement[0]);
     ins_bytes[2] = displacement[0];
     ins_bytes[3] = displacement[1];
     dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
@@ -1122,13 +1122,13 @@ void instruction::ST::execute(Section *dest_section) const
   { // generates one instruction ==> 4B
     if (this->get_gp_reg_1() == type::GP_REG::NO_REG)
     {
-      Assembler::get_instance().internal_error("Both GP registers must be set when reg ind with disp mem addr mode is used with ld instruction.");
+      Assembler::get_instance().internal_error("Both GP registers must be set when reg ind with disp mem addr mode is used with st instruction.");
       return;
     }
 
     if (!param)
     {
-      Assembler::get_instance().internal_error("Parameter is needed when reg ind with disp mem addr mode is used with ld instruction.");
+      Assembler::get_instance().internal_error("Parameter is needed when reg ind with disp mem addr mode is used with st instruction.");
       return;
     }
 
@@ -1139,7 +1139,7 @@ void instruction::ST::execute(Section *dest_section) const
       Symbol *sym = (Symbol *)param;
       if (!sym->get_final_flag())
       {
-        Assembler::get_instance().internal_error("Used symbol: \"" + sym->get_name() + std::string("\" doesn't have final value and can't be used as displacement within ld instruction."));
+        Assembler::get_instance().internal_error("Used symbol: \"" + sym->get_name() + std::string("\" doesn't have final value and can't be used as displacement within st instruction."));
         return;
       }
 
@@ -1151,20 +1151,21 @@ void instruction::ST::execute(Section *dest_section) const
     }
     else
     {
-      Assembler::get_instance().internal_error("Wrong parameter passed to ld instruction [reg ind with disp mem addr mode].");
+      Assembler::get_instance().internal_error("Wrong parameter passed to st instruction [reg ind with disp mem addr mode].");
       return;
     }
 
     // check if displacement (signed) value can be written in 12bit instruction field
     if (reg_disp < type::MAX_NEG_DISP || reg_disp > type::MAX_POS_DISP)
     {
-      Assembler::get_instance().internal_error("Given displacement: " + reg_disp + std::string(", can't fit in 12bits wide instruction field. Cannot generate ld instruction [reg ind with disp mem addr mode]."));
+      Assembler::get_instance().internal_error("Given displacement: " + reg_disp + std::string(", can't fit in 12bits wide instruction field. Cannot generate st instruction [reg ind with disp mem addr mode]."));
       return;
     }
 
-    ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_2);
-    ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(this->get_gp_reg_0()));
+    ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::ST_DATA_0);
+    ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(type::GP_REG::R0));
     displacement = converter::disp_to_byte_arr(reg_disp);
+    converter::write_to_upper_byte_half(static_cast<type::byte>(this->get_gp_reg_0()), &displacement[0]);
     ins_bytes[2] = displacement[0];
     ins_bytes[3] = displacement[1];
     dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
@@ -1173,7 +1174,7 @@ void instruction::ST::execute(Section *dest_section) const
 
   default:
   {
-    Assembler::get_instance().internal_error("Wrong mem addr mode set for ld instruction.");
+    Assembler::get_instance().internal_error("Wrong mem addr mode set for st instruction.");
     return;
   }
   }

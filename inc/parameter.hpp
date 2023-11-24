@@ -15,7 +15,7 @@ public:
   virtual Parameter *clone() const;
   type::PARAMETER_TYPE get_type() const { return type; }
 
-  // this methods are not supported for literals, therefore are virtual
+  // these methods are not supported for literals, therefore are virtual
   virtual bool set_id(int32_t id);
   virtual int32_t get_id();
 };
