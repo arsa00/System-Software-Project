@@ -1181,19 +1181,59 @@ void instruction::ST::execute(Section *dest_section) const
 }
 
 instruction::CSRRD::CSRRD()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::CSRRD::execute(Section *dest_section) const
 {
-  // TODO: implement CSRRD execute
+  // TODO: test CSRRD
+  // csrrd %csr, %gpr ==> gpr <= csr; [csr = cs_reg_0 | gpr = gp_reg_0]
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP register must be set to execute csrrd instruction.");
+    return;
+  }
+
+  if (this->get_cs_reg_0() == type::CS_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("CS register must be set to execute csrrd instruction.");
+    return;
+  }
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_0);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_0()), static_cast<type::byte>(this->get_cs_reg_0()));
+
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 }
 
 instruction::CSRWR::CSRWR()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
 }
 
 void instruction::CSRWR::execute(Section *dest_section) const
 {
-  // TODO: implement CSRWR execute
+  // TODO: test CSRWR
+  // csrwr %gpr, %csr ==> csr <= gpr; [csr = cs_reg_0 | gpr = gp_reg_0]
+  if (this->get_gp_reg_0() == type::GP_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("GP register must be set to execute csrwr instruction.");
+    return;
+  }
+
+  if (this->get_cs_reg_0() == type::CS_REG::NO_REG)
+  {
+    Assembler::get_instance().internal_error("CS register must be set to execute csrwr instruction.");
+    return;
+  }
+
+  std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
+
+  ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::LD_DATA_4);
+  ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_cs_reg_0()), static_cast<type::byte>(this->get_gp_reg_0()));
+
+  dest_section->write_byte_arr({ins_bytes.begin(), ins_bytes.end()});
 }
