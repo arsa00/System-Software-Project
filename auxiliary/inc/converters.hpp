@@ -24,6 +24,7 @@ namespace converter
   type::byte create_byte_of_two_halves(type::byte upper_half, type::byte lower_half);
 
   type::instruction_size create_instruction_of_bytes(type::byte b3, type::byte b2, type::byte b1, type::byte b0);
+  std::array<type::byte, 4> get_instruction_bytes(type::instruction_size instruction);
 
 }
 

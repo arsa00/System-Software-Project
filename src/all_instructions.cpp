@@ -114,7 +114,7 @@ void create_jump_ins(Section *dest_section, Parameter *param, type::CPU_INSTRUCT
 
     if (!sym->get_defined_flag())
     {
-      Assembler::get_instance().internal_error("Using undefined symbol within call instruction.");
+      Assembler::get_instance().internal_error("Using undefined symbol: \"" + sym->get_name() + std::string("\". Cannot generate call instruction."));
       return;
     }
 
@@ -788,7 +788,7 @@ void instruction::LD::execute(Section *dest_section) const
       Symbol *sym = (Symbol *)param;
       if (!sym->get_defined_flag())
       {
-        Assembler::get_instance().internal_error("Using undefined symbol: \"" + sym->get_name() + std::string(". Cannot generate ld instruction [immed mem addr mode]."));
+        Assembler::get_instance().internal_error("Using undefined symbol: \"" + sym->get_name() + std::string("\". Cannot generate ld instruction [immed mem addr mode]."));
         return;
       }
 
@@ -1018,7 +1018,7 @@ void instruction::ST::execute(Section *dest_section) const
       Symbol *sym = (Symbol *)param;
       if (!sym->get_defined_flag())
       {
-        Assembler::get_instance().internal_error("Using undefined symbol: \"" + sym->get_name() + std::string(". Cannot generate ld instruction [immed mem addr mode]."));
+        Assembler::get_instance().internal_error("Using undefined symbol: \"" + sym->get_name() + std::string("\". Cannot generate ld instruction [immed mem addr mode]."));
         return;
       }
 

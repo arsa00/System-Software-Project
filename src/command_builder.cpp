@@ -222,19 +222,19 @@ Directive *CommandBuilder::build_directive(type::DIRECTIVE_TYPE dir_alias)
   break;
   case type::DIRECTIVE_TYPE::EXTERN:
   { // this directive is executed in first round of assembling
-    // XXX: maybe check if Parameter is instance of Symbol
-    Symbol *sym = (Symbol *)this->deque_param();
-    sym->set_global_flag(true);
-    sym->set_defined_flag(true);
+    dir = new directive::EXTERN();
+    dir->set_params(this->get_params());
+    dir->execute(nullptr); // the directive is independent of the section
+    dir = nullptr;
     directive_executed = true;
   }
   break;
   case type::DIRECTIVE_TYPE::SECTION:
   { // this directive is executed in first round of assembling
-    // XXX: maybe check if Parameter is instance of Symbol
-    Symbol *sym = (Symbol *)this->deque_param();
-    std::cout << "[CMD_BUILDER->.section]: " << sym->get_name() << std::endl;
-    Assembler::get_instance().add_section(sym->get_name());
+    dir = new directive::SECTION();
+    dir->set_params(this->get_params());
+    dir->execute(nullptr); // the directive is independent of the section
+    dir = nullptr;
     directive_executed = true;
   }
   break;

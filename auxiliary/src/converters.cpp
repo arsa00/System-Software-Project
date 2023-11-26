@@ -244,3 +244,15 @@ type::instruction_size converter::create_instruction_of_bytes(type::byte b3, typ
 
   return ins_record;
 }
+
+std::array<type::byte, 4> converter::get_instruction_bytes(type::instruction_size instruction)
+{
+  std::array<type::byte, 4> bytes = {0, 0, 0, 0};
+
+  bytes[0] = instruction & 0x000000FF;
+  bytes[1] = (instruction >> 8) & 0x000000FF;
+  bytes[2] = (instruction >> 16) & 0x000000FF;
+  bytes[3] = (instruction >> 24) & 0x000000FF;
+
+  return bytes;
+}

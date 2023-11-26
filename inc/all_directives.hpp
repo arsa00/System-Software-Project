@@ -33,6 +33,7 @@ namespace directive
   public:
     WORD();
     void execute(Section *dest_section) const override;
+    uint32_t get_size() const override;
   };
 
   class SKIP : public Directive
