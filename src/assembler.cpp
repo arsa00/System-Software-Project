@@ -258,5 +258,7 @@ bool Assembler::run(FILE *file, char *file_name)
     // FIXME: ...until here
   }
 
+  remove(file_name);
+
   return this->is_running;
 }

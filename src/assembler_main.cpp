@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string.h>
 #include "../auxiliary/inc/exceptions.hpp"
 #include "../auxiliary/inc/parser.hpp"
@@ -46,16 +47,42 @@ int main(int argc, char const *argv[])
     }
 
     // cout << file_input << endl;
-    yyin = fopen(file_input, "a+");
+    yyin = fopen(file_input, "r");
     if (yyin == nullptr)
       throw new file_exception();
 
-    fseek(yyin, 0, SEEK_END);
-    fprintf(yyin, "\n");
-    fseek(yyin, 0, SEEK_SET);
+    string line;
+    ifstream in_file{string(file_input)};
+    ofstream out_file{string(file_input) + "_copy.txt"};
+    if (in_file && out_file)
+    {
+      while (getline(in_file, line))
+      {
+        out_file << line << "\n";
+      }
+    }
+    else
+    {
+      // Something went wrong
+      printf("Cannot read File");
+    }
+    // Closing file
+    in_file.close();
+    out_file.close();
+
+    char *file_input_final = (char *)file_input;
+    file_input_final = strcat(file_input_final, "_copy.txt");
+
+    yyin = fopen(file_input_final, "r");
+    if (yyin == nullptr)
+      throw new file_exception();
+
+    // fseek(yyin, 0, SEEK_END);
+    // fprintf(yyin, "\n");
+    // fseek(yyin, 0, SEEK_SET);
 
     // yyparse();
-    Assembler::get_instance().run(yyin, file_input);
+    Assembler::get_instance().run(yyin, file_input_final);
   }
   catch (const exception &e)
   {

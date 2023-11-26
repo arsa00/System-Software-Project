@@ -79,7 +79,7 @@ void test2()
             << "----------- TEST 2 ----------- " << std::endl
             << std::endl;
 
-  Assembler::get_instance().run();
+  Assembler::get_instance().run(nullptr, "");
 
   Symbol *symbol = new Symbol(".test");
 
