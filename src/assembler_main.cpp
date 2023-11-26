@@ -2,6 +2,7 @@
 #include <string.h>
 #include "../auxiliary/inc/exceptions.hpp"
 #include "../auxiliary/inc/parser.hpp"
+#include "../inc/assembler.hpp"
 
 using namespace std;
 
@@ -45,11 +46,16 @@ int main(int argc, char const *argv[])
     }
 
     // cout << file_input << endl;
-    yyin = fopen(file_input, "r");
+    yyin = fopen(file_input, "a+");
     if (yyin == nullptr)
       throw new file_exception();
 
-    yyparse();
+    fseek(yyin, 0, SEEK_END);
+    fprintf(yyin, "\n");
+    fseek(yyin, 0, SEEK_SET);
+
+    // yyparse();
+    Assembler::get_instance().run(yyin, file_input);
   }
   catch (const exception &e)
   {

@@ -15,8 +15,6 @@ void test1()
             << "----------- TEST 1 ----------- " << std::endl
             << std::endl;
 
-  Assembler::get_instance().run();
-
   Symbol *symbol = new Symbol(".test");
   std::cout << symbol->get_name() << std::endl;
 
@@ -139,8 +137,6 @@ void test3()
   std::cout << std::endl
             << "----------- TEST 3 ----------- " << std::endl
             << std::endl;
-
-  Assembler::get_instance().run();
 
   Section *section = new Section(".test3");
   section->set_id(0);

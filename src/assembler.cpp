@@ -1,6 +1,8 @@
 #include "../inc/assembler.hpp"
 #include <iostream>
 
+extern int yyparse();
+
 Assembler &Assembler::get_instance()
 {
   static Assembler assembler_instance;
@@ -178,8 +180,83 @@ void Assembler::stop()
   this->is_running = false;
 }
 
-bool Assembler::run()
+bool Assembler::run(FILE *file, char *file_name)
 {
   this->is_running = true;
+  yyparse();
+  fclose(file);
+
+  std::cout << "finished parsing..." << std::endl;
+
+  std::cout << "executing section: __NO_DATA_SECTION__" << std::endl;
+  this->no_data_section->create_output_file();
+  std::vector<type::byte> output_file = this->no_data_section->get_output_file();
+  std::list<RelocationRecord *> realocations = this->no_data_section->get_all_relocations();
+
+  // FIXME: (only for test purposes) from here...
+  std::cout << "0x00: | ";
+  type::byte new_line_cnt = 0;
+  for (type::byte single_byte : output_file)
+  {
+    std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)single_byte << " | ";
+
+    if (++new_line_cnt % 4 == 0)
+    {
+      std::cout << std::endl;
+
+      if (new_line_cnt < output_file.size())
+        std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)new_line_cnt << ": | ";
+    }
+  }
+
+  std::cout << std::endl
+            << "Relocations: " << std::endl;
+  for (RelocationRecord *rel : realocations)
+  {
+    std::cout << "Offset: " << rel->get_offset()
+              << " | Addend: " << rel->get_addend()
+              << " | Sym_id: " << rel->get_symbol_id()
+              << " | Addend sign: " << rel->get_addend_signed_flag()
+              << std::endl;
+  }
+  // FIXME: ...until here
+
+  for (auto &iter : this->section_table)
+  {
+    Section *section = iter.second;
+    std::cout << "executing section: " << iter.first << std::endl;
+    section->create_output_file();
+    std::vector<type::byte> output_file = section->get_output_file();
+    std::list<RelocationRecord *> realocations = section->get_all_relocations();
+
+    // FIXME: (only for test purposes) from here...
+    std::cout << "0x00: | ";
+    // type::byte new_line_cnt = 0;
+    for (type::byte single_byte : output_file)
+    {
+      std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)single_byte << " | ";
+
+      if (++new_line_cnt % 4 == 0)
+      {
+        std::cout << std::endl;
+
+        if (new_line_cnt < output_file.size())
+          std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)new_line_cnt << ": | ";
+      }
+    }
+
+    std::cout << std::endl
+              << "Relocations: " << std::endl;
+    for (RelocationRecord *rel : realocations)
+    {
+      std::cout << "Offset: " << rel->get_offset()
+                << " | Addend: " << rel->get_addend()
+                << " | Sym_id: " << rel->get_symbol_id()
+                << " | Addend sign: " << rel->get_addend_signed_flag()
+                << std::endl;
+    }
+    // FIXME: ...until here
+  }
+
   return this->is_running;
 }

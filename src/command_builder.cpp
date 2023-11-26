@@ -24,7 +24,7 @@ void CommandBuilder::clear_builder()
 
 Instruction *CommandBuilder::build_instruction(type::INSTRUCTION_TYPE ins_alias)
 { // TODO: test build_instruction
-  if (Assembler::get_instance().get_running_flag())
+  if (!Assembler::get_instance().get_running_flag())
     return nullptr;
 
   Instruction *ins = nullptr;
@@ -212,7 +212,7 @@ Instruction *CommandBuilder::build_instruction(type::INSTRUCTION_TYPE ins_alias)
 
 Directive *CommandBuilder::build_directive(type::DIRECTIVE_TYPE dir_alias)
 { // TODO: test build_directive
-  if (Assembler::get_instance().get_running_flag())
+  if (!Assembler::get_instance().get_running_flag())
     return nullptr;
 
   Directive *dir = nullptr;

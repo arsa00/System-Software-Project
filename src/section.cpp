@@ -1,4 +1,5 @@
 #include "../inc/section.hpp"
+#include "../auxiliary/inc/converters.hpp"
 #include <iostream>
 #include <iomanip>
 #include <bitset>
@@ -81,14 +82,26 @@ void Section::create_output_file()
 { // TODO: finish implementation
   this->location_counter = 0;
 
-  // TODO: execute all commands - test
+  // execute all commands
   for (Command *cmd : this->commands)
   {
     cmd->execute(this);
   }
 
-  // TODO: after executing all commands, insert literal pool records in output file
-  // TODO: at the end, create section's relocation table
+  // after executing all commands, exapnd output_file and insert literal pool records in output file
+  this->output_file.resize(this->output_file.size() + this->literal_pool.size(), 0);
+  for (auto &iter : this->literal_pool)
+  {
+    LiteralPoolRecord *literal_pool_record = iter.second;
+    type::addr_size addr = literal_pool_record->get_address();
+    std::array<type::byte, 4> value_bytes = converter::get_instruction_bytes(literal_pool_record->get_value());
+    this->output_file[addr + 0] = value_bytes[0];
+    this->output_file[addr + 1] = value_bytes[1];
+    this->output_file[addr + 2] = value_bytes[2];
+    this->output_file[addr + 3] = value_bytes[3];
+  }
+
+  // XXX: check if it's needed to create section's relocation table???
 }
 
 std::vector<type::byte> Section::get_output_file() const
