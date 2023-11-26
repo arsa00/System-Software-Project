@@ -20,6 +20,7 @@ private:
   Section *curr_section;
   Section *no_data_section;
 
+  bool is_running = false;
   bool is_first_round = false;
   bool parsing_err = false;
   bool internal_err = false;
@@ -38,6 +39,8 @@ public:
   static Assembler &get_instance();
 
   bool run();
+  void stop();
+  bool get_running_flag() const;
 
   // create and define symbol if symbol is not alredy created
   // if it is created, set section and value (and defined flag) ==> define symbol

@@ -54,6 +54,9 @@ void Assembler::set_id_to_sym(Parameter *param)
 
 Symbol *Assembler::add_symbol(std::string name)
 {
+  if (!this->is_running)
+    return nullptr;
+
   if (!this->curr_section)
   {
     this->parse_error("No section opened. Cannot define symbol: " + name);
@@ -86,12 +89,18 @@ Symbol *Assembler::add_symbol(std::string name)
 
 Symbol *Assembler::add_symbol(char *name)
 {
+  if (!this->is_running)
+    return nullptr;
+
   std::string str_name(name);
   return this->add_symbol(str_name);
 }
 
 Symbol *Assembler::create_symbol(std::string name)
 {
+  if (!this->is_running)
+    return nullptr;
+
   // if already exist, just return it from symbol table
   if (this->symbol_table.find(name) != this->symbol_table.end())
     return this->symbol_table[name];
@@ -105,12 +114,18 @@ Symbol *Assembler::create_symbol(std::string name)
 
 Symbol *Assembler::create_symbol(char *name)
 {
+  if (!this->is_running)
+    return nullptr;
+
   std::string str_name(name);
   return this->create_symbol(str_name);
 }
 
 void Assembler::add_section(std::string section_name)
 {
+  if (!this->is_running)
+    return;
+
   Section *new_section = nullptr;
 
   // create new section if it's not already existing
@@ -133,6 +148,9 @@ void Assembler::add_section(std::string section_name)
 
 void Assembler::add_command(Command *cmd)
 {
+  if (!this->is_running)
+    return;
+
   // if there is no active section and command doesn't emit any data
   // add it to the __NO_DATA_SECTION__
   if (!this->curr_section && !cmd->get_generate_data_flag())
@@ -148,4 +166,20 @@ void Assembler::add_command(Command *cmd)
   }
 
   this->curr_section->add_command(cmd);
+}
+
+bool Assembler::get_running_flag() const
+{
+  return this->is_running;
+}
+
+void Assembler::stop()
+{
+  this->is_running = false;
+}
+
+bool Assembler::run()
+{
+  this->is_running = true;
+  return this->is_running;
 }

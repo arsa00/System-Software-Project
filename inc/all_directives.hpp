@@ -41,6 +41,7 @@ namespace directive
   public:
     SKIP();
     void execute(Section *dest_section) const override;
+    uint32_t get_size() const override;
   };
 
   class ASCII : public Directive
@@ -48,6 +49,7 @@ namespace directive
   public:
     ASCII();
     void execute(Section *dest_section) const override;
+    uint32_t get_size() const override;
   };
 
   class END : public Directive

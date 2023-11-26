@@ -6,6 +6,7 @@
 #include <iostream>
 #include "../inc/command_builder.hpp"
 #include "../inc/section.hpp"
+#include "../inc/assembler.hpp"
 #include <vector>
 
 void test1()
@@ -13,6 +14,9 @@ void test1()
   std::cout << std::endl
             << "----------- TEST 1 ----------- " << std::endl
             << std::endl;
+
+  Assembler::get_instance().run();
+
   Symbol *symbol = new Symbol(".test");
   std::cout << symbol->get_name() << std::endl;
 
@@ -76,6 +80,9 @@ void test2()
   std::cout << std::endl
             << "----------- TEST 2 ----------- " << std::endl
             << std::endl;
+
+  Assembler::get_instance().run();
+
   Symbol *symbol = new Symbol(".test");
 
   Literal *literal = new Literal(1212);
@@ -132,6 +139,8 @@ void test3()
   std::cout << std::endl
             << "----------- TEST 3 ----------- " << std::endl
             << std::endl;
+
+  Assembler::get_instance().run();
 
   Section *section = new Section(".test3");
   section->set_id(0);

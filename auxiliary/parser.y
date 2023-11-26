@@ -13,6 +13,9 @@
 
   void build_instruction(type::INSTRUCTION_TYPE ins_type)
   {
+    if (Assembler::get_instance().get_running_flag())
+      return;
+
     Instruction *ins = CommandBuilder::get_instance().build_instruction(ins_type);
     if(ins) 
       Assembler::get_instance().add_command(ins);
@@ -20,6 +23,9 @@
 
   void build_directive(type::DIRECTIVE_TYPE dir_type)
   {
+    if (Assembler::get_instance().get_running_flag())
+      return;
+      
     Directive *dir = CommandBuilder::get_instance().build_directive(dir_type);
     if(dir) 
       Assembler::get_instance().add_command(dir);

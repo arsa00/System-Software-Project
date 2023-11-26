@@ -82,6 +82,9 @@
 
   void build_instruction(type::INSTRUCTION_TYPE ins_type)
   {
+    if (Assembler::get_instance().get_running_flag())
+      return;
+
     Instruction *ins = CommandBuilder::get_instance().build_instruction(ins_type);
     if(ins) 
       Assembler::get_instance().add_command(ins);
@@ -89,12 +92,15 @@
 
   void build_directive(type::DIRECTIVE_TYPE dir_type)
   {
+    if (Assembler::get_instance().get_running_flag())
+      return;
+      
     Directive *dir = CommandBuilder::get_instance().build_directive(dir_type);
     if(dir) 
       Assembler::get_instance().add_command(dir);
   }
 
-#line 98 "./auxiliary/src/parser.cpp"
+#line 104 "./auxiliary/src/parser.cpp"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -199,14 +205,14 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 30 "./auxiliary/parser.y"
+#line 36 "./auxiliary/parser.y"
 
   char *symbol_name;
   char *literal_value;
   int gpr_index;
   int csr_index;
 
-#line 210 "./auxiliary/src/parser.cpp"
+#line 216 "./auxiliary/src/parser.cpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -523,18 +529,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  90
+#define YYFINAL  89
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   230
+#define YYLAST   227
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  53
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  11
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  68
+#define YYNRULES  64
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  188
+#define YYNSTATES  180
 
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   307
@@ -586,13 +592,13 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    98,    98,    99,   103,   104,   105,   106,   107,   108,
-     109,   110,   111,   112,   113,   114,   115,   116,   117,   118,
-     119,   120,   121,   122,   123,   124,   125,   126,   127,   128,
-     129,   130,   131,   132,   133,   134,   135,   136,   137,   138,
-     139,   140,   141,   142,   146,   147,   151,   152,   153,   157,
-     161,   162,   163,   164,   168,   172,   176,   180,   181,   182,
-     183,   184,   185,   186,   187,   188,   189,   190,   191
+       0,   104,   104,   105,   109,   110,   111,   112,   113,   114,
+     115,   116,   117,   118,   119,   120,   121,   122,   123,   124,
+     125,   126,   127,   128,   129,   130,   131,   132,   133,   134,
+     135,   136,   137,   138,   139,   140,   141,   142,   143,   144,
+     145,   146,   147,   148,   152,   153,   157,   158,   159,   163,
+     167,   168,   169,   170,   174,   178,   182,   186,   187,   188,
+     189,   190,   191,   192,   193
 };
 #endif
 
@@ -635,7 +641,7 @@ static const yytype_int16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF (-73)
+#define YYPACT_NINF (-77)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -649,25 +655,24 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-     179,   -47,   -39,   -36,   -18,   -34,   -18,    -5,    -5,    -5,
-      -5,    -5,    -5,    -5,    -5,    -5,    -5,    -5,    -5,    -5,
-      -5,    -5,    -5,   -31,    -5,     1,    -5,     2,     2,     2,
-     -18,    -8,     6,     0,   -73,   -73,    50,   179,   -73,   -73,
-     -73,   -73,   -73,   -73,   -73,   -73,     3,     4,   -73,     5,
-       7,   -73,     9,    10,    11,    12,    13,    15,    17,    18,
-      36,    38,    39,    41,    42,    43,    44,    46,   -73,   -17,
-     -18,   -73,   -73,   -73,   -73,    47,    49,    51,    52,    -9,
-     -73,    -7,    53,    -3,   -73,   -73,    54,   -73,    55,   -73,
-     -73,   -73,   -73,   -73,   -73,   -73,    -5,    -5,    -5,   -73,
-     -73,    -5,    -5,    -5,    -5,    -5,   -73,    -5,    -5,    -5,
-      -5,    -5,   -11,   -10,   -73,   -73,    -5,   -31,    -5,     1,
-       2,   -73,   -73,   -73,   -18,   -73,   -73,   -73,    57,    58,
-      59,    60,    61,    64,    65,    66,    67,    68,    70,    71,
-      73,   -18,   -73,   -18,   -73,    74,    75,    76,    77,    79,
-      80,   -18,   -18,   -18,   -73,   -73,   -73,   -73,   -73,   -73,
-     -73,   -73,   -73,   -73,    14,    62,    83,    85,   -73,   -73,
-     -73,   -73,    84,    87,    90,    92,    93,    94,   -73,   -73,
-     -73,   -73,   -73,   -73,   -73,   -73,   -73,   -73
+     176,   -47,   -37,   -33,   -18,   -12,   -18,   -28,   -28,   -28,
+     -28,   -28,   -28,   -28,   -28,   -28,   -28,   -28,   -28,   -28,
+     -28,   -28,   -28,   -32,   -28,    -5,   -28,     3,     3,     3,
+     -18,    -8,     0,    -9,   -77,   -77,    44,   176,   -77,   -77,
+     -77,   -77,   -77,   -77,   -77,   -77,    -6,    -3,   -77,    -2,
+       1,   -77,     4,     5,     6,     2,     7,     9,    10,    11,
+      12,    13,    15,    14,    17,    35,    37,    39,   -28,   -18,
+     -77,   -77,   -77,    40,    42,   -77,    43,    45,   -23,   -77,
+     -15,    46,   -13,   -77,   -77,    47,   -77,    48,   -77,   -77,
+     -77,   -77,   -77,   -77,   -77,   -28,   -28,   -28,   -77,   -77,
+     -28,   -28,   -28,   -28,   -28,   -77,   -28,   -28,   -28,   -28,
+     -28,   -35,   -77,   -77,   -28,   -32,   -28,    -5,     3,   -77,
+     -77,   -77,   -18,   -77,   -77,   -77,    50,    51,    52,    53,
+      54,    55,    56,    57,    58,    59,    61,    63,    64,   -18,
+     -77,    65,    66,    68,    69,    72,    73,   -18,   -18,   -18,
+     -77,   -77,   -77,   -77,   -77,   -77,   -77,   -77,   -77,   -77,
+      76,    77,   -77,   -77,   -77,   -77,    75,    78,    80,    81,
+      82,    83,   -77,   -77,   -77,   -77,   -77,   -77,   -77,   -77
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -681,33 +686,32 @@ static const yytype_int8 yydefact[] =
        0,     0,     0,     0,    11,    43,     0,     2,    12,    13,
       14,    49,    50,    51,    52,    53,     0,     0,    15,     0,
        0,    55,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,    56,     0,
-       0,    60,    59,    62,    61,     0,     0,     0,     0,     0,
-      45,     0,     0,     0,    47,    48,     0,    54,     0,     9,
-       1,     3,    16,    17,    18,    19,     0,     0,     0,    26,
-      27,     0,     0,     0,     0,     0,    33,     0,     0,     0,
-       0,     0,     0,     0,    58,    57,     0,     0,     0,     0,
-       0,     5,     6,     7,     0,     4,     8,    10,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    64,     0,    63,     0,     0,     0,     0,    44,
-      46,     0,     0,     0,    28,    29,    30,    31,    32,    34,
-      35,    36,    37,    38,     0,     0,     0,     0,    41,    42,
-      39,    40,     0,     0,     0,     0,     0,     0,    68,    66,
-      67,    65,    20,    21,    22,    23,    24,    25
+      60,    59,    61,     0,     0,    56,     0,     0,     0,    45,
+       0,     0,     0,    47,    48,     0,    54,     0,     9,     1,
+       3,    16,    17,    18,    19,     0,     0,     0,    26,    27,
+       0,     0,     0,     0,     0,    33,     0,     0,     0,     0,
+       0,     0,    58,    57,     0,     0,     0,     0,     0,     5,
+       6,     7,     0,     4,     8,    10,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+      62,     0,     0,     0,     0,    44,    46,     0,     0,     0,
+      28,    29,    30,    31,    32,    34,    35,    36,    37,    38,
+       0,     0,    41,    42,    39,    40,     0,     0,     0,     0,
+       0,     0,    64,    63,    20,    21,    22,    23,    24,    25
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -73,    16,   -73,   -22,   -72,    -4,    -1,   -73,    63,   -24,
-     -60
+     -77,    20,   -77,   -27,   -76,    -4,    -1,   -77,    62,   -70,
+     -65
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,    36,    37,    79,    83,    80,    72,    88,    73,    74,
-      75
+      -1,    36,    37,    78,    82,    79,    71,    87,    72,    76,
+      73
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -715,58 +719,56 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      46,    77,    49,    47,    38,    50,    81,    41,    42,    43,
-      44,    45,    39,    51,    68,    40,    69,    48,    70,    71,
-      41,    42,    43,    44,    45,    82,    84,    51,    68,    85,
-      86,    42,    43,    44,    45,   141,   143,   142,   144,    51,
-      41,   120,   121,   120,   122,   113,    68,   124,   125,    87,
-      90,    89,   150,    91,    92,    93,    94,   146,    95,    96,
-      97,    98,   178,    99,   100,   101,   114,   102,   103,   115,
-      52,    53,    54,    55,    56,    57,    58,    59,    60,    61,
-      62,    63,    64,    65,    66,    67,   104,    76,   105,    78,
-     106,   107,   108,   109,   110,   148,   111,   116,   149,   117,
-       0,   118,   119,     0,   123,   126,   127,   151,   152,   153,
-     179,   154,   155,    71,     0,   156,   157,   158,   159,   160,
-      84,   161,   162,    85,   163,   168,   169,   170,   171,   120,
-     124,   180,   112,   181,     0,   182,     0,   164,   183,   166,
-     165,   184,   167,   185,   186,   187,     0,   172,   174,   176,
-     173,   175,   177,     0,     0,     0,     0,     0,     0,   128,
-     129,   130,     0,     0,   131,   132,   133,   134,   135,     0,
-     136,   137,   138,   139,   140,     0,     0,     0,     0,   145,
-       0,   147,     1,     2,     3,     4,     5,     6,     7,     8,
-       9,    10,    11,    12,    13,    14,    15,    16,    17,    18,
-      19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
-      29,    30,    31,    32,     0,    33,    34,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-      35
+      46,    80,    49,    47,    38,    50,    41,    42,    43,    44,
+      45,   139,    51,   140,    39,    68,    51,    69,    40,    70,
+      41,    42,    43,    44,    45,    81,    83,   118,   119,    84,
+      85,    42,    43,    44,    45,   118,   120,   122,   123,    48,
+      75,    41,    88,    86,    89,    91,   146,   144,    92,    93,
+     142,     0,    94,    98,    95,    96,    97,    90,    99,   100,
+     101,   102,   103,   104,   106,   112,   105,   107,   113,    52,
+      53,    54,    55,    56,    57,    58,    59,    60,    61,    62,
+      63,    64,    65,    66,    67,   108,    74,   109,    77,   110,
+     114,   145,   115,   116,     0,   117,     0,   121,   124,   125,
+     147,   148,   149,     0,   150,   151,   152,   153,   154,   155,
+     156,    70,   157,     0,   158,   159,   162,   163,    83,   164,
+     165,    84,   118,   122,   172,   173,   174,     0,     0,   175,
+     111,   176,   177,   178,   179,   160,     0,     0,   161,     0,
+       0,     0,     0,   166,   168,   170,   167,   169,   171,     0,
+       0,     0,     0,     0,     0,     0,     0,   126,   127,   128,
+       0,     0,   129,   130,   131,   132,   133,     0,   134,   135,
+     136,   137,   138,     0,     0,     0,   141,     0,   143,     1,
+       2,     3,     4,     5,     6,     7,     8,     9,    10,    11,
+      12,    13,    14,    15,    16,    17,    18,    19,    20,    21,
+      22,    23,    24,    25,    26,    27,    28,    29,    30,    31,
+      32,     0,    33,    34,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,    35
 };
 
 static const yytype_int16 yycheck[] =
 {
-       4,    25,     6,     4,    51,     6,    28,    38,    39,    40,
-      41,    42,    51,    44,    45,    51,    47,    51,    49,    23,
-      38,    39,    40,    41,    42,    29,    30,    44,    45,    30,
-      31,    39,    40,    41,    42,    46,    46,    48,    48,    44,
-      38,    50,    51,    50,    51,    69,    45,    50,    51,    43,
-       0,    51,   124,    37,    51,    51,    51,   117,    51,    50,
-      50,    50,    48,    51,    51,    50,    70,    50,    50,    70,
-       7,     8,     9,    10,    11,    12,    13,    14,    15,    16,
-      17,    18,    19,    20,    21,    22,    50,    24,    50,    26,
-      51,    50,    50,    50,    50,   119,    50,    50,   120,    50,
-      -1,    50,    50,    -1,    51,    51,    51,    50,    50,    50,
-      48,    51,    51,   117,    -1,    51,    51,    51,    51,    51,
-     124,    51,    51,   124,    51,    51,    51,    51,    51,    50,
-      50,    48,    69,    48,    -1,    51,    -1,   141,    51,   143,
-     141,    51,   143,    51,    51,    51,    -1,   151,   152,   153,
-     151,   152,   153,    -1,    -1,    -1,    -1,    -1,    -1,    96,
-      97,    98,    -1,    -1,   101,   102,   103,   104,   105,    -1,
-     107,   108,   109,   110,   111,    -1,    -1,    -1,    -1,   116,
-      -1,   118,     3,     4,     5,     6,     7,     8,     9,    10,
-      11,    12,    13,    14,    15,    16,    17,    18,    19,    20,
-      21,    22,    23,    24,    25,    26,    27,    28,    29,    30,
-      31,    32,    33,    34,    -1,    36,    37,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      51
+       4,    28,     6,     4,    51,     6,    38,    39,    40,    41,
+      42,    46,    44,    48,    51,    47,    44,    49,    51,    23,
+      38,    39,    40,    41,    42,    29,    30,    50,    51,    30,
+      31,    39,    40,    41,    42,    50,    51,    50,    51,    51,
+      45,    38,    51,    43,     0,    51,   122,   117,    51,    51,
+     115,    -1,    51,    51,    50,    50,    50,    37,    51,    50,
+      50,    50,    50,    50,    50,    69,    51,    50,    69,     7,
+       8,     9,    10,    11,    12,    13,    14,    15,    16,    17,
+      18,    19,    20,    21,    22,    50,    24,    50,    26,    50,
+      50,   118,    50,    50,    -1,    50,    -1,    51,    51,    51,
+      50,    50,    50,    -1,    51,    51,    51,    51,    51,    51,
+      51,   115,    51,    -1,    51,    51,    51,    51,   122,    51,
+      51,   122,    50,    50,    48,    48,    51,    -1,    -1,    51,
+      68,    51,    51,    51,    51,   139,    -1,    -1,   139,    -1,
+      -1,    -1,    -1,   147,   148,   149,   147,   148,   149,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    95,    96,    97,
+      -1,    -1,   100,   101,   102,   103,   104,    -1,   106,   107,
+     108,   109,   110,    -1,    -1,    -1,   114,    -1,   116,     3,
+       4,     5,     6,     7,     8,     9,    10,    11,    12,    13,
+      14,    15,    16,    17,    18,    19,    20,    21,    22,    23,
+      24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
+      34,    -1,    36,    37,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    51
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -779,19 +781,18 @@ static const yytype_int8 yystos[] =
       32,    33,    34,    36,    37,    51,    54,    55,    51,    51,
       51,    38,    39,    40,    41,    42,    58,    59,    51,    58,
       59,    44,    61,    61,    61,    61,    61,    61,    61,    61,
-      61,    61,    61,    61,    61,    61,    61,    61,    45,    47,
-      49,    58,    59,    61,    62,    63,    61,    62,    61,    56,
-      58,    56,    58,    57,    58,    59,    59,    43,    60,    51,
-       0,    54,    51,    51,    51,    51,    50,    50,    50,    51,
-      51,    50,    50,    50,    50,    50,    51,    50,    50,    50,
-      50,    50,    61,    62,    58,    59,    50,    50,    50,    50,
-      50,    51,    51,    51,    50,    51,    51,    51,    61,    61,
-      61,    61,    61,    61,    61,    61,    61,    61,    61,    61,
-      61,    46,    48,    46,    48,    61,    63,    61,    62,    56,
-      57,    50,    50,    50,    51,    51,    51,    51,    51,    51,
-      51,    51,    51,    51,    58,    59,    58,    59,    51,    51,
-      51,    51,    58,    59,    58,    59,    58,    59,    48,    48,
-      48,    48,    51,    51,    51,    51,    51,    51
+      61,    61,    61,    61,    61,    61,    61,    61,    47,    49,
+      58,    59,    61,    63,    61,    45,    62,    61,    56,    58,
+      56,    58,    57,    58,    59,    59,    43,    60,    51,     0,
+      54,    51,    51,    51,    51,    50,    50,    50,    51,    51,
+      50,    50,    50,    50,    50,    51,    50,    50,    50,    50,
+      50,    61,    58,    59,    50,    50,    50,    50,    50,    51,
+      51,    51,    50,    51,    51,    51,    61,    61,    61,    61,
+      61,    61,    61,    61,    61,    61,    61,    61,    61,    46,
+      48,    61,    63,    61,    62,    56,    57,    50,    50,    50,
+      51,    51,    51,    51,    51,    51,    51,    51,    51,    51,
+      58,    59,    51,    51,    51,    51,    58,    59,    58,    59,
+      58,    59,    48,    48,    51,    51,    51,    51,    51,    51
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
@@ -803,7 +804,7 @@ static const yytype_int8 yyr1[] =
       55,    55,    55,    55,    55,    55,    55,    55,    55,    55,
       55,    55,    55,    55,    56,    56,    57,    57,    57,    58,
       59,    59,    59,    59,    60,    61,    62,    63,    63,    63,
-      63,    63,    63,    63,    63,    63,    63,    63,    63
+      63,    63,    63,    63,    63
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -815,7 +816,7 @@ static const yytype_int8 yyr2[] =
        5,     5,     5,     3,     5,     5,     5,     5,     5,     5,
        5,     5,     5,     1,     3,     1,     3,     1,     1,     1,
        1,     1,     1,     1,     1,     1,     1,     2,     2,     1,
-       1,     1,     1,     3,     3,     5,     5,     5,     5
+       1,     1,     3,     5,     5
 };
 
 
@@ -1511,361 +1512,337 @@ yyreduce:
   switch (yyn)
     {
   case 4:
-#line 103 "./auxiliary/parser.y"
+#line 109 "./auxiliary/parser.y"
                                        { std::cout << ".word" << std::endl; build_directive(type::DIRECTIVE_TYPE::WORD); }
-#line 1517 "./auxiliary/src/parser.cpp"
+#line 1518 "./auxiliary/src/parser.cpp"
     break;
 
   case 5:
-#line 104 "./auxiliary/parser.y"
+#line 110 "./auxiliary/parser.y"
                                    { std::cout << ".global" << std::endl; build_directive(type::DIRECTIVE_TYPE::GLOBAL); }
-#line 1523 "./auxiliary/src/parser.cpp"
+#line 1524 "./auxiliary/src/parser.cpp"
     break;
 
   case 6:
-#line 105 "./auxiliary/parser.y"
+#line 111 "./auxiliary/parser.y"
                                    { std::cout << ".extern" << std::endl; build_directive(type::DIRECTIVE_TYPE::EXTERN); }
-#line 1529 "./auxiliary/src/parser.cpp"
+#line 1530 "./auxiliary/src/parser.cpp"
     break;
 
   case 7:
-#line 106 "./auxiliary/parser.y"
+#line 112 "./auxiliary/parser.y"
                                       { std::cout << ".section" << std::endl; build_directive(type::DIRECTIVE_TYPE::SECTION); }
-#line 1535 "./auxiliary/src/parser.cpp"
+#line 1536 "./auxiliary/src/parser.cpp"
     break;
 
   case 8:
-#line 107 "./auxiliary/parser.y"
+#line 113 "./auxiliary/parser.y"
                                       { std::cout << ".skip" << std::endl; build_directive(type::DIRECTIVE_TYPE::SKIP); }
-#line 1541 "./auxiliary/src/parser.cpp"
+#line 1542 "./auxiliary/src/parser.cpp"
     break;
 
   case 9:
-#line 108 "./auxiliary/parser.y"
+#line 114 "./auxiliary/parser.y"
                     { std::cout << ".end" << std::endl; build_directive(type::DIRECTIVE_TYPE::END); }
-#line 1547 "./auxiliary/src/parser.cpp"
+#line 1548 "./auxiliary/src/parser.cpp"
     break;
 
   case 10:
-#line 109 "./auxiliary/parser.y"
+#line 115 "./auxiliary/parser.y"
                                      { std::cout << ".ascii" << std::endl; build_directive(type::DIRECTIVE_TYPE::ASCII); }
-#line 1553 "./auxiliary/src/parser.cpp"
+#line 1554 "./auxiliary/src/parser.cpp"
     break;
 
   case 11:
-#line 110 "./auxiliary/parser.y"
+#line 116 "./auxiliary/parser.y"
         { std::cout << "labela: " << (yyvsp[0].symbol_name) << std::endl; Assembler::get_instance().add_symbol((yyvsp[0].symbol_name)); }
-#line 1559 "./auxiliary/src/parser.cpp"
+#line 1560 "./auxiliary/src/parser.cpp"
     break;
 
   case 12:
-#line 111 "./auxiliary/parser.y"
+#line 117 "./auxiliary/parser.y"
                        { std::cout << "halt" << std::endl; build_instruction(type::INSTRUCTION_TYPE::HALT); }
-#line 1565 "./auxiliary/src/parser.cpp"
+#line 1566 "./auxiliary/src/parser.cpp"
     break;
 
   case 13:
-#line 112 "./auxiliary/parser.y"
+#line 118 "./auxiliary/parser.y"
                       { std::cout << "int" << std::endl; build_instruction(type::INSTRUCTION_TYPE::INT); }
-#line 1571 "./auxiliary/src/parser.cpp"
+#line 1572 "./auxiliary/src/parser.cpp"
     break;
 
   case 14:
-#line 113 "./auxiliary/parser.y"
+#line 119 "./auxiliary/parser.y"
                        { std::cout << "iret" << std::endl; build_instruction(type::INSTRUCTION_TYPE::IRET); }
-#line 1577 "./auxiliary/src/parser.cpp"
+#line 1578 "./auxiliary/src/parser.cpp"
     break;
 
   case 15:
-#line 114 "./auxiliary/parser.y"
+#line 120 "./auxiliary/parser.y"
                       { std::cout << "ret" << std::endl; build_instruction(type::INSTRUCTION_TYPE::RET); }
-#line 1583 "./auxiliary/src/parser.cpp"
+#line 1584 "./auxiliary/src/parser.cpp"
     break;
 
   case 16:
-#line 115 "./auxiliary/parser.y"
+#line 121 "./auxiliary/parser.y"
                                      { std::cout << "call" << std::endl; build_instruction(type::INSTRUCTION_TYPE::CALL); }
-#line 1589 "./auxiliary/src/parser.cpp"
+#line 1590 "./auxiliary/src/parser.cpp"
     break;
 
   case 17:
-#line 116 "./auxiliary/parser.y"
+#line 122 "./auxiliary/parser.y"
                                         { std::cout << "call" << std::endl; build_instruction(type::INSTRUCTION_TYPE::CALL); }
-#line 1595 "./auxiliary/src/parser.cpp"
+#line 1596 "./auxiliary/src/parser.cpp"
     break;
 
   case 18:
-#line 117 "./auxiliary/parser.y"
+#line 123 "./auxiliary/parser.y"
                                     { std::cout << "jmp" << std::endl; build_instruction(type::INSTRUCTION_TYPE::JMP); }
-#line 1601 "./auxiliary/src/parser.cpp"
+#line 1602 "./auxiliary/src/parser.cpp"
     break;
 
   case 19:
-#line 118 "./auxiliary/parser.y"
+#line 124 "./auxiliary/parser.y"
                                        { std::cout << "jmp" << std::endl; build_instruction(type::INSTRUCTION_TYPE::JMP); }
-#line 1607 "./auxiliary/src/parser.cpp"
+#line 1608 "./auxiliary/src/parser.cpp"
     break;
 
   case 20:
-#line 119 "./auxiliary/parser.y"
+#line 125 "./auxiliary/parser.y"
                                                                             { std::cout << "beq" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BEQ); }
-#line 1613 "./auxiliary/src/parser.cpp"
+#line 1614 "./auxiliary/src/parser.cpp"
     break;
 
   case 21:
-#line 120 "./auxiliary/parser.y"
+#line 126 "./auxiliary/parser.y"
                                                                                { std::cout << "beq" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BEQ); }
-#line 1619 "./auxiliary/src/parser.cpp"
+#line 1620 "./auxiliary/src/parser.cpp"
     break;
 
   case 22:
-#line 121 "./auxiliary/parser.y"
+#line 127 "./auxiliary/parser.y"
                                                                             { std::cout << "bne" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BNE); }
-#line 1625 "./auxiliary/src/parser.cpp"
+#line 1626 "./auxiliary/src/parser.cpp"
     break;
 
   case 23:
-#line 122 "./auxiliary/parser.y"
+#line 128 "./auxiliary/parser.y"
                                                                                { std::cout << "bne" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BNE); }
-#line 1631 "./auxiliary/src/parser.cpp"
+#line 1632 "./auxiliary/src/parser.cpp"
     break;
 
   case 24:
-#line 123 "./auxiliary/parser.y"
+#line 129 "./auxiliary/parser.y"
                                                                             { std::cout << "bgt" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BGT); }
-#line 1637 "./auxiliary/src/parser.cpp"
+#line 1638 "./auxiliary/src/parser.cpp"
     break;
 
   case 25:
-#line 124 "./auxiliary/parser.y"
+#line 130 "./auxiliary/parser.y"
                                                                                { std::cout << "bgt" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BGT); }
-#line 1643 "./auxiliary/src/parser.cpp"
+#line 1644 "./auxiliary/src/parser.cpp"
     break;
 
   case 26:
-#line 125 "./auxiliary/parser.y"
+#line 131 "./auxiliary/parser.y"
                                      { std::cout << "push" << std::endl; build_instruction(type::INSTRUCTION_TYPE::PUSH); }
-#line 1649 "./auxiliary/src/parser.cpp"
+#line 1650 "./auxiliary/src/parser.cpp"
     break;
 
   case 27:
-#line 126 "./auxiliary/parser.y"
+#line 132 "./auxiliary/parser.y"
                                     { std::cout << "pop" << std::endl; build_instruction(type::INSTRUCTION_TYPE::POP); }
-#line 1655 "./auxiliary/src/parser.cpp"
+#line 1656 "./auxiliary/src/parser.cpp"
     break;
 
   case 28:
-#line 127 "./auxiliary/parser.y"
+#line 133 "./auxiliary/parser.y"
                                                          { std::cout << "xchg" << std::endl; build_instruction(type::INSTRUCTION_TYPE::XCHG); }
-#line 1661 "./auxiliary/src/parser.cpp"
+#line 1662 "./auxiliary/src/parser.cpp"
     break;
 
   case 29:
-#line 128 "./auxiliary/parser.y"
+#line 134 "./auxiliary/parser.y"
                                                         { std::cout << "add" << std::endl; build_instruction(type::INSTRUCTION_TYPE::ADD); }
-#line 1667 "./auxiliary/src/parser.cpp"
+#line 1668 "./auxiliary/src/parser.cpp"
     break;
 
   case 30:
-#line 129 "./auxiliary/parser.y"
+#line 135 "./auxiliary/parser.y"
                                                         { std::cout << "sub" << std::endl; build_instruction(type::INSTRUCTION_TYPE::SUB); }
-#line 1673 "./auxiliary/src/parser.cpp"
+#line 1674 "./auxiliary/src/parser.cpp"
     break;
 
   case 31:
-#line 130 "./auxiliary/parser.y"
+#line 136 "./auxiliary/parser.y"
                                                         { std::cout << "mul" << std::endl; build_instruction(type::INSTRUCTION_TYPE::MUL); }
-#line 1679 "./auxiliary/src/parser.cpp"
+#line 1680 "./auxiliary/src/parser.cpp"
     break;
 
   case 32:
-#line 131 "./auxiliary/parser.y"
+#line 137 "./auxiliary/parser.y"
                                                         { std::cout << "div" << std::endl; build_instruction(type::INSTRUCTION_TYPE::DIV); }
-#line 1685 "./auxiliary/src/parser.cpp"
+#line 1686 "./auxiliary/src/parser.cpp"
     break;
 
   case 33:
-#line 132 "./auxiliary/parser.y"
+#line 138 "./auxiliary/parser.y"
                                     { std::cout << "not" << std::endl; build_instruction(type::INSTRUCTION_TYPE::NOT); }
-#line 1691 "./auxiliary/src/parser.cpp"
+#line 1692 "./auxiliary/src/parser.cpp"
     break;
 
   case 34:
-#line 133 "./auxiliary/parser.y"
+#line 139 "./auxiliary/parser.y"
                                                         { std::cout << "and" << std::endl; build_instruction(type::INSTRUCTION_TYPE::AND); }
-#line 1697 "./auxiliary/src/parser.cpp"
+#line 1698 "./auxiliary/src/parser.cpp"
     break;
 
   case 35:
-#line 134 "./auxiliary/parser.y"
+#line 140 "./auxiliary/parser.y"
                                                        { std::cout << "or" << std::endl; build_instruction(type::INSTRUCTION_TYPE::OR); }
-#line 1703 "./auxiliary/src/parser.cpp"
+#line 1704 "./auxiliary/src/parser.cpp"
     break;
 
   case 36:
-#line 135 "./auxiliary/parser.y"
+#line 141 "./auxiliary/parser.y"
                                                         { std::cout << "xor" << std::endl; build_instruction(type::INSTRUCTION_TYPE::XOR); }
-#line 1709 "./auxiliary/src/parser.cpp"
+#line 1710 "./auxiliary/src/parser.cpp"
     break;
 
   case 37:
-#line 136 "./auxiliary/parser.y"
+#line 142 "./auxiliary/parser.y"
                                                         { std::cout << "shl" << std::endl; build_instruction(type::INSTRUCTION_TYPE::SHL); }
-#line 1715 "./auxiliary/src/parser.cpp"
+#line 1716 "./auxiliary/src/parser.cpp"
     break;
 
   case 38:
-#line 137 "./auxiliary/parser.y"
+#line 143 "./auxiliary/parser.y"
                                                         { std::cout << "shr" << std::endl; build_instruction(type::INSTRUCTION_TYPE::SHR); }
-#line 1721 "./auxiliary/src/parser.cpp"
+#line 1722 "./auxiliary/src/parser.cpp"
     break;
 
   case 39:
-#line 138 "./auxiliary/parser.y"
+#line 144 "./auxiliary/parser.y"
                                                           { std::cout << "csrrd" << std::endl; build_instruction(type::INSTRUCTION_TYPE::CSRRD); }
-#line 1727 "./auxiliary/src/parser.cpp"
+#line 1728 "./auxiliary/src/parser.cpp"
     break;
 
   case 40:
-#line 139 "./auxiliary/parser.y"
+#line 145 "./auxiliary/parser.y"
                                                           { std::cout << "csrwr" << std::endl; build_instruction(type::INSTRUCTION_TYPE::CSRWR); }
-#line 1733 "./auxiliary/src/parser.cpp"
+#line 1734 "./auxiliary/src/parser.cpp"
     break;
 
   case 41:
-#line 140 "./auxiliary/parser.y"
+#line 146 "./auxiliary/parser.y"
                                                        { std::cout << "ld" << std::endl; build_instruction(type::INSTRUCTION_TYPE::LD); }
-#line 1739 "./auxiliary/src/parser.cpp"
+#line 1740 "./auxiliary/src/parser.cpp"
     break;
 
   case 42:
-#line 141 "./auxiliary/parser.y"
+#line 147 "./auxiliary/parser.y"
                                                        { std::cout << "st" << std::endl; build_instruction(type::INSTRUCTION_TYPE::ST); }
-#line 1745 "./auxiliary/src/parser.cpp"
+#line 1746 "./auxiliary/src/parser.cpp"
     break;
 
   case 49:
-#line 157 "./auxiliary/parser.y"
+#line 163 "./auxiliary/parser.y"
        { std::cout << "simbol: " << (yyvsp[0].symbol_name) << std::endl;  CommandBuilder::get_instance().enque_param(Assembler::get_instance().create_symbol((yyvsp[0].symbol_name))); }
-#line 1751 "./auxiliary/src/parser.cpp"
+#line 1752 "./auxiliary/src/parser.cpp"
     break;
 
   case 50:
-#line 161 "./auxiliary/parser.y"
+#line 167 "./auxiliary/parser.y"
             { std::cout << "literal: " << std::stoi((yyvsp[0].literal_value) + 2, 0, 2) << std::endl; CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value) + 2, 0, 2))); }
-#line 1757 "./auxiliary/src/parser.cpp"
+#line 1758 "./auxiliary/src/parser.cpp"
     break;
 
   case 51:
-#line 162 "./auxiliary/parser.y"
+#line 168 "./auxiliary/parser.y"
               { std::cout << "literal: " << std::stoi((yyvsp[0].literal_value), 0, 8) << std::endl;   CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value), 0, 8))); }
-#line 1763 "./auxiliary/src/parser.cpp"
+#line 1764 "./auxiliary/src/parser.cpp"
     break;
 
   case 52:
-#line 163 "./auxiliary/parser.y"
+#line 169 "./auxiliary/parser.y"
               { std::cout << "literal: " << std::stoi((yyvsp[0].literal_value), 0, 10) << std::endl;  CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value), 0, 10))); }
-#line 1769 "./auxiliary/src/parser.cpp"
+#line 1770 "./auxiliary/src/parser.cpp"
     break;
 
   case 53:
-#line 164 "./auxiliary/parser.y"
+#line 170 "./auxiliary/parser.y"
               { std::cout << "literal: " << std::stoi((yyvsp[0].literal_value), 0, 16) << std::endl;  CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value), 0, 16))); }
-#line 1775 "./auxiliary/src/parser.cpp"
+#line 1776 "./auxiliary/src/parser.cpp"
     break;
 
   case 54:
-#line 168 "./auxiliary/parser.y"
+#line 174 "./auxiliary/parser.y"
                { std::cout << "literal: " << (yyvsp[0].literal_value) << std::endl; CommandBuilder::get_instance().enque_param(new Literal((yyvsp[0].literal_value))); }
-#line 1781 "./auxiliary/src/parser.cpp"
+#line 1782 "./auxiliary/src/parser.cpp"
     break;
 
   case 55:
-#line 172 "./auxiliary/parser.y"
+#line 178 "./auxiliary/parser.y"
        { std::cout << "GP registar: " << (yyvsp[0].gpr_index) << std::endl; CommandBuilder::get_instance().set_next_gp_reg(static_cast<type::GP_REG>((yyvsp[0].gpr_index))); }
-#line 1787 "./auxiliary/src/parser.cpp"
+#line 1788 "./auxiliary/src/parser.cpp"
     break;
 
   case 56:
-#line 176 "./auxiliary/parser.y"
+#line 182 "./auxiliary/parser.y"
        { std::cout << "CS registar: " << (yyvsp[0].csr_index) << std::endl; CommandBuilder::get_instance().set_next_cs_reg(static_cast<type::CS_REG>((yyvsp[0].csr_index))); }
-#line 1793 "./auxiliary/src/parser.cpp"
+#line 1794 "./auxiliary/src/parser.cpp"
     break;
 
   case 57:
-#line 180 "./auxiliary/parser.y"
+#line 186 "./auxiliary/parser.y"
                         { std::cout << "immed" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::IMMED); }
-#line 1799 "./auxiliary/src/parser.cpp"
+#line 1800 "./auxiliary/src/parser.cpp"
     break;
 
   case 58:
-#line 181 "./auxiliary/parser.y"
+#line 187 "./auxiliary/parser.y"
                        { std::cout << "immed" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::IMMED); }
-#line 1805 "./auxiliary/src/parser.cpp"
+#line 1806 "./auxiliary/src/parser.cpp"
     break;
 
   case 59:
-#line 182 "./auxiliary/parser.y"
+#line 188 "./auxiliary/parser.y"
                    { std::cout << "mem dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::MEM_DIR); }
-#line 1811 "./auxiliary/src/parser.cpp"
+#line 1812 "./auxiliary/src/parser.cpp"
     break;
 
   case 60:
-#line 183 "./auxiliary/parser.y"
+#line 189 "./auxiliary/parser.y"
                  { std::cout << "mem dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::MEM_DIR); }
-#line 1817 "./auxiliary/src/parser.cpp"
+#line 1818 "./auxiliary/src/parser.cpp"
     break;
 
   case 61:
-#line 184 "./auxiliary/parser.y"
+#line 190 "./auxiliary/parser.y"
                  { std::cout << "reg dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_DIR); }
-#line 1823 "./auxiliary/src/parser.cpp"
+#line 1824 "./auxiliary/src/parser.cpp"
     break;
 
   case 62:
-#line 185 "./auxiliary/parser.y"
-                 { std::cout << "reg dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_DIR); }
-#line 1829 "./auxiliary/src/parser.cpp"
+#line 191 "./auxiliary/parser.y"
+                                                   { std::cout << "reg mem" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND); }
+#line 1830 "./auxiliary/src/parser.cpp"
     break;
 
   case 63:
-#line 186 "./auxiliary/parser.y"
-                                                   { std::cout << "reg mem" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND); }
-#line 1835 "./auxiliary/src/parser.cpp"
+#line 192 "./auxiliary/parser.y"
+                                                                        { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
+#line 1836 "./auxiliary/src/parser.cpp"
     break;
 
   case 64:
-#line 187 "./auxiliary/parser.y"
-                                                   { std::cout << "reg mem" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND); }
-#line 1841 "./auxiliary/src/parser.cpp"
-    break;
-
-  case 65:
-#line 188 "./auxiliary/parser.y"
-                                                                        { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
-#line 1847 "./auxiliary/src/parser.cpp"
-    break;
-
-  case 66:
-#line 189 "./auxiliary/parser.y"
-                                                                        { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
-#line 1853 "./auxiliary/src/parser.cpp"
-    break;
-
-  case 67:
-#line 190 "./auxiliary/parser.y"
+#line 193 "./auxiliary/parser.y"
                                                                      { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
-#line 1859 "./auxiliary/src/parser.cpp"
-    break;
-
-  case 68:
-#line 191 "./auxiliary/parser.y"
-                                                                     { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
-#line 1865 "./auxiliary/src/parser.cpp"
+#line 1842 "./auxiliary/src/parser.cpp"
     break;
 
 
-#line 1869 "./auxiliary/src/parser.cpp"
+#line 1846 "./auxiliary/src/parser.cpp"
 
       default: break;
     }
@@ -2097,4 +2074,4 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 193 "./auxiliary/parser.y"
+#line 195 "./auxiliary/parser.y"

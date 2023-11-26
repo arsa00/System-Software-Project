@@ -117,28 +117,70 @@ void directive::WORD::execute(Section *dest_section) const
 }
 
 directive::SKIP::SKIP()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
+}
+
+// needed to calculate size in virtual method, because it depends on
+// value of literal passed to dirtective
+uint32_t directive::SKIP::get_size() const
+{
+  if (this->params.front()->get_type() != type::PARAMETER_TYPE::LITERAL)
+    return 0;
+
+  return ((Literal *)this->params.front())->get_num_value();
 }
 
 void directive::SKIP::execute(Section *dest_section) const
-{
-  // TODO: implement SKIP execute
+{ // TODO: implement SKIP execute
+  if (this->params.front()->get_type() != type::PARAMETER_TYPE::LITERAL)
+  {
+    Assembler::get_instance().internal_error("Wrong parameter type passed to the .skip directive.");
+    return;
+  }
+
+  uint32_t aloc_size = ((Literal *)this->params.front())->get_num_value();
+  for (uint32_t i = 0; i < aloc_size; i++)
+    dest_section->write_byte(0);
 }
 
 directive::ASCII::ASCII()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = true;
+}
+
+// needed to calculate size in virtual method, because it depends on
+// length of string literal passed to dirtective
+uint32_t directive::ASCII::get_size() const
+{
+  if (this->params.front()->get_type() != type::PARAMETER_TYPE::LITERAL)
+    return 0;
+
+  return ((Literal *)this->params.front())->get_str_value().length() + 1; // +1 for '\0' character
 }
 
 void directive::ASCII::execute(Section *dest_section) const
-{
-  // TODO: implement ASCII execute
+{ // TODO: test ASCII
+  Parameter *param = this->params.front();
+  if (param->get_type() != type::PARAMETER_TYPE::LITERAL)
+  {
+    Assembler::get_instance().internal_error("Wrong parameter type passed to the .ascii directive.");
+    return;
+  }
+
+  std::string str_value = ((Literal *)param)->get_str_value();
+  for (uint32_t i = 0; i < str_value.length(); i++)
+    dest_section->write_byte(static_cast<type::byte>(str_value[i]));
+
+  dest_section->write_byte(0);
 }
 
 directive::END::END()
-{ // TODO: implement constructor
+{
+  this->is_generating_data = false;
 }
 
 void directive::END::execute(Section *dest_section) const
-{
-  // TODO: implement END execute
+{ // TODO: test END
+  Assembler::get_instance().stop();
 }
