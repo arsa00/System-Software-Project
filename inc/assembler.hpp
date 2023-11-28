@@ -38,7 +38,7 @@ private:
 public:
   static Assembler &get_instance();
 
-  bool run(FILE *file, char *file_name);
+  bool run();
   void stop();
   bool get_running_flag() const;
 

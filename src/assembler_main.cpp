@@ -46,43 +46,68 @@ int main(int argc, char const *argv[])
       file_input = argv[i];
     }
 
-    // cout << file_input << endl;
-    yyin = fopen(file_input, "r");
-    if (yyin == nullptr)
-      throw new file_exception();
+    if (file_input == nullptr || file_input == "")
+    {
+      yyerror("Missing input assembler file");
+      return 1;
+    }
+
+    // create tempporary copy file with one new line appended (needed because of lexer/parser)
+    char *file_input_copy = new char[strlen(file_input) + 1];
+    strcpy(file_input_copy, file_input);
+    file_input_copy = strcat(file_input_copy, "_copy");
 
     string line;
     ifstream in_file{string(file_input)};
-    ofstream out_file{string(file_input) + "_copy.txt"};
-    if (in_file && out_file)
+    ofstream copy_file{string(file_input_copy)};
+
+    if (!in_file)
+    {
+      // Something went wrong
+      yyerror("Cannot read input assembler file1");
+      return 1;
+    }
+
+    if (!copy_file)
+    {
+      // Something went wrong
+      yyerror("Cannot read copy of assembler file");
+      return 1;
+    }
+
+    if (in_file && copy_file)
     {
       while (getline(in_file, line))
       {
-        out_file << line << "\n";
+        copy_file << line << "\n";
       }
     }
     else
     {
       // Something went wrong
-      printf("Cannot read File");
+      yyerror("Cannot read input assembler file");
+      return 1;
     }
-    // Closing file
+
+    // Closing files used for copying
     in_file.close();
-    out_file.close();
+    copy_file.close();
 
-    char *file_input_final = (char *)file_input;
-    file_input_final = strcat(file_input_final, "_copy.txt");
-
-    yyin = fopen(file_input_final, "r");
+    // define file handle for parser and lexer
+    yyin = fopen(file_input_copy, "r");
     if (yyin == nullptr)
-      throw new file_exception();
+    {
+      // Something went wrong
+      yyerror("Cannot parse input assembler file");
+      return 1;
+    }
 
-    // fseek(yyin, 0, SEEK_END);
-    // fprintf(yyin, "\n");
-    // fseek(yyin, 0, SEEK_SET);
+    // run the assembler
+    Assembler::get_instance().run();
 
-    // yyparse();
-    Assembler::get_instance().run(yyin, file_input_final);
+    // close handle for parser and lexer, and remove the temporary file
+    fclose(yyin);
+    remove(file_input_copy);
   }
   catch (const exception &e)
   {

@@ -79,7 +79,7 @@ std::list<Command *> Section::get_all_commands() const
 }
 
 void Section::create_output_file()
-{ // TODO: finish implementation
+{ // TODO: test implementation
   this->location_counter = 0;
 
   // execute all commands
@@ -89,7 +89,7 @@ void Section::create_output_file()
   }
 
   // after executing all commands, exapnd output_file and insert literal pool records in output file
-  this->output_file.resize(this->output_file.size() + this->literal_pool.size(), 0);
+  this->output_file.resize(this->output_file.size() + this->literal_pool.size() * 4, 0);
   for (auto &iter : this->literal_pool)
   {
     LiteralPoolRecord *literal_pool_record = iter.second;
