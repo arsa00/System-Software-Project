@@ -5,6 +5,7 @@ example:
 .word example
 example2:
 .extern hehe
+text2:
 .ascii "BBB"
 .word example2, 0x44332211
 

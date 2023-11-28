@@ -135,18 +135,28 @@ void Assembler::add_section(std::string section_name)
   if (this->section_table.find(section_name) == this->section_table.end())
   {
     new_section = new Section(section_name);
-    this->set_id_to_sym(new_section);
+
+    // try to reuse the id (if the symbol which is used for defining the section doesn't exist for itself ==> is not defined)
+    Symbol *sym = nullptr;
+    if (this->symbol_table.find(section_name) != this->symbol_table.end())
+      sym = this->symbol_table[section_name];
+
+    if (!sym || sym->get_defined_flag())
+    {
+      this->set_id_to_sym(new_section); // create new id
+    }
+    else
+    {
+      new_section->set_id(sym->get_id());     // reuse id of non-defined symbol
+      this->symbol_table.erase(section_name); // remove unused symbol
+    }
     this->section_table[section_name] = new_section;
-    std::cout << "[ASSEMBLER]: "
-              << "created section with name: " << new_section->get_name() << std::endl;
   }
 
   if (!new_section)
     new_section = this->section_table[section_name];
 
   this->curr_section = new_section;
-
-  std::cout << "[ASSEMBLER]: finished " << this->section_table[section_name]->get_name() << std::endl;
 }
 
 void Assembler::add_command(Command *cmd)
@@ -263,7 +273,7 @@ bool Assembler::run()
             << "SYMBOL TABLE: " << std::endl;
 
   char *s = new char[100];
-  sprintf(s, "%10s | %2s | %10s | %7s | %8s |", "NAME", "ID", "SECTION", "GLOBAL", "VALUE");
+  sprintf(s, "%10s | %2s | %10s | %7s | %8s | %7s |", "NAME", "ID", "SECTION", "GLOBAL", "VALUE", "TYPE");
   std::cout << s << std::endl;
   uint8_t padding = 6; // %10s - strlen("NAME")
   for (uint8_t i = 0; i < strlen(s) + padding; i++)
@@ -277,7 +287,7 @@ bool Assembler::run()
       continue;
 
     s = new char[100];
-    sprintf(s, "%10s | %2d | %10s | %7s | %8s |", sym->get_name().c_str(), sym->get_id(), sym->get_section() != nullptr ? std::to_string(sym->get_section()->get_id()).c_str() : "NO_SECTION", sym->get_global_flag() ? "true" : "false", sym->has_set_value() ? std::to_string(sym->get_value()).c_str() : "NO_VALUE");
+    sprintf(s, "%10s | %2d | %10s | %7s | %8s | %7s |", sym->get_name().c_str(), sym->get_id(), sym->get_section() != nullptr ? std::to_string(sym->get_section()->get_id()).c_str() : "NO_SECTION", sym->get_global_flag() ? "true" : "false", sym->has_set_value() ? std::to_string(sym->get_value()).c_str() : "NO_VALUE", "SYMBOL");
     std::cout << s << std::endl;
   }
 
@@ -286,7 +296,7 @@ bool Assembler::run()
     Section *sym = iter.second;
 
     s = new char[100];
-    sprintf(s, "%10s | %2d | %10s | %7s | %8s |", sym->get_name().c_str(), sym->get_id(), "", "true", std::to_string(sym->get_length()).c_str());
+    sprintf(s, "%10s | %2d | %10s | %7s | %8s | %7s |", sym->get_name().c_str(), sym->get_id(), "", "true", std::to_string(sym->get_length()).c_str(), "SECTION");
     std::cout << s << std::endl;
   }
 
