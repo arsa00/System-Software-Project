@@ -1513,331 +1513,331 @@ yyreduce:
     {
   case 4:
 #line 109 "./auxiliary/parser.y"
-                                       { std::cout << ".word" << std::endl; build_directive(type::DIRECTIVE_TYPE::WORD); }
+                                       { build_directive(type::DIRECTIVE_TYPE::WORD); }
 #line 1518 "./auxiliary/src/parser.cpp"
     break;
 
   case 5:
 #line 110 "./auxiliary/parser.y"
-                                   { std::cout << ".global" << std::endl; build_directive(type::DIRECTIVE_TYPE::GLOBAL); }
+                                   { build_directive(type::DIRECTIVE_TYPE::GLOBAL); }
 #line 1524 "./auxiliary/src/parser.cpp"
     break;
 
   case 6:
 #line 111 "./auxiliary/parser.y"
-                                   { std::cout << ".extern" << std::endl; build_directive(type::DIRECTIVE_TYPE::EXTERN); }
+                                   { build_directive(type::DIRECTIVE_TYPE::EXTERN); }
 #line 1530 "./auxiliary/src/parser.cpp"
     break;
 
   case 7:
 #line 112 "./auxiliary/parser.y"
-                                      { std::cout << ".section" << std::endl; build_directive(type::DIRECTIVE_TYPE::SECTION); }
+                                      { build_directive(type::DIRECTIVE_TYPE::SECTION); }
 #line 1536 "./auxiliary/src/parser.cpp"
     break;
 
   case 8:
 #line 113 "./auxiliary/parser.y"
-                                      { std::cout << ".skip" << std::endl; build_directive(type::DIRECTIVE_TYPE::SKIP); }
+                                      { build_directive(type::DIRECTIVE_TYPE::SKIP); }
 #line 1542 "./auxiliary/src/parser.cpp"
     break;
 
   case 9:
 #line 114 "./auxiliary/parser.y"
-                    { std::cout << ".end" << std::endl; build_directive(type::DIRECTIVE_TYPE::END); }
+                    { build_directive(type::DIRECTIVE_TYPE::END); }
 #line 1548 "./auxiliary/src/parser.cpp"
     break;
 
   case 10:
 #line 115 "./auxiliary/parser.y"
-                                     { std::cout << ".ascii" << std::endl; build_directive(type::DIRECTIVE_TYPE::ASCII); }
+                                     { build_directive(type::DIRECTIVE_TYPE::ASCII); }
 #line 1554 "./auxiliary/src/parser.cpp"
     break;
 
   case 11:
 #line 116 "./auxiliary/parser.y"
-        { std::cout << "labela: " << (yyvsp[0].symbol_name) << std::endl; Assembler::get_instance().add_symbol((yyvsp[0].symbol_name)); }
+        { Assembler::get_instance().add_symbol((yyvsp[0].symbol_name)); }
 #line 1560 "./auxiliary/src/parser.cpp"
     break;
 
   case 12:
 #line 117 "./auxiliary/parser.y"
-                       { std::cout << "halt" << std::endl; build_instruction(type::INSTRUCTION_TYPE::HALT); }
+                       { build_instruction(type::INSTRUCTION_TYPE::HALT); }
 #line 1566 "./auxiliary/src/parser.cpp"
     break;
 
   case 13:
 #line 118 "./auxiliary/parser.y"
-                      { std::cout << "int" << std::endl; build_instruction(type::INSTRUCTION_TYPE::INT); }
+                      { build_instruction(type::INSTRUCTION_TYPE::INT); }
 #line 1572 "./auxiliary/src/parser.cpp"
     break;
 
   case 14:
 #line 119 "./auxiliary/parser.y"
-                       { std::cout << "iret" << std::endl; build_instruction(type::INSTRUCTION_TYPE::IRET); }
+                       { build_instruction(type::INSTRUCTION_TYPE::IRET); }
 #line 1578 "./auxiliary/src/parser.cpp"
     break;
 
   case 15:
 #line 120 "./auxiliary/parser.y"
-                      { std::cout << "ret" << std::endl; build_instruction(type::INSTRUCTION_TYPE::RET); }
+                      { build_instruction(type::INSTRUCTION_TYPE::RET); }
 #line 1584 "./auxiliary/src/parser.cpp"
     break;
 
   case 16:
 #line 121 "./auxiliary/parser.y"
-                                     { std::cout << "call" << std::endl; build_instruction(type::INSTRUCTION_TYPE::CALL); }
+                                     { build_instruction(type::INSTRUCTION_TYPE::CALL); }
 #line 1590 "./auxiliary/src/parser.cpp"
     break;
 
   case 17:
 #line 122 "./auxiliary/parser.y"
-                                        { std::cout << "call" << std::endl; build_instruction(type::INSTRUCTION_TYPE::CALL); }
+                                        { build_instruction(type::INSTRUCTION_TYPE::CALL); }
 #line 1596 "./auxiliary/src/parser.cpp"
     break;
 
   case 18:
 #line 123 "./auxiliary/parser.y"
-                                    { std::cout << "jmp" << std::endl; build_instruction(type::INSTRUCTION_TYPE::JMP); }
+                                    { build_instruction(type::INSTRUCTION_TYPE::JMP); }
 #line 1602 "./auxiliary/src/parser.cpp"
     break;
 
   case 19:
 #line 124 "./auxiliary/parser.y"
-                                       { std::cout << "jmp" << std::endl; build_instruction(type::INSTRUCTION_TYPE::JMP); }
+                                       { build_instruction(type::INSTRUCTION_TYPE::JMP); }
 #line 1608 "./auxiliary/src/parser.cpp"
     break;
 
   case 20:
 #line 125 "./auxiliary/parser.y"
-                                                                            { std::cout << "beq" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BEQ); }
+                                                                            { build_instruction(type::INSTRUCTION_TYPE::BEQ); }
 #line 1614 "./auxiliary/src/parser.cpp"
     break;
 
   case 21:
 #line 126 "./auxiliary/parser.y"
-                                                                               { std::cout << "beq" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BEQ); }
+                                                                               { build_instruction(type::INSTRUCTION_TYPE::BEQ); }
 #line 1620 "./auxiliary/src/parser.cpp"
     break;
 
   case 22:
 #line 127 "./auxiliary/parser.y"
-                                                                            { std::cout << "bne" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BNE); }
+                                                                            { build_instruction(type::INSTRUCTION_TYPE::BNE); }
 #line 1626 "./auxiliary/src/parser.cpp"
     break;
 
   case 23:
 #line 128 "./auxiliary/parser.y"
-                                                                               { std::cout << "bne" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BNE); }
+                                                                               { build_instruction(type::INSTRUCTION_TYPE::BNE); }
 #line 1632 "./auxiliary/src/parser.cpp"
     break;
 
   case 24:
 #line 129 "./auxiliary/parser.y"
-                                                                            { std::cout << "bgt" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BGT); }
+                                                                            { build_instruction(type::INSTRUCTION_TYPE::BGT); }
 #line 1638 "./auxiliary/src/parser.cpp"
     break;
 
   case 25:
 #line 130 "./auxiliary/parser.y"
-                                                                               { std::cout << "bgt" << std::endl; build_instruction(type::INSTRUCTION_TYPE::BGT); }
+                                                                               { build_instruction(type::INSTRUCTION_TYPE::BGT); }
 #line 1644 "./auxiliary/src/parser.cpp"
     break;
 
   case 26:
 #line 131 "./auxiliary/parser.y"
-                                     { std::cout << "push" << std::endl; build_instruction(type::INSTRUCTION_TYPE::PUSH); }
+                                     { build_instruction(type::INSTRUCTION_TYPE::PUSH); }
 #line 1650 "./auxiliary/src/parser.cpp"
     break;
 
   case 27:
 #line 132 "./auxiliary/parser.y"
-                                    { std::cout << "pop" << std::endl; build_instruction(type::INSTRUCTION_TYPE::POP); }
+                                    { build_instruction(type::INSTRUCTION_TYPE::POP); }
 #line 1656 "./auxiliary/src/parser.cpp"
     break;
 
   case 28:
 #line 133 "./auxiliary/parser.y"
-                                                         { std::cout << "xchg" << std::endl; build_instruction(type::INSTRUCTION_TYPE::XCHG); }
+                                                         { build_instruction(type::INSTRUCTION_TYPE::XCHG); }
 #line 1662 "./auxiliary/src/parser.cpp"
     break;
 
   case 29:
 #line 134 "./auxiliary/parser.y"
-                                                        { std::cout << "add" << std::endl; build_instruction(type::INSTRUCTION_TYPE::ADD); }
+                                                        { build_instruction(type::INSTRUCTION_TYPE::ADD); }
 #line 1668 "./auxiliary/src/parser.cpp"
     break;
 
   case 30:
 #line 135 "./auxiliary/parser.y"
-                                                        { std::cout << "sub" << std::endl; build_instruction(type::INSTRUCTION_TYPE::SUB); }
+                                                        { build_instruction(type::INSTRUCTION_TYPE::SUB); }
 #line 1674 "./auxiliary/src/parser.cpp"
     break;
 
   case 31:
 #line 136 "./auxiliary/parser.y"
-                                                        { std::cout << "mul" << std::endl; build_instruction(type::INSTRUCTION_TYPE::MUL); }
+                                                        { build_instruction(type::INSTRUCTION_TYPE::MUL); }
 #line 1680 "./auxiliary/src/parser.cpp"
     break;
 
   case 32:
 #line 137 "./auxiliary/parser.y"
-                                                        { std::cout << "div" << std::endl; build_instruction(type::INSTRUCTION_TYPE::DIV); }
+                                                        { build_instruction(type::INSTRUCTION_TYPE::DIV); }
 #line 1686 "./auxiliary/src/parser.cpp"
     break;
 
   case 33:
 #line 138 "./auxiliary/parser.y"
-                                    { std::cout << "not" << std::endl; build_instruction(type::INSTRUCTION_TYPE::NOT); }
+                                    { build_instruction(type::INSTRUCTION_TYPE::NOT); }
 #line 1692 "./auxiliary/src/parser.cpp"
     break;
 
   case 34:
 #line 139 "./auxiliary/parser.y"
-                                                        { std::cout << "and" << std::endl; build_instruction(type::INSTRUCTION_TYPE::AND); }
+                                                        { build_instruction(type::INSTRUCTION_TYPE::AND); }
 #line 1698 "./auxiliary/src/parser.cpp"
     break;
 
   case 35:
 #line 140 "./auxiliary/parser.y"
-                                                       { std::cout << "or" << std::endl; build_instruction(type::INSTRUCTION_TYPE::OR); }
+                                                       { build_instruction(type::INSTRUCTION_TYPE::OR); }
 #line 1704 "./auxiliary/src/parser.cpp"
     break;
 
   case 36:
 #line 141 "./auxiliary/parser.y"
-                                                        { std::cout << "xor" << std::endl; build_instruction(type::INSTRUCTION_TYPE::XOR); }
+                                                        { build_instruction(type::INSTRUCTION_TYPE::XOR); }
 #line 1710 "./auxiliary/src/parser.cpp"
     break;
 
   case 37:
 #line 142 "./auxiliary/parser.y"
-                                                        { std::cout << "shl" << std::endl; build_instruction(type::INSTRUCTION_TYPE::SHL); }
+                                                        { build_instruction(type::INSTRUCTION_TYPE::SHL); }
 #line 1716 "./auxiliary/src/parser.cpp"
     break;
 
   case 38:
 #line 143 "./auxiliary/parser.y"
-                                                        { std::cout << "shr" << std::endl; build_instruction(type::INSTRUCTION_TYPE::SHR); }
+                                                        { build_instruction(type::INSTRUCTION_TYPE::SHR); }
 #line 1722 "./auxiliary/src/parser.cpp"
     break;
 
   case 39:
 #line 144 "./auxiliary/parser.y"
-                                                          { std::cout << "csrrd" << std::endl; build_instruction(type::INSTRUCTION_TYPE::CSRRD); }
+                                                          { build_instruction(type::INSTRUCTION_TYPE::CSRRD); }
 #line 1728 "./auxiliary/src/parser.cpp"
     break;
 
   case 40:
 #line 145 "./auxiliary/parser.y"
-                                                          { std::cout << "csrwr" << std::endl; build_instruction(type::INSTRUCTION_TYPE::CSRWR); }
+                                                          { build_instruction(type::INSTRUCTION_TYPE::CSRWR); }
 #line 1734 "./auxiliary/src/parser.cpp"
     break;
 
   case 41:
 #line 146 "./auxiliary/parser.y"
-                                                       { std::cout << "ld" << std::endl; build_instruction(type::INSTRUCTION_TYPE::LD); }
+                                                       { build_instruction(type::INSTRUCTION_TYPE::LD); }
 #line 1740 "./auxiliary/src/parser.cpp"
     break;
 
   case 42:
 #line 147 "./auxiliary/parser.y"
-                                                       { std::cout << "st" << std::endl; build_instruction(type::INSTRUCTION_TYPE::ST); }
+                                                       { build_instruction(type::INSTRUCTION_TYPE::ST); }
 #line 1746 "./auxiliary/src/parser.cpp"
     break;
 
   case 49:
 #line 163 "./auxiliary/parser.y"
-       { std::cout << "simbol: " << (yyvsp[0].symbol_name) << std::endl;  CommandBuilder::get_instance().enque_param(Assembler::get_instance().create_symbol((yyvsp[0].symbol_name))); }
+       {  CommandBuilder::get_instance().enque_param(Assembler::get_instance().create_symbol((yyvsp[0].symbol_name))); }
 #line 1752 "./auxiliary/src/parser.cpp"
     break;
 
   case 50:
 #line 167 "./auxiliary/parser.y"
-            { std::cout << "literal: " << std::stoi((yyvsp[0].literal_value) + 2, 0, 2) << std::endl; CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value) + 2, 0, 2))); }
+            { CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value) + 2, 0, 2))); }
 #line 1758 "./auxiliary/src/parser.cpp"
     break;
 
   case 51:
 #line 168 "./auxiliary/parser.y"
-              { std::cout << "literal: " << std::stoi((yyvsp[0].literal_value), 0, 8) << std::endl;   CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value), 0, 8))); }
+              {   CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value), 0, 8))); }
 #line 1764 "./auxiliary/src/parser.cpp"
     break;
 
   case 52:
 #line 169 "./auxiliary/parser.y"
-              { std::cout << "literal: " << std::stoi((yyvsp[0].literal_value), 0, 10) << std::endl;  CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value), 0, 10))); }
+              {  CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value), 0, 10))); }
 #line 1770 "./auxiliary/src/parser.cpp"
     break;
 
   case 53:
 #line 170 "./auxiliary/parser.y"
-              { std::cout << "literal: " << std::stoi((yyvsp[0].literal_value), 0, 16) << std::endl;  CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value), 0, 16))); }
+              {  CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value), 0, 16))); }
 #line 1776 "./auxiliary/src/parser.cpp"
     break;
 
   case 54:
 #line 174 "./auxiliary/parser.y"
-               { std::cout << "literal: " << (yyvsp[0].literal_value) << std::endl; CommandBuilder::get_instance().enque_param(new Literal((yyvsp[0].literal_value))); }
+               { CommandBuilder::get_instance().enque_param(new Literal((yyvsp[0].literal_value))); }
 #line 1782 "./auxiliary/src/parser.cpp"
     break;
 
   case 55:
 #line 178 "./auxiliary/parser.y"
-       { std::cout << "GP registar: " << (yyvsp[0].gpr_index) << std::endl; CommandBuilder::get_instance().set_next_gp_reg(static_cast<type::GP_REG>((yyvsp[0].gpr_index))); }
+       { CommandBuilder::get_instance().set_next_gp_reg(static_cast<type::GP_REG>((yyvsp[0].gpr_index))); }
 #line 1788 "./auxiliary/src/parser.cpp"
     break;
 
   case 56:
 #line 182 "./auxiliary/parser.y"
-       { std::cout << "CS registar: " << (yyvsp[0].csr_index) << std::endl; CommandBuilder::get_instance().set_next_cs_reg(static_cast<type::CS_REG>((yyvsp[0].csr_index))); }
+       { CommandBuilder::get_instance().set_next_cs_reg(static_cast<type::CS_REG>((yyvsp[0].csr_index))); }
 #line 1794 "./auxiliary/src/parser.cpp"
     break;
 
   case 57:
 #line 186 "./auxiliary/parser.y"
-                        { std::cout << "immed" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::IMMED); }
+                        { CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::IMMED); }
 #line 1800 "./auxiliary/src/parser.cpp"
     break;
 
   case 58:
 #line 187 "./auxiliary/parser.y"
-                       { std::cout << "immed" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::IMMED); }
+                       { CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::IMMED); }
 #line 1806 "./auxiliary/src/parser.cpp"
     break;
 
   case 59:
 #line 188 "./auxiliary/parser.y"
-                   { std::cout << "mem dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::MEM_DIR); }
+                   { CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::MEM_DIR); }
 #line 1812 "./auxiliary/src/parser.cpp"
     break;
 
   case 60:
 #line 189 "./auxiliary/parser.y"
-                 { std::cout << "mem dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::MEM_DIR); }
+                 { CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::MEM_DIR); }
 #line 1818 "./auxiliary/src/parser.cpp"
     break;
 
   case 61:
 #line 190 "./auxiliary/parser.y"
-                 { std::cout << "reg dir" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_DIR); }
+                 { CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_DIR); }
 #line 1824 "./auxiliary/src/parser.cpp"
     break;
 
   case 62:
 #line 191 "./auxiliary/parser.y"
-                                                   { std::cout << "reg mem" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND); }
+                                                   { CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND); }
 #line 1830 "./auxiliary/src/parser.cpp"
     break;
 
   case 63:
 #line 192 "./auxiliary/parser.y"
-                                                                        { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
+                                                                        { CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
 #line 1836 "./auxiliary/src/parser.cpp"
     break;
 
   case 64:
 #line 193 "./auxiliary/parser.y"
-                                                                     { std::cout << "reg mem with disp" << std::endl; CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
+                                                                     { CommandBuilder::get_instance().set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::REG_IND_WITH_DISP); }
 #line 1842 "./auxiliary/src/parser.cpp"
     break;
 

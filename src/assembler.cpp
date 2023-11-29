@@ -1,4 +1,5 @@
 #include "../inc/assembler.hpp"
+#include "../auxiliary/inc/converters.hpp"
 #include <iostream>
 #include <cstring>
 
@@ -201,36 +202,14 @@ bool Assembler::run()
   std::cout << "executing section: __NO_DATA_SECTION__" << std::endl;
   this->no_data_section->create_output_file();
   std::vector<type::byte> output_file = this->no_data_section->get_output_file();
-  std::list<RelocationRecord *> realocations = this->no_data_section->get_all_relocations();
+  std::list<RelocationRecord *> relocations = this->no_data_section->get_all_relocations();
 
-  // FIXME: (only for test purposes) from here...
-  std::cout << "0x00: | ";
-  type::byte new_line_cnt = 0;
-  for (type::byte single_byte : output_file)
+  if (output_file.size() > 0 || relocations.size() > 0)
   {
-    std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)single_byte << " | ";
-
-    if (++new_line_cnt % 4 == 0)
-    {
-      std::cout << std::endl;
-
-      if (new_line_cnt < output_file.size())
-        std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)new_line_cnt << ": | ";
-    }
+    this->internal_error("Something written to __NO_DATA_SECTION__");
   }
 
-  std::cout << std::endl
-            << "Relocations: " << std::endl;
-  for (RelocationRecord *rel : realocations)
-  {
-    std::cout << "Offset: " << rel->get_offset()
-              << " | Addend: " << rel->get_addend()
-              << " | Sym_id: " << rel->get_symbol_id()
-              << " | Addend sign: " << rel->get_addend_signed_flag()
-              << std::endl;
-  }
-  // FIXME: ...until here
-
+  char *s; // s is used for formatted output
   for (auto &iter : this->section_table)
   {
     Section *section = iter.second;
@@ -238,11 +217,10 @@ bool Assembler::run()
               << "executing section: " << iter.first << std::endl;
     section->create_output_file();
     std::vector<type::byte> output_file = section->get_output_file();
-    std::list<RelocationRecord *> realocations = section->get_all_relocations();
+    std::list<RelocationRecord *> relocations = section->get_all_relocations();
 
-    // FIXME: (only for test purposes) from here...
     std::cout << "0x00: | ";
-    new_line_cnt = 0;
+    uint32_t new_line_cnt = 0;
     for (type::byte single_byte : output_file)
     {
       std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)single_byte << " | ";
@@ -257,25 +235,30 @@ bool Assembler::run()
     }
 
     std::cout << std::endl
-              << "Relocations: " << std::endl;
-    for (RelocationRecord *rel : realocations)
+              << "RELOCATIONS: " << std::endl;
+
+    s = new char[100];
+    sprintf(s, "%7s | %7s | %7s | %8s | %7s", "OFFSET", "SYM_ID", "ADDEND", "SIGN", "TYPE");
+    std::cout << s << std::endl;
+
+    for (uint8_t i = 0; i < strlen(s) + 1; i++)
+      std::cout << "-";
+    std::cout << std::endl;
+    for (RelocationRecord *rel : relocations)
     {
-      std::cout << "Offset: " << rel->get_offset()
-                << " | Addend: " << rel->get_addend()
-                << " | Sym_id: " << rel->get_symbol_id()
-                << " | Addend sign: " << rel->get_addend_signed_flag()
-                << std::endl;
+      s = new char[100];
+      sprintf(s, "%7d | %7d | %7d | %8s | %7s", rel->get_offset(), rel->get_symbol_id(), rel->get_addend(), rel->get_addend_signed_flag() ? "SIGNED" : "UNSIGNED", converter::relocation_type_to_string(rel->get_type()).c_str());
+      std::cout << s << std::endl;
     }
-    // FIXME: ...until here
   }
 
   std::cout << std::endl
             << "SYMBOL TABLE: " << std::endl;
 
-  char *s = new char[100];
-  sprintf(s, "%10s | %2s | %10s | %7s | %8s | %7s |", "NAME", "ID", "SECTION", "GLOBAL", "VALUE", "TYPE");
+  s = new char[100];
+  sprintf(s, "%15s | %3s | %10s | %7s | %8s | %7s |", "NAME", "ID", "SECTION", "GLOBAL", "VALUE", "TYPE");
   std::cout << s << std::endl;
-  uint8_t padding = 6; // %10s - strlen("NAME")
+  uint8_t padding = 11; // %15s - strlen("NAME")
   for (uint8_t i = 0; i < strlen(s) + padding; i++)
     std::cout << "-";
   std::cout << std::endl;
@@ -287,7 +270,7 @@ bool Assembler::run()
       continue;
 
     s = new char[100];
-    sprintf(s, "%10s | %2d | %10s | %7s | %8s | %7s |", sym->get_name().c_str(), sym->get_id(), sym->get_section() != nullptr ? std::to_string(sym->get_section()->get_id()).c_str() : "NO_SECTION", sym->get_global_flag() ? "true" : "false", sym->has_set_value() ? std::to_string(sym->get_value()).c_str() : "NO_VALUE", "SYMBOL");
+    sprintf(s, "%15s | %3d | %10s | %7s | %8s | %7s |", sym->get_name().c_str(), sym->get_id(), sym->get_section() != nullptr ? std::to_string(sym->get_section()->get_id()).c_str() : "NO_SECTION", sym->get_global_flag() ? "true" : "false", sym->has_set_value() ? std::to_string(sym->get_value()).c_str() : "NO_VALUE", "SYMBOL");
     std::cout << s << std::endl;
   }
 
@@ -296,7 +279,7 @@ bool Assembler::run()
     Section *sym = iter.second;
 
     s = new char[100];
-    sprintf(s, "%10s | %2d | %10s | %7s | %8s | %7s |", sym->get_name().c_str(), sym->get_id(), "", "true", std::to_string(sym->get_length()).c_str(), "SECTION");
+    sprintf(s, "%15s | %3d | %10s | %7s | %8s | %7s |", sym->get_name().c_str(), sym->get_id(), "", "true", std::to_string(sym->get_length()).c_str(), "SECTION");
     std::cout << s << std::endl;
   }
 

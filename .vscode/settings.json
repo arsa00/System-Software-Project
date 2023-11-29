@@ -50,7 +50,8 @@
     "ctime": "cpp",
     "iomanip": "cpp",
     "typeindex": "cpp",
-    "unordered_set": "cpp"
+    "unordered_set": "cpp",
+    "cstring": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }

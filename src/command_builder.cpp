@@ -265,6 +265,9 @@ Directive *CommandBuilder::build_directive(type::DIRECTIVE_TYPE dir_alias)
   case type::DIRECTIVE_TYPE::END:
   {
     dir = new directive::END();
+    dir->execute(nullptr); // the directive is independent of the section
+    dir = nullptr;
+    directive_executed = true;
   }
   break;
     // TODO: maybe add EQU?
@@ -277,7 +280,6 @@ Directive *CommandBuilder::build_directive(type::DIRECTIVE_TYPE dir_alias)
   if (!dir && !directive_executed)
     Assembler::get_instance().parse_error("Error occured while building " + converter::directive_type_to_string(dir_alias) + " directive");
 
-  std::cout << "[CMD_BUILDER]: finished" << std::endl;
   return dir;
 }
 

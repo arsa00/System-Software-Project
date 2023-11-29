@@ -164,6 +164,19 @@ std::string converter::cpu_instruction_type_to_string(type::CPU_INSTRUCTIONS ins
   }
 }
 
+std::string converter::relocation_type_to_string(type::RELOCATIONS rel_alias)
+{
+  switch (rel_alias)
+  {
+  case type::RELOCATIONS::ABS_32S:
+    return "ABS_32S";
+  case type::RELOCATIONS::ABS_32U:
+    return "ABS_32U";
+  default:
+    return "";
+  }
+}
+
 // displacement is 12bit value, so higher 4 bits of arr[0] are always zero and must be overwritten
 // to use value needed in instruction
 std::array<type::byte, 2> converter::disp_to_byte_arr(int16_t displacement)

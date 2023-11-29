@@ -12,5 +12,12 @@ text2:
 .section text2
 .word example
 jmp example2
+example3:
 .word hehe, 0x332211
 jmp 0x321
+
+.end
+
+.section non_existing
+jmp text2
+.word 0x32
