@@ -13,6 +13,7 @@ extern FILE *yyin;
 extern void test1();
 extern void test2();
 extern void test3();
+extern void testSymbolJsonRecord1();
 
 void yyerror(char *s)
 {
@@ -118,6 +119,7 @@ int main(int argc, char const *argv[])
   // test1();
   // test2();
   // test3();
+  testSymbolJsonRecord1();
 
   return 0;
 }

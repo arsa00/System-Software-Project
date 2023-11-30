@@ -8,6 +8,7 @@
 #include "../inc/section.hpp"
 #include "../inc/assembler.hpp"
 #include <vector>
+#include "../auxiliary/inc/symbol_json.hpp"
 
 void test1()
 {
@@ -173,4 +174,40 @@ void test3()
 
   section->print_output_file();
   std::cout << std::dec << "Location counter = " << section->get_curr_loc_cnt() << std::endl;
+}
+
+void testSymbolJsonRecord1()
+{
+  SymbolJsonRecord *symJson = new SymbolJsonRecord();
+  symJson->set_id(1);
+  symJson->set_is_final(false);
+  symJson->set_is_global(true);
+  symJson->set_name("test1");
+  symJson->set_section(3);
+  symJson->set_type(type::PARAMETER_TYPE::SYMBOL);
+  symJson->set_value(22);
+
+  std::string jsonFile = symJson->convert_to_json();
+
+  SymbolJsonRecord *sym1Json = new SymbolJsonRecord();
+  sym1Json->convert_to_json();
+  sym1Json->init_from_json(jsonFile);
+  sym1Json->convert_to_json();
+
+  Symbol *sym = new Symbol("symbolInitTest");
+  sym->set_id(22);
+  sym->set_final_flag(true);
+  sym->set_global_flag(false);
+  sym->set_value(32);
+
+  SymbolJsonRecord *sym2Json = new SymbolJsonRecord();
+  sym2Json->init_from_symbol(sym);
+  sym2Json->convert_to_json();
+
+  Section *sec_sym = new Section("sectionInitTest");
+  sec_sym->set_id(19151003);
+
+  SymbolJsonRecord *sym3Json = new SymbolJsonRecord();
+  sym3Json->init_from_section_symbol(sec_sym);
+  sym3Json->convert_to_json();
 }
