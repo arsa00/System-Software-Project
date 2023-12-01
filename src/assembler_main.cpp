@@ -18,6 +18,8 @@ extern void testSymbolJsonRecord1();
 void yyerror(char *s)
 {
   cerr << s << endl;
+
+  Assembler::get_instance().parse_error(s);
 }
 
 int main(int argc, char const *argv[])

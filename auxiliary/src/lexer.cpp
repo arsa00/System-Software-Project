@@ -1063,17 +1063,17 @@ YY_RULE_SETUP
 case 42:
 YY_RULE_SETUP
 #line 57 "./auxiliary/lexer.l"
-{ yylval.gpr_index = 0; return CS_REG; }
+{ yylval.csr_index = 0; return CS_REG; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
 #line 58 "./auxiliary/lexer.l"
-{ yylval.gpr_index = 1; return CS_REG; }
+{ yylval.csr_index = 1; return CS_REG; }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
 #line 59 "./auxiliary/lexer.l"
-{ yylval.gpr_index = 2; return CS_REG; }
+{ yylval.csr_index = 2; return CS_REG; }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP

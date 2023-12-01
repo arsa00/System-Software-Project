@@ -285,11 +285,17 @@ Directive *CommandBuilder::build_directive(type::DIRECTIVE_TYPE dir_alias)
 
 void CommandBuilder::set_next_gp_reg(type::GP_REG gp_reg)
 {
-  if (this->gp_reg_0 != type::GP_REG::NO_REG)
+  if (this->gp_reg_0 == type::GP_REG::NO_REG)
+  {
     this->gp_reg_0 = gp_reg;
+    return;
+  }
 
-  if (this->gp_reg_1 != type::GP_REG::NO_REG)
+  if (this->gp_reg_1 == type::GP_REG::NO_REG)
+  {
     this->gp_reg_1 = gp_reg;
+    return;
+  }
 }
 
 void CommandBuilder::set_gp_regs(type::GP_REG gp_reg_0, type::GP_REG gp_reg_1)
@@ -320,11 +326,17 @@ type::GP_REG CommandBuilder::get_gp_reg_1() const
 
 void CommandBuilder::set_next_cs_reg(type::CS_REG cs_reg)
 {
-  if (this->cs_reg_0 != type::CS_REG::NO_REG)
+  if (this->cs_reg_0 == type::CS_REG::NO_REG)
+  {
     this->cs_reg_0 = cs_reg;
+    return;
+  }
 
-  if (this->cs_reg_1 != type::CS_REG::NO_REG)
+  if (this->cs_reg_1 == type::CS_REG::NO_REG)
+  {
     this->cs_reg_1 = cs_reg;
+    return;
+  }
 }
 
 void CommandBuilder::set_cs_regs(type::CS_REG cs_reg_0, type::CS_REG cs_reg_1)

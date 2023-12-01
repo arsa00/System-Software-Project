@@ -15,6 +15,8 @@ jmp example2
 example3:
 .word hehe, 0x332211
 jmp 0x321
+ld [%r3 + 0x321], %r2
+#ld [%r5 + hehe], %r3
 
 .end
 

@@ -454,9 +454,9 @@ void create_operation_instruction(Section *dest_section, type::CPU_INSTRUCTIONS 
     std::string msg = "GP registers have non-consistent values: \n{";
     msg += "section name: \"" + dest_section->get_name() + std::string("\",\n");
     msg += "cpu instruction: \"" + converter::cpu_instruction_type_to_string(ins) + std::string("\",\n");
-    msg += "gprA: " + static_cast<int16_t>(gprA) + std::string(",\n");
-    msg += "gprB: " + static_cast<int16_t>(gprB) + std::string(",\n");
-    msg += "gprC: " + static_cast<int16_t>(gprC) + std::string("\n}");
+    msg += "gprA: " + std::to_string(static_cast<int16_t>(gprA)) + std::string(",\n");
+    msg += "gprB: " + std::to_string(static_cast<int16_t>(gprB)) + std::string(",\n");
+    msg += "gprC: " + std::to_string(static_cast<int16_t>(gprC)) + std::string("\n}");
     Assembler::get_instance().internal_error(msg);
     return;
   }
@@ -955,7 +955,7 @@ void instruction::LD::execute(Section *dest_section) const
     // check if displacement (signed) value can be written in 12bit instruction field
     if (reg_disp < type::MAX_NEG_DISP || reg_disp > type::MAX_POS_DISP)
     {
-      Assembler::get_instance().internal_error("Given displacement: " + reg_disp + std::string(", can't fit in 12bits wide instruction field. Cannot generate ld instruction [reg ind with disp mem addr mode]."));
+      Assembler::get_instance().internal_error("Given displacement: " + std::to_string(reg_disp) + std::string(", can't fit in 12bits wide instruction field. Cannot generate ld instruction [reg ind with disp mem addr mode]."));
       return;
     }
 
@@ -1158,7 +1158,7 @@ void instruction::ST::execute(Section *dest_section) const
     // check if displacement (signed) value can be written in 12bit instruction field
     if (reg_disp < type::MAX_NEG_DISP || reg_disp > type::MAX_POS_DISP)
     {
-      Assembler::get_instance().internal_error("Given displacement: " + reg_disp + std::string(", can't fit in 12bits wide instruction field. Cannot generate st instruction [reg ind with disp mem addr mode]."));
+      Assembler::get_instance().internal_error("Given displacement: " + std::to_string(reg_disp) + std::string(", can't fit in 12bits wide instruction field. Cannot generate st instruction [reg ind with disp mem addr mode]."));
       return;
     }
 
