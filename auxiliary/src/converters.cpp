@@ -269,3 +269,84 @@ std::array<type::byte, 4> converter::get_instruction_bytes(type::instruction_siz
 
   return bytes;
 }
+
+std::string converter::get_value_from_json(const std::string &json_file, const std::string &key, uint32_t *start_pos, bool is_array)
+{ // TODO: implement not crashing on the wrong file and std::string::npos
+  uint32_t start = 0;
+  const char *delimiter = is_array ? "],\n" : ",\n";
+  if (start_pos)
+  {
+    start = *start_pos;
+  }
+  size_t pos = json_file.find(key, start);
+  size_t substr_start = pos + key.size();
+  size_t substr_end = json_file.find(delimiter, pos) + (is_array ? 1 : 0);
+  std::string val = json_file.substr(substr_start, substr_end - substr_start);
+  if (start_pos)
+  {
+    *start_pos = substr_end + 2;
+  }
+  return val;
+}
+
+std::vector<std::string> converter::decode_json_array(const std::string &json_arr)
+{ // TODO: remove logs (leave only error-reporting ones)
+  std::cout << "CONVERTER: " << std::endl
+            << json_arr << std::endl;
+
+  if (json_arr[0] != '[' || json_arr[json_arr.size() - 1] != ']')
+  {
+    // print err
+    return {};
+  }
+
+  size_t start = 1; // skip '['
+  size_t end;
+  std::vector<std::string> res;
+
+  if (json_arr.find("{") == std::string::npos)
+  {
+    while (true)
+    {
+      end = json_arr.find(",", start);
+      if (end == std::string::npos)
+      {
+        // ',' not found, look for ']'
+        end = json_arr.find("]", start);
+        if (end == std::string::npos)
+        {
+          break;
+        }
+      }
+
+      res.push_back(json_arr.substr(start, end - start));
+      start = end + 1;
+    }
+  }
+  else
+  {
+    start = json_arr.find("{", 0);
+    while (true)
+    {
+      end = json_arr.find("},", start);
+      if (end == std::string::npos)
+      {
+        // ',' not found, look for ']'
+        end = json_arr.find("}]", start);
+        if (end == std::string::npos)
+        {
+          break;
+        }
+      }
+
+      end++; // because of the '}'
+
+      res.push_back(json_arr.substr(start, end - start));
+      std::cout << "CONVERTER found: " << std::endl
+                << json_arr.substr(start, end - start) << std::endl;
+      start = end + 1;
+    }
+  }
+
+  return res;
+}

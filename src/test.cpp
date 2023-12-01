@@ -9,6 +9,7 @@
 #include "../inc/assembler.hpp"
 #include <vector>
 #include "../auxiliary/inc/symbol_json.hpp"
+#include "../auxiliary/inc/section_json.hpp"
 
 void test1()
 {
@@ -210,4 +211,39 @@ void testSymbolJsonRecord1()
   SymbolJsonRecord *sym3Json = new SymbolJsonRecord();
   sym3Json->init_from_section_symbol(sec_sym);
   sym3Json->convert_to_json();
+}
+
+void testSectionJsonRecord1()
+{
+  SectionJsonRecord *sectionJson = new SectionJsonRecord();
+  sectionJson->add_output_file(5);
+  sectionJson->add_output_file(4);
+  sectionJson->add_output_file(3);
+  sectionJson->add_output_file(22);
+  sectionJson->add_output_file(1);
+
+  std::string jsonFile = sectionJson->convert_to_json();
+  sectionJson->init_from_json(jsonFile);
+
+  RelocationJsonRecord *relJson1 = new RelocationJsonRecord();
+  relJson1->set_addend(12);
+  relJson1->set_is_addend_signed(false);
+  relJson1->set_offset(22);
+  relJson1->set_sym_id(15);
+  relJson1->set_type(type::RELOCATIONS::ABS_32U);
+  relJson1->convert_to_json();
+
+  RelocationJsonRecord *relJson2 = new RelocationJsonRecord();
+  relJson2->set_addend(19);
+  relJson2->set_is_addend_signed(true);
+  relJson2->set_offset(10);
+  relJson2->set_sym_id(3);
+  relJson2->set_type(type::RELOCATIONS::ABS_32S);
+  relJson2->convert_to_json();
+
+  sectionJson->add_relocations(*relJson1);
+  sectionJson->add_relocations(*relJson2);
+
+  jsonFile = sectionJson->convert_to_json();
+  sectionJson->init_from_json(jsonFile);
 }

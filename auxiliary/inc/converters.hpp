@@ -4,6 +4,7 @@
 #include "../../inc/types.hpp"
 #include <string>
 #include <array>
+#include <vector>
 
 namespace converter
 {
@@ -27,6 +28,8 @@ namespace converter
   type::instruction_size create_instruction_of_bytes(type::byte b3, type::byte b2, type::byte b1, type::byte b0);
   std::array<type::byte, 4> get_instruction_bytes(type::instruction_size instruction);
 
+  std::string get_value_from_json(const std::string &json_file, const std::string &key, uint32_t *start_pos = nullptr, bool is_array = false);
+  std::vector<std::string> decode_json_array(const std::string &json_arr);
 }
 
 #endif
