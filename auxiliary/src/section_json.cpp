@@ -11,6 +11,11 @@ RelocationJsonRecord::RelocationJsonRecord(RelocationRecord *rel_record)
   }
 }
 
+RelocationJsonRecord::RelocationJsonRecord(std::string json_file)
+{
+  this->init_from_json(json_file);
+}
+
 void RelocationJsonRecord::set_offset(uint32_t offset)
 {
   this->offset = offset;
@@ -77,7 +82,7 @@ std::string RelocationJsonRecord::convert_to_json()
   out_json += (TYPE_KEY + std::to_string(static_cast<int>(this->type)) + ",\n");
   out_json += "}";
 
-  std::cout << out_json.c_str() << std::endl;
+  // std::cout << out_json.c_str() << std::endl;
   return out_json;
 }
 
@@ -85,7 +90,7 @@ void RelocationJsonRecord::init_from_json(std::string json_file)
 {
   if (json_file[0] != '{' || json_file[json_file.size() - 1] != '}')
   {
-    std::cout << "Wrong format" << std::endl;
+    std::cout << "Wrong json format: " << json_file << std::endl;
     return;
   }
   uint32_t pos = 1;
@@ -128,6 +133,11 @@ SectionJsonRecord::SectionJsonRecord(Section *section)
   }
 }
 
+SectionJsonRecord::SectionJsonRecord(std::string json_file)
+{
+  this->init_from_json(json_file);
+}
+
 void SectionJsonRecord::set_output_file(std::vector<type::byte> output_file)
 {
   this->output_file = output_file;
@@ -138,12 +148,12 @@ void SectionJsonRecord::set_relocations(std::vector<RelocationJsonRecord> reloca
   this->relocations = relocations;
 }
 
-void SectionJsonRecord::add_output_file(type::byte single_byte)
+void SectionJsonRecord::add_to_output_file(type::byte single_byte)
 {
   this->output_file.push_back(single_byte);
 }
 
-void SectionJsonRecord::add_relocations(RelocationJsonRecord json_rel_record)
+void SectionJsonRecord::add_relocation(RelocationJsonRecord json_rel_record)
 {
   this->relocations.push_back(json_rel_record);
 }
@@ -187,7 +197,7 @@ std::string SectionJsonRecord::convert_to_json()
 
   out_json += "}";
 
-  std::cout << out_json.c_str() << std::endl;
+  // std::cout << out_json.c_str() << std::endl;
   return out_json;
 }
 
@@ -195,33 +205,45 @@ void SectionJsonRecord::init_from_json(std::string json_file)
 {
   if (json_file[0] != '{' || json_file[json_file.size() - 1] != '}')
   {
-    std::cout << "Wrong format" << std::endl;
+    std::cout << "Wrong json format: " << json_file << std::endl;
     return;
   }
   uint32_t pos = 1;
   std::string val;
 
+  // reset current values
+  this->output_file = {};
+  this->relocations = {};
+
   val = converter::get_value_from_json(json_file, OUTPUT_FILE_KEY, &pos, true);
   std::vector<std::string> output_file_str = converter::decode_json_array(val);
+
+  for (std::string str : output_file_str)
+  {
+    if (str.empty())
+      continue;
+
+    this->add_to_output_file(static_cast<type::byte>(std::stoul(str)));
+  }
 
   val = converter::get_value_from_json(json_file, RELOCATIONS_KEY, &pos, true);
   std::vector<std::string> relocations_str = converter::decode_json_array(val);
 
-  std::cout << "output_file_str: " << std::endl;
-  for (std::string str : output_file_str)
-  {
-    std::cout << str << " ";
-  }
-  std::cout << std::endl;
-
-  std::cout << "relocations_str: " << std::endl;
   for (std::string str : relocations_str)
   {
-    std::cout << str << " ";
+    if (str.empty())
+      continue;
+
+    this->add_relocation(RelocationJsonRecord(str));
   }
-  std::cout << std::endl;
 }
 
 void SectionJsonRecord::init_from_section(Section *section)
 {
+  this->output_file = section->get_output_file();
+  std::list<RelocationRecord *> rel_records = section->get_all_relocations();
+  for (RelocationRecord *rel_record : rel_records)
+  {
+    this->add_relocation(RelocationJsonRecord(rel_record));
+  }
 }

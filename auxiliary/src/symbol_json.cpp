@@ -2,6 +2,23 @@
 #include "../inc/converters.hpp"
 #include <iostream>
 
+SymbolJsonRecord::SymbolJsonRecord(Symbol *sym)
+{
+  if (sym)
+    this->init_from_symbol(sym);
+}
+
+SymbolJsonRecord::SymbolJsonRecord(Section *sym)
+{
+  if (sym)
+    this->init_from_section_symbol(sym);
+}
+
+SymbolJsonRecord::SymbolJsonRecord(std::string json_file)
+{
+  this->init_from_json(json_file);
+}
+
 void SymbolJsonRecord::set_value(int32_t val)
 {
   this->value = val;
@@ -108,7 +125,7 @@ std::string SymbolJsonRecord::convert_to_json()
   out_json += (TYPE_KEY + std::to_string(static_cast<int>(this->type)) + ",\n");
   out_json += "}";
 
-  std::cout << out_json.c_str() << std::endl;
+  // std::cout << out_json.c_str() << std::endl;
   return out_json;
 }
 
@@ -116,7 +133,7 @@ void SymbolJsonRecord::init_from_json(std::string json_file)
 {
   if (json_file[0] != '{' || json_file[json_file.size() - 1] != '}')
   {
-    std::cout << "Wrong format" << std::endl;
+    std::cout << "Wrong json format: " << json_file << std::endl;
     return;
   }
   uint32_t pos = 1;

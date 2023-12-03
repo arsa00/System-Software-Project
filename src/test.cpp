@@ -179,6 +179,10 @@ void test3()
 
 void testSymbolJsonRecord1()
 {
+  std::cout << std::endl
+            << "----------- testSymbolJsonRecord1 ----------- " << std::endl
+            << std::endl;
+
   SymbolJsonRecord *symJson = new SymbolJsonRecord();
   symJson->set_id(1);
   symJson->set_is_final(false);
@@ -189,11 +193,13 @@ void testSymbolJsonRecord1()
   symJson->set_value(22);
 
   std::string jsonFile = symJson->convert_to_json();
+  std::cout << "\nsymJson:" << std::endl;
+  std::cout << jsonFile << std::endl;
 
-  SymbolJsonRecord *sym1Json = new SymbolJsonRecord();
-  sym1Json->convert_to_json();
-  sym1Json->init_from_json(jsonFile);
-  sym1Json->convert_to_json();
+  SymbolJsonRecord *sym1Json = new SymbolJsonRecord(jsonFile);
+  jsonFile = sym1Json->convert_to_json();
+  std::cout << "\nsym1Json:" << std::endl;
+  std::cout << jsonFile << std::endl;
 
   Symbol *sym = new Symbol("symbolInitTest");
   sym->set_id(22);
@@ -201,28 +207,36 @@ void testSymbolJsonRecord1()
   sym->set_global_flag(false);
   sym->set_value(32);
 
-  SymbolJsonRecord *sym2Json = new SymbolJsonRecord();
-  sym2Json->init_from_symbol(sym);
-  sym2Json->convert_to_json();
+  SymbolJsonRecord *sym2Json = new SymbolJsonRecord(sym);
+  jsonFile = sym2Json->convert_to_json();
+  std::cout << "\nsym2Json:" << std::endl;
+  std::cout << jsonFile << std::endl;
 
   Section *sec_sym = new Section("sectionInitTest");
   sec_sym->set_id(19151003);
 
-  SymbolJsonRecord *sym3Json = new SymbolJsonRecord();
-  sym3Json->init_from_section_symbol(sec_sym);
-  sym3Json->convert_to_json();
+  SymbolJsonRecord *sym3Json = new SymbolJsonRecord(sec_sym);
+  jsonFile = sym3Json->convert_to_json();
+  std::cout << "\nsym3Json:" << std::endl;
+  std::cout << jsonFile << std::endl;
 }
 
 void testSectionJsonRecord1()
 {
-  SectionJsonRecord *sectionJson = new SectionJsonRecord();
-  sectionJson->add_output_file(5);
-  sectionJson->add_output_file(4);
-  sectionJson->add_output_file(3);
-  sectionJson->add_output_file(22);
-  sectionJson->add_output_file(1);
+  std::cout << std::endl
+            << "----------- testSectionJsonRecord1 ----------- " << std::endl
+            << std::endl;
 
+  SectionJsonRecord *sectionJson = new SectionJsonRecord();
+  sectionJson->add_to_output_file(5);
+  sectionJson->add_to_output_file(4);
+  sectionJson->add_to_output_file(3);
+  sectionJson->add_to_output_file(22);
+  sectionJson->add_to_output_file(1);
+
+  std::cout << "\nsectionJson1 (only output file):" << std::endl;
   std::string jsonFile = sectionJson->convert_to_json();
+  std::cout << jsonFile << std::endl;
   sectionJson->init_from_json(jsonFile);
 
   RelocationJsonRecord *relJson1 = new RelocationJsonRecord();
@@ -231,7 +245,6 @@ void testSectionJsonRecord1()
   relJson1->set_offset(22);
   relJson1->set_sym_id(15);
   relJson1->set_type(type::RELOCATIONS::ABS_32U);
-  relJson1->convert_to_json();
 
   RelocationJsonRecord *relJson2 = new RelocationJsonRecord();
   relJson2->set_addend(19);
@@ -239,11 +252,29 @@ void testSectionJsonRecord1()
   relJson2->set_offset(10);
   relJson2->set_sym_id(3);
   relJson2->set_type(type::RELOCATIONS::ABS_32S);
-  relJson2->convert_to_json();
 
-  sectionJson->add_relocations(*relJson1);
-  sectionJson->add_relocations(*relJson2);
+  sectionJson->add_relocation(*relJson1);
+  sectionJson->add_relocation(*relJson2);
 
-  jsonFile = sectionJson->convert_to_json();
-  sectionJson->init_from_json(jsonFile);
+  std::cout << "\nsectionJson1:" << std::endl;
+  std::cout << sectionJson->convert_to_json() << std::endl;
+
+  std::cout << "\nsectionJson2:" << std::endl;
+  SectionJsonRecord *sectionJson2 = new SectionJsonRecord(sectionJson->convert_to_json());
+  std::cout << sectionJson2->convert_to_json() << std::endl;
+
+  Section *sec_sym = new Section("sectionToJsonTest");
+  sec_sym->set_id(228);
+  sec_sym->write_byte(12);
+  sec_sym->write_byte(15);
+  sec_sym->write_byte(19);
+  sec_sym->write_byte(3);
+  sec_sym->write_byte(10);
+  sec_sym->add_new_relocation(new RelocationRecord(1000, 100, type::RELOCATIONS::ABS_32U, 125));
+  sec_sym->add_new_relocation(new RelocationRecord(1000, 100, type::RELOCATIONS::ABS_32S, 125));
+  sec_sym->add_new_relocation(new RelocationRecord(555, 55, type::RELOCATIONS::ABS_32U, 5));
+
+  std::cout << "\nsectionJson3:" << std::endl;
+  SectionJsonRecord *sectionJson3 = new SectionJsonRecord(sec_sym);
+  std::cout << sectionJson3->convert_to_json() << std::endl;
 }

@@ -290,13 +290,10 @@ std::string converter::get_value_from_json(const std::string &json_file, const s
 }
 
 std::vector<std::string> converter::decode_json_array(const std::string &json_arr)
-{ // TODO: remove logs (leave only error-reporting ones)
-  std::cout << "CONVERTER: " << std::endl
-            << json_arr << std::endl;
-
+{
   if (json_arr[0] != '[' || json_arr[json_arr.size() - 1] != ']')
   {
-    // print err
+    std::cout << "Wrong format of json array: " << json_arr << std::endl;
     return {};
   }
 
@@ -305,7 +302,7 @@ std::vector<std::string> converter::decode_json_array(const std::string &json_ar
   std::vector<std::string> res;
 
   if (json_arr.find("{") == std::string::npos)
-  {
+  { // array doesn't contain any complex objects (structs)
     while (true)
     {
       end = json_arr.find(",", start);
@@ -324,14 +321,14 @@ std::vector<std::string> converter::decode_json_array(const std::string &json_ar
     }
   }
   else
-  {
+  { // array contains complex objects (structs)
     start = json_arr.find("{", 0);
     while (true)
     {
       end = json_arr.find("},", start);
       if (end == std::string::npos)
       {
-        // ',' not found, look for ']'
+        // '},' not found, look for '}]'
         end = json_arr.find("}]", start);
         if (end == std::string::npos)
         {
@@ -342,8 +339,6 @@ std::vector<std::string> converter::decode_json_array(const std::string &json_ar
       end++; // because of the '}'
 
       res.push_back(json_arr.substr(start, end - start));
-      std::cout << "CONVERTER found: " << std::endl
-                << json_arr.substr(start, end - start) << std::endl;
       start = end + 1;
     }
   }

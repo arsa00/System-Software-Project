@@ -20,7 +20,10 @@ private:
   type::PARAMETER_TYPE type;
 
 public:
-  SymbolJsonRecord() {}
+  SymbolJsonRecord() = default;
+  SymbolJsonRecord(Symbol *sym);
+  SymbolJsonRecord(Section *sym);
+  SymbolJsonRecord(std::string json_file);
 
   void set_value(int32_t val);           // sets value and has_value=true
   void set_section(uint32_t section_id); // sets section id and has_section=true

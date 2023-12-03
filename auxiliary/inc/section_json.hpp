@@ -18,7 +18,9 @@ private:
   type::RELOCATIONS type;
 
 public:
-  RelocationJsonRecord(RelocationRecord *rel_record = nullptr);
+  RelocationJsonRecord() = default;
+  RelocationJsonRecord(RelocationRecord *rel_record);
+  RelocationJsonRecord(std::string json_file);
 
   void set_offset(uint32_t offset);
   void set_addend(uint32_t addend);
@@ -44,13 +46,15 @@ private:
   std::vector<RelocationJsonRecord> relocations;
 
 public:
-  SectionJsonRecord(Section *section = nullptr);
+  SectionJsonRecord() = default;
+  SectionJsonRecord(Section *section);
+  SectionJsonRecord(std::string json_file);
 
   void set_output_file(std::vector<type::byte> output_file);
   void set_relocations(std::vector<RelocationJsonRecord> relocations);
 
-  void add_output_file(type::byte single_byte);
-  void add_relocations(RelocationJsonRecord json_rel_record);
+  void add_to_output_file(type::byte single_byte);
+  void add_relocation(RelocationJsonRecord json_rel_record);
 
   std::vector<type::byte> get_output_file();
   std::vector<RelocationJsonRecord> get_relocations();
