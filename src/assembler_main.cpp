@@ -15,6 +15,7 @@ extern void test2();
 extern void test3();
 extern void testSymbolJsonRecord1();
 extern void testSectionJsonRecord1();
+extern void testObjectFile1();
 
 void yyerror(char *s)
 {
@@ -124,6 +125,7 @@ int main(int argc, char const *argv[])
   // test3();
   testSymbolJsonRecord1();
   testSectionJsonRecord1();
+  testObjectFile1();
 
   return 0;
 }

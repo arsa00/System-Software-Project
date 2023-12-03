@@ -10,6 +10,7 @@
 #include <vector>
 #include "../auxiliary/inc/symbol_json.hpp"
 #include "../auxiliary/inc/section_json.hpp"
+#include "../auxiliary/inc/object_file.hpp"
 
 void test1()
 {
@@ -277,4 +278,62 @@ void testSectionJsonRecord1()
   std::cout << "\nsectionJson3:" << std::endl;
   SectionJsonRecord *sectionJson3 = new SectionJsonRecord(sec_sym);
   std::cout << sectionJson3->convert_to_json() << std::endl;
+}
+
+void testObjectFile1()
+{
+  std::cout << std::endl
+            << "----------- testObjectFile1 ----------- " << std::endl
+            << std::endl;
+
+  SectionJsonRecord *sectionJson = new SectionJsonRecord();
+  sectionJson->add_to_output_file(5);
+  sectionJson->add_to_output_file(4);
+  sectionJson->add_to_output_file(3);
+  sectionJson->add_to_output_file(22);
+  sectionJson->add_to_output_file(1);
+
+  RelocationJsonRecord *relJson1 = new RelocationJsonRecord();
+  relJson1->set_addend(12);
+  relJson1->set_is_addend_signed(false);
+  relJson1->set_offset(22);
+  relJson1->set_sym_id(15);
+  relJson1->set_type(type::RELOCATIONS::ABS_32U);
+
+  RelocationJsonRecord *relJson2 = new RelocationJsonRecord();
+  relJson2->set_addend(19);
+  relJson2->set_is_addend_signed(true);
+  relJson2->set_offset(10);
+  relJson2->set_sym_id(3);
+  relJson2->set_type(type::RELOCATIONS::ABS_32S);
+
+  sectionJson->add_relocation(*relJson1);
+  sectionJson->add_relocation(*relJson2);
+
+  ObjectFile *objFile1 = new ObjectFile();
+  objFile1->add_section(*sectionJson);
+  objFile1->add_section(*sectionJson);
+  sectionJson->add_relocation(*relJson2);
+  objFile1->add_section(*sectionJson);
+
+  std::cout << "\nobjFile1 (only sections):" << std::endl;
+  std::cout << objFile1->convert_to_json() << std::endl;
+
+  SymbolJsonRecord *symJson = new SymbolJsonRecord();
+  symJson->set_id(1);
+  symJson->set_is_final(false);
+  symJson->set_is_global(true);
+  symJson->set_name("test1");
+  symJson->set_section(3);
+  symJson->set_type(type::PARAMETER_TYPE::SYMBOL);
+  symJson->set_value(28);
+
+  Section *sec_sym = new Section("sectionInitTest");
+  sec_sym->set_id(1215190310);
+
+  objFile1->add_symbol(*symJson);
+  objFile1->add_symbol(sec_sym);
+
+  std::cout << "\nobjFile1:" << std::endl;
+  std::cout << objFile1->convert_to_json() << std::endl;
 }
