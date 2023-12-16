@@ -148,6 +148,11 @@ void SectionJsonRecord::set_relocations(std::vector<RelocationJsonRecord> reloca
   this->relocations = relocations;
 }
 
+void SectionJsonRecord::set_id(uint32_t id)
+{
+  this->id = id;
+}
+
 void SectionJsonRecord::add_to_output_file(type::byte single_byte)
 {
   this->output_file.push_back(single_byte);
@@ -168,12 +173,20 @@ std::vector<RelocationJsonRecord> SectionJsonRecord::get_relocations()
   return this->relocations;
 }
 
+uint32_t SectionJsonRecord::get_id()
+{
+  return this->id;
+}
+
 const std::string OUTPUT_FILE_KEY = "out_hex_file:";
 const std::string RELOCATIONS_KEY = "relocations:";
+const std::string ID_KEY = "id:";
 
 std::string SectionJsonRecord::convert_to_json()
 {
   std::string out_json = "{\n";
+
+  out_json += (ID_KEY + std::to_string(this->id) + ",\n");
 
   out_json += (OUTPUT_FILE_KEY + "[");
   for (uint32_t i = 0; i < this->output_file.size(); i++)
@@ -215,6 +228,9 @@ void SectionJsonRecord::init_from_json(std::string json_file)
   this->output_file = {};
   this->relocations = {};
 
+  val = converter::get_value_from_json(json_file, ID_KEY, &pos);
+  this->id = (uint32_t)std::stoul(val);
+
   val = converter::get_value_from_json(json_file, OUTPUT_FILE_KEY, &pos, true);
   std::vector<std::string> output_file_str = converter::decode_json_array(val);
 
@@ -240,6 +256,7 @@ void SectionJsonRecord::init_from_json(std::string json_file)
 
 void SectionJsonRecord::init_from_section(Section *section)
 {
+  this->id = section->get_id();
   this->output_file = section->get_output_file();
   std::list<RelocationRecord *> rel_records = section->get_all_relocations();
   for (RelocationRecord *rel_record : rel_records)

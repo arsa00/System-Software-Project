@@ -18,7 +18,7 @@ Assembler &Assembler::get_instance()
 Assembler::Assembler()
 {
   std::cout << "[ASSEMBLER]: Created Assembler instance." << std::endl;
-  this->no_data_section = new Section("__NO_DATA_SECTION__");
+  // this->no_data_section = new Section("__NO_DATA_SECTION__");
 
   // set .text to be default section
   Section *default_section = new Section(".text");
@@ -43,8 +43,8 @@ Assembler::~Assembler()
     delete iter_begin->second;
   }
 
-  if (this->no_data_section)
-    delete this->no_data_section;
+  // if (this->no_data_section)
+  //   delete this->no_data_section;
 }
 
 void Assembler::parse_error(std::string err_msg)
@@ -188,11 +188,11 @@ void Assembler::add_command(Command *cmd)
 
   // if there is no active section and command doesn't emit any data
   // add it to the __NO_DATA_SECTION__
-  if (!this->curr_section && !cmd->get_generate_data_flag())
-  {
-    this->no_data_section->add_command(cmd);
-    return;
-  }
+  // if (!this->curr_section && !cmd->get_generate_data_flag())
+  // {
+  //   this->no_data_section->add_command(cmd);
+  //   return;
+  // }
 
   if (!this->curr_section)
   {
@@ -227,19 +227,19 @@ bool Assembler::run()
   std::cout << "finished parsing..." << std::endl;
 
   // execute __NO_DATA_SECTION__, although it should be empty
-  std::cout << "executing section: __NO_DATA_SECTION__" << std::endl;
-  this->no_data_section->create_output_file();
-  std::vector<type::byte> output_file = this->no_data_section->get_output_file();
-  std::list<RelocationRecord *> relocations = this->no_data_section->get_all_relocations();
+  // std::cout << "executing section: __NO_DATA_SECTION__" << std::endl;
+  // this->no_data_section->create_output_file();
+  // std::vector<type::byte> output_file = this->no_data_section->get_output_file();
+  // std::list<RelocationRecord *> relocations = this->no_data_section->get_all_relocations();
 
-  if (output_file.size() > 0 || relocations.size() > 0)
-  {
-    this->internal_error("Something written to __NO_DATA_SECTION__");
-  }
+  // if (output_file.size() > 0 || relocations.size() > 0)
+  // {
+  //   this->internal_error("Something written to __NO_DATA_SECTION__");
+  // }
 
   // create output obj file and add all sections to it (after executing sections!!!)
   ObjectFile *out_obj_file = new ObjectFile();
-  out_obj_file->add_section(this->no_data_section);
+  // out_obj_file->add_section(this->no_data_section);
 
   for (auto &iter : this->section_table)
   {

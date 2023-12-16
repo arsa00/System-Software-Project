@@ -1,10 +1,11 @@
 .global example
-.section text
 example:
 .ascii "AAA"
 .word example
+.section .text2
 example2:
 .extern hehe
+.section .text
 text2:
 .ascii "BBB"
 .word example2, 0x44332211
