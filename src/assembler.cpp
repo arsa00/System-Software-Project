@@ -2,6 +2,10 @@
 #include "../auxiliary/inc/converters.hpp"
 #include <iostream>
 #include <cstring>
+#include <fstream>
+#include "../auxiliary/inc/symbol_json.hpp"
+#include "../auxiliary/inc/section_json.hpp"
+#include "../auxiliary/inc/object_file.hpp"
 
 extern int yyparse();
 
@@ -15,6 +19,12 @@ Assembler::Assembler()
 {
   std::cout << "[ASSEMBLER]: Created Assembler instance." << std::endl;
   this->no_data_section = new Section("__NO_DATA_SECTION__");
+
+  // set .text to be default section
+  Section *default_section = new Section(".text");
+  this->set_id_to_sym(default_section); // create new id
+  this->section_table[".text"] = default_section;
+  this->curr_section = default_section;
 }
 
 Assembler::~Assembler()
@@ -33,7 +43,8 @@ Assembler::~Assembler()
     delete iter_begin->second;
   }
 
-  delete this->no_data_section;
+  if (this->no_data_section)
+    delete this->no_data_section;
 }
 
 void Assembler::parse_error(std::string err_msg)
@@ -47,6 +58,16 @@ void Assembler::internal_error(std::string err_msg)
 { // TODO: add some panic exit of Assembler...
   this->internal_err = true;
   std::cerr << "[ASSEMBLER]: { INTERNAL ERROR: " << err_msg << " }" << std::endl;
+}
+
+void Assembler::set_output_file_name(std::string file_name)
+{
+  this->output_file_name = file_name;
+}
+
+std::string Assembler::get_output_file_name()
+{
+  return this->output_file_name;
 }
 
 void Assembler::set_id_to_sym(Parameter *param)
@@ -194,11 +215,18 @@ void Assembler::stop()
 
 bool Assembler::run()
 {
+  if (this->output_file_name.empty())
+  {
+    this->internal_error("Output file must be set.");
+    return false;
+  }
+
   this->is_running = true;
   yyparse();
 
   std::cout << "finished parsing..." << std::endl;
 
+  // execute __NO_DATA_SECTION__, although it should be empty
   std::cout << "executing section: __NO_DATA_SECTION__" << std::endl;
   this->no_data_section->create_output_file();
   std::vector<type::byte> output_file = this->no_data_section->get_output_file();
@@ -209,21 +237,37 @@ bool Assembler::run()
     this->internal_error("Something written to __NO_DATA_SECTION__");
   }
 
+  // create output obj file and add all sections to it (after executing sections!!!)
+  ObjectFile *out_obj_file = new ObjectFile();
+  out_obj_file->add_section(this->no_data_section);
+
   for (auto &iter : this->section_table)
   {
     Section *section = iter.second;
     std::cout << std::endl
               << "executing section: " << iter.first << std::endl;
     section->create_output_file();
+    out_obj_file->add_section(section);
+    out_obj_file->add_symbol(section);
   }
 
   if (this->internal_err || this->parsing_err)
   {
-    std::cout << "Assembler finished with an error." << std::endl;
     this->is_running = false;
     return false; // failed
   }
 
+  // add all symbols to output obj file
+  for (auto &iter : this->symbol_table)
+  {
+    Symbol *sym = iter.second;
+    if (!sym->get_defined_flag())
+      continue;
+
+    out_obj_file->add_symbol(sym);
+  }
+
+  // print sections
   std::cout << std::endl;
 
   char *s; // s is used for formatted output
@@ -268,6 +312,7 @@ bool Assembler::run()
     }
   }
 
+  // print symbol table
   std::cout << std::endl
             << "SYMBOL TABLE: " << std::endl;
 
@@ -310,7 +355,29 @@ bool Assembler::run()
     std::cout << s << std::endl;
   }
 
-  std::cout << "Assembler finished without error." << std::endl;
+  // get json content from output obj file
+  std::string output_json_content = out_obj_file->convert_to_json();
+
+  // create output file
+  std::ofstream out_file(this->output_file_name);
+
+  // write to output file
+  if (out_file)
+  {
+    out_file << output_json_content;
+  }
+  else
+  {
+    // something went wrong
+    this->internal_error("Cannot write to output assembler file");
+    this->is_running = false;
+    return false;
+  }
+
+  // close output file
+  out_file.close();
+
+  // assembler successfully finished
   this->is_running = false;
   return true; // success
 }

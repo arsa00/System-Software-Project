@@ -26,6 +26,8 @@ private:
   bool internal_err = false;
   int32_t symbol_id = 0;
 
+  std::string output_file_name;
+
   // TODO: add object file field and (maybe?) ObjectFile class
 
   Assembler();
@@ -56,6 +58,9 @@ public:
 
   void parse_error(std::string err_msg);
   void internal_error(std::string err_msg);
+
+  void set_output_file_name(std::string file_name);
+  std::string get_output_file_name();
 };
 
 #endif

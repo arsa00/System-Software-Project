@@ -26,7 +26,7 @@ void yyerror(char *s)
 
 int main(int argc, char const *argv[])
 {
-  const char *file_input, *file_output;
+  const char *file_input = nullptr, *file_output = nullptr;
 
   try
   {
@@ -80,18 +80,9 @@ int main(int argc, char const *argv[])
       return 1;
     }
 
-    if (in_file && copy_file)
+    while (getline(in_file, line))
     {
-      while (getline(in_file, line))
-      {
-        copy_file << line << "\n";
-      }
-    }
-    else
-    {
-      // Something went wrong
-      yyerror("Cannot read input assembler file");
-      return 1;
+      copy_file << line << "\n";
     }
 
     // Closing files used for copying
@@ -104,15 +95,28 @@ int main(int argc, char const *argv[])
     {
       // Something went wrong
       yyerror("Cannot parse input assembler file");
+      remove(file_input_copy);
       return 1;
     }
 
     // run the assembler
-    Assembler::get_instance().run();
+    Assembler::get_instance().set_output_file_name(file_output ? string(file_output) : "out_" + std::string(file_input));
+    bool asmRes = Assembler::get_instance().run();
 
     // close handle for parser and lexer, and remove the temporary file
     fclose(yyin);
     remove(file_input_copy);
+
+    if (asmRes)
+    {
+      std::cout << "Assembler finished without error." << std::endl;
+      return 0;
+    }
+    else
+    {
+      std::cout << "Assembler finished with an error." << std::endl;
+      return 1;
+    }
   }
   catch (const exception &e)
   {
