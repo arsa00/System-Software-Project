@@ -44,7 +44,10 @@ class SectionJsonRecord
 private:
   std::vector<type::byte> output_file;
   std::vector<RelocationJsonRecord> relocations;
+
   uint32_t id;
+  uint32_t start_mem_addr = 0;
+  bool is_section_placed = false;
 
 public:
   SectionJsonRecord() = default;
@@ -54,6 +57,7 @@ public:
   void set_output_file(std::vector<type::byte> output_file);
   void set_relocations(std::vector<RelocationJsonRecord> relocations);
   void set_id(uint32_t id);
+  void set_start_mem_addr(uint32_t mem_addr);
 
   void add_to_output_file(type::byte single_byte);
   void add_relocation(RelocationJsonRecord json_rel_record);
@@ -61,6 +65,8 @@ public:
   std::vector<type::byte> get_output_file();
   std::vector<RelocationJsonRecord> get_relocations();
   uint32_t get_id();
+  uint32_t get_start_mem_addr();
+  bool get_is_section_placed();
 
   std::string convert_to_json();
   void init_from_json(std::string json_file);

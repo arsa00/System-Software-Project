@@ -3,12 +3,18 @@
 #include <string.h>
 #include <unordered_map>
 #include <vector>
+#include "../inc/linker.hpp"
 
 using namespace std;
 
+void yyerror(char *s)
+{
+  cerr << s << endl;
+}
+
 int main(int argc, char const *argv[])
 {
-  const uint8_t place_option_len = 7; // -place=abc@
+  const uint8_t place_option_len = 7; // -place=
   const char *file_output = nullptr;
   size_t start_index;
   unordered_map<string, uint32_t> section_places;
@@ -77,20 +83,28 @@ int main(int argc, char const *argv[])
       return 1;
     }
 
-    // run the linker
-    // Assembler::get_instance().set_output_file_name(file_output ? string(file_output) : "out_" + string(file_input));
-    // bool linker_res = Assembler::get_instance().run();
+    if (!hex_output && !relocatable_output)
+    {
+      throw "At least one of -hex or -relocatable options must be set";
+      return 1;
+    }
 
-    // if (linker_res)
-    // {
-    //   cout << "Assembler finished without error." << endl;
-    //   return 0;
-    // }
-    // else
-    // {
-    //   cout << "Assembler finished with an error." << endl;
-    //   return 1;
-    // }
+    // run the linker
+    if (file_output)
+      Linker::get_instance().set_output_file_name(file_output);
+
+    bool linker_res = Linker::get_instance().load_input_obj_files(input_object_files);
+
+    if (linker_res)
+    {
+      cout << "Linker finished without error." << endl;
+      return 0;
+    }
+    else
+    {
+      cout << "Linker finished with an error." << endl;
+      return 1;
+    }
   }
   catch (const exception &e)
   {
@@ -98,6 +112,11 @@ int main(int argc, char const *argv[])
     return 1;
   }
   catch (string err)
+  {
+    cout << err << endl;
+    return 2;
+  }
+  catch (char const *err)
   {
     cout << err << endl;
     return 2;

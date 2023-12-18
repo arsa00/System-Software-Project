@@ -181,3 +181,46 @@ void ObjectFile::init_from_json(std::string json_file)
     this->add_symbol(SymbolJsonRecord(str));
   }
 }
+
+bool ObjectFile::create_lookup_maps()
+{
+  if (this->sym_table.size() == 0 || this->sections.size() == 0)
+    return false;
+
+  for (uint32_t i = 0; i < this->sym_table.size(); i++)
+  {
+    this->symbol_lookup_map[this->sym_table[i].get_id()] = i;
+  }
+
+  for (uint32_t i = 0; i < this->sections.size(); i++)
+  {
+    std::string section_name = this->sym_table[this->symbol_lookup_map[this->sections[i].get_id()]].get_name();
+    this->section_lookup_map[section_name] = i;
+  }
+
+  return true;
+}
+
+SectionJsonRecord *ObjectFile::get_section(std::string section_name)
+{
+  if (this->section_lookup_map.size() == 0)
+  {
+    bool res = this->create_lookup_maps();
+    if (!res)
+      return nullptr;
+  }
+
+  return &this->sections[this->section_lookup_map[section_name]];
+}
+
+SymbolJsonRecord *ObjectFile::get_symbol(uint32_t symbol_id)
+{
+  if (this->symbol_lookup_map.size() == 0)
+  {
+    bool res = this->create_lookup_maps();
+    if (!res)
+      return nullptr;
+  }
+
+  return &this->sym_table[this->symbol_lookup_map[symbol_id]];
+}

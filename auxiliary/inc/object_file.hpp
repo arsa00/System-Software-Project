@@ -16,6 +16,9 @@ private:
   std::vector<SectionJsonRecord> sections;
   std::vector<SymbolJsonRecord> sym_table;
 
+  std::unordered_map<std::string, uint32_t> section_lookup_map;
+  std::unordered_map<uint32_t, uint32_t> symbol_lookup_map;
+
 public:
   ObjectFile() = default;
   ObjectFile(std::string json_file);
@@ -41,6 +44,9 @@ public:
 
   std::string convert_to_json();
   void init_from_json(std::string json_file);
+  bool create_lookup_maps();
+  SectionJsonRecord *get_section(std::string section_name);
+  SymbolJsonRecord *get_symbol(uint32_t symbol_id);
 };
 
 #endif

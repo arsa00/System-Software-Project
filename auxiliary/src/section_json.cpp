@@ -153,6 +153,12 @@ void SectionJsonRecord::set_id(uint32_t id)
   this->id = id;
 }
 
+void SectionJsonRecord::set_start_mem_addr(uint32_t mem_addr)
+{
+  this->is_section_placed = true;
+  this->start_mem_addr = mem_addr;
+}
+
 void SectionJsonRecord::add_to_output_file(type::byte single_byte)
 {
   this->output_file.push_back(single_byte);
@@ -176,6 +182,16 @@ std::vector<RelocationJsonRecord> SectionJsonRecord::get_relocations()
 uint32_t SectionJsonRecord::get_id()
 {
   return this->id;
+}
+
+uint32_t SectionJsonRecord::get_start_mem_addr()
+{
+  return this->start_mem_addr;
+}
+
+bool SectionJsonRecord::get_is_section_placed()
+{
+  this->is_section_placed;
 }
 
 const std::string OUTPUT_FILE_KEY = "out_hex_file:";
