@@ -194,7 +194,8 @@ bool ObjectFile::create_lookup_maps()
 
   for (uint32_t i = 0; i < this->sections.size(); i++)
   {
-    std::string section_name = this->sym_table[this->symbol_lookup_map[this->sections[i].get_id()]].get_name();
+    SymbolJsonRecord *section_sym = this->get_symbol(this->sections[i].get_id());
+    std::string section_name = section_sym->get_name();
     this->section_lookup_map[section_name] = i;
   }
 
@@ -210,7 +211,17 @@ SectionJsonRecord *ObjectFile::get_section(std::string section_name)
       return nullptr;
   }
 
-  return &this->sections[this->section_lookup_map[section_name]];
+  // section name not present in sections list of obj file
+  if (this->section_lookup_map.find(section_name) == this->section_lookup_map.end())
+    return nullptr;
+
+  // check if index is in range
+  uint32_t section_index = this->section_lookup_map[section_name];
+  if (section_index >= this->sections.size())
+    return nullptr;
+
+  // return section in O(1)
+  return &this->sections[section_index];
 }
 
 SymbolJsonRecord *ObjectFile::get_symbol(uint32_t symbol_id)
@@ -222,5 +233,15 @@ SymbolJsonRecord *ObjectFile::get_symbol(uint32_t symbol_id)
       return nullptr;
   }
 
-  return &this->sym_table[this->symbol_lookup_map[symbol_id]];
+  // symbol id not present in symbols list of obj file
+  if (this->symbol_lookup_map.find(symbol_id) == this->symbol_lookup_map.end())
+    return nullptr;
+
+  // check if index is in range
+  uint32_t symbol_index = this->symbol_lookup_map[symbol_id];
+  if (symbol_index >= this->sym_table.size())
+    return nullptr;
+
+  // return symbol in O(1)
+  return &this->sym_table[symbol_index];
 }

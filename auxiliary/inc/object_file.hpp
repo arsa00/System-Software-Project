@@ -16,7 +16,10 @@ private:
   std::vector<SectionJsonRecord> sections;
   std::vector<SymbolJsonRecord> sym_table;
 
+  // <section_name, index> pairs
   std::unordered_map<std::string, uint32_t> section_lookup_map;
+
+  // <symbol_id, index> pairs
   std::unordered_map<uint32_t, uint32_t> symbol_lookup_map;
 
 public:
