@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <list>
 #include <vector>
+#include <functional>
+#include <iomanip>
 
 class Interval
 {
@@ -27,6 +29,30 @@ public:
   bool is_interval_valid();
 };
 
+struct SymbolTableKey
+{
+  std::string sym_name;
+  type::PARAMETER_TYPE sym_type;
+
+  SymbolTableKey(std::string sym_name = "", type::PARAMETER_TYPE type = type::PARAMETER_TYPE::SYMBOL) : sym_name(sym_name), sym_type(type) {}
+
+  bool operator==(const SymbolTableKey &key) const
+  {
+    return key.sym_name == this->sym_name && key.sym_type == this->sym_type;
+  }
+};
+
+struct SymbolTableKeyHasher
+{
+  std::size_t operator()(const SymbolTableKey &k) const
+  {
+    using std::hash;
+    using std::size_t;
+
+    return hash<std::string>()(k.sym_name) ^ (hash<int>()(static_cast<int>(k.sym_type)) << 1);
+  }
+};
+
 class Linker
 {
 private:
@@ -38,8 +64,11 @@ private:
   std::string output_file_name = "";
 
   std::unordered_map<std::string, Interval> placed_sections;
-  std::unordered_map<std::string, SymbolJsonRecord> global_sym_table;
+  std::unordered_map<SymbolTableKey, SymbolJsonRecord, SymbolTableKeyHasher> global_sym_table;
   std::vector<RelocationJsonRecord> global_relocations;
+
+  // <sym_id, SymbolTableKey> pairs
+  std::unordered_map<uint32_t, SymbolTableKey> sym_table_lookup_map;
 
   bool internal_err = false;
 
@@ -52,6 +81,14 @@ private:
   std::string get_placed_section_by_addr(uint32_t addr);
   uint32_t generate_next_id();
   SymbolJsonRecord create_new_section(std::string section_name, uint32_t addr);
+  void add_sym_to_table(SymbolJsonRecord sym);
+  bool is_sym_in_table(std::string sym_name, type::PARAMETER_TYPE sym_type);
+  bool is_sym_in_table(SymbolJsonRecord sym);
+  bool is_sym_in_table(uint32_t sym_id);
+  SymbolJsonRecord *get_sym_from_table(std::string sym_name, type::PARAMETER_TYPE sym_type);
+  SymbolJsonRecord *get_sym_from_table(SymbolJsonRecord sym);
+  SymbolJsonRecord *get_sym_from_table(uint32_t sym_id);
+  std::vector<type::byte> resolve_relocation(RelocationJsonRecord relocation);
 
 public:
   static Linker &get_instance();

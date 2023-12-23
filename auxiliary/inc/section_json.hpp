@@ -33,6 +33,7 @@ public:
   bool get_is_addend_signed();
   type::RELOCATIONS get_type();
   uint32_t get_sym_id();
+  bool is_addend_valid();
 
   std::string convert_to_json();
   void init_from_json(std::string json_file);

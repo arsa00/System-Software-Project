@@ -66,6 +66,11 @@ uint32_t RelocationJsonRecord::get_sym_id()
   return this->sym_id;
 }
 
+bool RelocationJsonRecord::is_addend_valid()
+{
+  return this->is_addend_signed == RelocationRecord::get_signed_flag_from_type(this->type);
+}
+
 const std::string OFFSET_KEY = "offset:";
 const std::string ADDEND_KEY = "addend:";
 const std::string IS_ADDEND_SIGNED_KEY = "is_addend_signed:";

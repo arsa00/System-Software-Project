@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include "../inc/linker.hpp"
 
 void Interval::set_start(uint32_t start)
@@ -165,6 +166,117 @@ SymbolJsonRecord Linker::create_new_section(std::string section_name, uint32_t a
   return section;
 }
 
+void Linker::add_sym_to_table(SymbolJsonRecord sym)
+{
+  SymbolTableKey sym_key(sym.get_name(), sym.get_type());
+  this->global_sym_table[sym_key] = sym;
+  this->sym_table_lookup_map[sym.get_id()] = sym_key;
+}
+
+bool Linker::is_sym_in_table(std::string sym_name, type::PARAMETER_TYPE sym_type)
+{
+  SymbolTableKey sym_key(sym_name, sym_type);
+  if (this->global_sym_table.find(sym_key) == this->global_sym_table.end())
+    return false;
+
+  return true;
+}
+
+bool Linker::is_sym_in_table(SymbolJsonRecord sym)
+{
+  return this->is_sym_in_table(sym.get_name(), sym.get_type());
+}
+
+bool Linker::is_sym_in_table(uint32_t sym_id)
+{
+  if (this->sym_table_lookup_map.find(sym_id) == this->sym_table_lookup_map.end())
+    return false;
+
+  if (this->global_sym_table.find(this->sym_table_lookup_map[sym_id]) == this->global_sym_table.end())
+    return false;
+
+  return true;
+}
+
+SymbolJsonRecord *Linker::get_sym_from_table(std::string sym_name, type::PARAMETER_TYPE sym_type)
+{
+  if (!this->is_sym_in_table(sym_name, sym_type))
+    return nullptr;
+
+  return &this->global_sym_table[SymbolTableKey(sym_name, sym_type)];
+}
+
+SymbolJsonRecord *Linker::get_sym_from_table(SymbolJsonRecord sym)
+{
+  return this->get_sym_from_table(sym.get_name(), sym.get_type());
+}
+
+SymbolJsonRecord *Linker::get_sym_from_table(uint32_t sym_id)
+{
+  if (!this->is_sym_in_table(sym_id))
+    return nullptr;
+
+  return &this->global_sym_table[this->sym_table_lookup_map[sym_id]];
+}
+
+// always check for internal error after calling this method
+std::vector<type::byte> Linker::resolve_relocation(RelocationJsonRecord relocation)
+{
+  if (!this->is_sym_in_table(relocation.get_sym_id()))
+  {
+    this->internal_error("Symbol is missing in linker symbol talbe. symbol_id: " + std::to_string(relocation.get_sym_id()));
+    return {};
+  }
+
+  SymbolJsonRecord *sym = this->get_sym_from_table(relocation.get_sym_id());
+  if (!sym)
+  {
+    this->internal_error("Symbol cannot be fethced from symbol talbe. symbol_id: " + std::to_string(relocation.get_sym_id()));
+    return {};
+  }
+
+  std::vector<type::byte> result_bytes;
+
+  // get symbol offset/addr
+  int32_t sym_value;
+  if (!sym->get_value(&sym_value))
+  {
+    this->internal_error("Symbol is not resolved (it doesn't have value). symbol_name: " + sym->get_name() + ", symbol_id: " + std::to_string(sym->get_id()));
+    return {};
+  }
+
+  // calculate starting memory offset/addr
+  uint32_t start_mem_offset = sym_value;
+
+  if (relocation.get_is_addend_signed())
+  {
+    int32_t addend = (int32_t)relocation.get_addend();
+    start_mem_offset += addend;
+  }
+  else
+  {
+    start_mem_offset += relocation.get_addend();
+  }
+
+  uint32_t bytes_to_read = 0;
+  if (relocation.get_type() == type::RELOCATIONS::ABS_32S || relocation.get_type() == type::RELOCATIONS::ABS_32U)
+    bytes_to_read = 4;
+
+  for (uint32_t i = 0; i < bytes_to_read; i++)
+  {
+    if (this->output_file_byte.find(start_mem_offset + i) == this->output_file_byte.end())
+    {
+      // no data at given offset
+      this->internal_error("There's no data at calculated offset. offset: " + std::to_string(start_mem_offset + i) + ", relocation_json: " + relocation.convert_to_json());
+      return {};
+    }
+
+    result_bytes.push_back(this->output_file_byte[start_mem_offset + i]);
+  }
+
+  return result_bytes;
+}
+
 std::string Linker::create_hex()
 {
   // mapping sections
@@ -225,7 +337,8 @@ std::string Linker::create_hex()
     {
       // TODO: check addr value
       SymbolJsonRecord section = this->create_new_section(section_name, iter.second);
-      this->global_sym_table[section_name] = section;
+      this->add_sym_to_table(section);
+      // this->global_sym_table[section_name] = section;
     }
 
     // update maximum free address
@@ -308,7 +421,8 @@ std::string Linker::create_hex()
       {
         // TODO: check addr value
         SymbolJsonRecord section = this->create_new_section(section_name, this->placed_sections[section_name].get_start());
-        this->global_sym_table[section_name] = section;
+        this->add_sym_to_table(section);
+        // this->global_sym_table[section_name] = section;
       }
     }
   }
@@ -333,7 +447,8 @@ std::string Linker::create_hex()
           return "";
         }
 
-        if (this->global_sym_table.find(sym.get_name()) == this->global_sym_table.end() && section->get_output_file().size() > 0)
+        // this->global_sym_table.find(sym.get_name()) == this->global_sym_table.end()
+        if (!this->is_sym_in_table(sym) && section->get_output_file().size() > 0)
         {
           this->internal_error("Section is missing in symbol table of linker. section_name: " + sym.get_name());
           return "";
@@ -342,7 +457,8 @@ std::string Linker::create_hex()
         continue;
       }
 
-      if (this->global_sym_table.find(sym.get_name()) != this->global_sym_table.end())
+      // this->global_sym_table.find(sym.get_name()) != this->global_sym_table.end()
+      if (this->is_sym_in_table(sym))
       {
         this->internal_error("Multiple definitions of symbol. symbol_name: " + sym.get_name());
         return "";
@@ -371,7 +487,8 @@ std::string Linker::create_hex()
           return "";
         }
 
-        if (this->global_sym_table.find(section_sym->get_name()) == this->global_sym_table.end())
+        // this->global_sym_table.find(section_sym->get_name()) == this->global_sym_table.end()
+        if (!this->is_sym_in_table(*section_sym))
         {
           this->internal_error("Section is missing in symbol table of linker. section_name: " + section_sym->get_name());
           return "";
@@ -388,7 +505,8 @@ std::string Linker::create_hex()
         sym.set_section(this->global_sym_table[section_sym->get_name()].get_id());
         sym.set_id(this->generate_next_id());
         sym.set_is_final(true);
-        this->global_sym_table[sym.get_name()] = sym;
+        this->add_sym_to_table(sym);
+        // this->global_sym_table[sym.get_name()] = sym;
       }
       else
       {
@@ -425,7 +543,8 @@ std::string Linker::create_hex()
           return "";
         }
 
-        if (this->global_sym_table.find(sym->get_name()) == this->global_sym_table.end())
+        // this->global_sym_table.find(sym->get_name()) == this->global_sym_table.end()
+        if (!this->is_sym_in_table(*sym))
         {
           this->internal_error("Symbol is missing in symbol table of linker. symbol_name: " + sym->get_name());
           return "";
@@ -467,7 +586,71 @@ std::string Linker::create_hex()
     }
   }
 
-  // TODO: resolve all relocation records
+  // resolve all relocation records
+  for (RelocationJsonRecord relocation : this->global_relocations)
+  {
+    if (!relocation.is_addend_valid())
+    {
+      this->internal_error("Addend and type of relocation record are not valid. relocation_json: " + relocation.convert_to_json());
+      return "";
+    }
+
+    std::vector<type::byte> bytes_to_write = this->resolve_relocation(relocation);
+    if (this->internal_err)
+      return "";
+
+    uint32_t start_mem_offset = relocation.get_offset();
+    for (uint32_t i = 0; i < bytes_to_write.size(); i++)
+    {
+      this->output_file_byte[start_mem_offset + i] = bytes_to_write[i];
+    }
+  }
+
+  // create result output file
+  // sort mem addrs in ASC order
+  std::vector<uint32_t> mem_addrs(this->output_file_byte.size());
+
+  for (auto iter : this->output_file_byte)
+    mem_addrs.push_back(iter.first);
+
+  std::sort(mem_addrs.begin(), mem_addrs.end());
+
+  // get all bytes and create output string
+  std::string output = "";
+  const uint8_t output_width = 8;
+  uint32_t cnt = 0;
+  while (cnt < mem_addrs.size())
+  {
+    char addr_str[10];
+    sprintf(addr_str, "%08X", mem_addrs[cnt]);
+    output += std::string(addr_str) + ": ";
+
+    uint32_t previous_addr = mem_addrs[cnt] - 1; // TODO: check this
+    for (uint8_t j = 0; j < output_width; j++)
+    {
+      char value_str[3];
+
+      if (mem_addrs[cnt] == previous_addr + 1)
+      {
+        sprintf(value_str, "%02X", this->output_file_byte[mem_addrs[cnt]]);
+        output += std::string(value_str);
+        cnt++;
+      }
+      else
+      {
+        output += "00";
+      }
+
+      if (j < output_width - 1)
+        output += " ";
+
+      previous_addr++; // TODO: check this
+    }
+
+    output += "\n";
+  }
+
+  return output;
 }
 
 std::string Linker::create_relocatable()
