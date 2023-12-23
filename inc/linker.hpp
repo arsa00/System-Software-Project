@@ -39,7 +39,7 @@ private:
 
   std::unordered_map<std::string, Interval> placed_sections;
   std::unordered_map<std::string, SymbolJsonRecord> global_sym_table;
-  std::unordered_map<std::string, RelocationJsonRecord> global_relocations;
+  std::vector<RelocationJsonRecord> global_relocations;
 
   bool internal_err = false;
 

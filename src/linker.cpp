@@ -398,7 +398,74 @@ std::string Linker::create_hex()
     }
   }
 
-  // TODO: combine all relocation lists to one global (with recalculating offsets & addends)
+  // combine all relocation lists to one global (with recalculating offsets & addends)
+  for (ObjectFile *obj_file : this->obj_files)
+  {
+    for (SectionJsonRecord section : obj_file->get_sections())
+    {
+      if (!section.get_is_section_placed())
+      {
+        SymbolJsonRecord *sec_sym = obj_file->get_symbol(section.get_id());
+        if (sec_sym)
+        {
+          this->internal_error("Section is not placed. section_name: " + sec_sym->get_name());
+          return "";
+        }
+
+        this->internal_error("Section is not placed. section_id: " + section.get_id());
+        return "";
+      }
+
+      for (RelocationJsonRecord relocation : section.get_relocations())
+      {
+        SymbolJsonRecord *sym = obj_file->get_symbol(relocation.get_sym_id());
+        if (!sym)
+        {
+          this->internal_error("Symbol cannot be fetched. symbol_name: " + sym->get_name());
+          return "";
+        }
+
+        if (this->global_sym_table.find(sym->get_name()) == this->global_sym_table.end())
+        {
+          this->internal_error("Symbol is missing in symbol table of linker. symbol_name: " + sym->get_name());
+          return "";
+        }
+
+        if (sym->get_type() == type::PARAMETER_TYPE::SECTION)
+        {
+          SectionJsonRecord *target_section = obj_file->get_section(sym->get_name());
+          {
+            this->internal_error("Section cannot be fetched. section_name: " + sym->get_name());
+            return "";
+          }
+
+          if (!target_section->get_is_section_placed())
+          {
+            this->internal_error("Section is not placed. section_name: " + sym->get_name());
+            return "";
+          }
+
+          int32_t global_sym_value;
+          if (!this->global_sym_table[sym->get_name()].get_value(&global_sym_value))
+          {
+            this->internal_error("Symbol is not resolved (it doesn't have value). symbol_name: " + sym->get_name() + ", symbol_id: " + std::to_string(this->global_sym_table[sym->get_name()].get_id()));
+            return "";
+          }
+
+          relocation.set_addend(relocation.get_addend() + target_section->get_start_mem_addr() - global_sym_value);
+          relocation.set_sym_id(this->global_sym_table[sym->get_name()].get_id());
+          relocation.set_offset(relocation.get_offset() + section.get_start_mem_addr());
+          this->global_relocations.push_back(relocation);
+        }
+        else
+        {
+          relocation.set_sym_id(this->global_sym_table[sym->get_name()].get_id());
+          relocation.set_offset(relocation.get_offset() + section.get_start_mem_addr());
+          this->global_relocations.push_back(relocation);
+        }
+      }
+    }
+  }
 
   // TODO: resolve all relocation records
 }
