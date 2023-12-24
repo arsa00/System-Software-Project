@@ -170,6 +170,7 @@ void Linker::add_sym_to_table(SymbolJsonRecord sym)
 {
   SymbolTableKey sym_key(sym.get_name(), sym.get_type());
   this->global_sym_table[sym_key] = sym;
+  // std::cout << "Symbol is added. sym_name: " << sym_key.sym_name << " ; sym_type: " << static_cast<int>(sym_key.sym_type) << std::endl;
   this->sym_table_lookup_map[sym.get_id()] = sym_key;
 }
 
@@ -241,7 +242,7 @@ std::vector<type::byte> Linker::resolve_relocation(RelocationJsonRecord relocati
   int32_t sym_value;
   if (!sym->get_value(&sym_value))
   {
-    this->internal_error("Symbol is not resolved (it doesn't have value). symbol_name: " + sym->get_name() + ", symbol_id: " + std::to_string(sym->get_id()));
+    this->internal_error("1. Symbol is not resolved (it doesn't have value). symbol_name: " + sym->get_name() + ", symbol_id: " + std::to_string(sym->get_id()));
     return {};
   }
 
@@ -298,6 +299,9 @@ std::string Linker::create_hex()
       section->set_start_mem_addr(start_mem_addr);
       std::vector<type::byte> output_file = section->get_output_file();
 
+      if (output_file.size() == 0)
+        continue;
+
       for (type::byte byte : output_file)
       {
         if (this->output_file_byte.find(start_mem_addr) != this->output_file_byte.end())
@@ -315,7 +319,7 @@ std::string Linker::create_hex()
       section_mem_interval.set_end(start_mem_addr - 1);
 
       // insert section to placed_sections at it's interval
-      if (this->add_placed_section(section_name, section_mem_interval))
+      if (!this->add_placed_section(section_name, section_mem_interval))
       {
         if (this->placed_sections.find(section_name) != this->placed_sections.end())
         {
@@ -332,14 +336,11 @@ std::string Linker::create_hex()
       }
     }
 
-    // check if section is placed and if it is add it to global_sym_table
-    if (start_mem_addr > iter.second)
-    {
-      // TODO: check addr value
-      SymbolJsonRecord section = this->create_new_section(section_name, iter.second);
-      this->add_sym_to_table(section);
-      // this->global_sym_table[section_name] = section;
-    }
+    // add section to global_sym_table
+    // TODO: check addr value
+    SymbolJsonRecord section = this->create_new_section(section_name, iter.second);
+    this->add_sym_to_table(section);
+    // this->global_sym_table[section_name] = section;
 
     // update maximum free address
     if (start_mem_addr > max_mem_addr && start_mem_addr > iter.second)
@@ -352,7 +353,10 @@ std::string Linker::create_hex()
     for (auto section : obj_file->get_sections())
     {
       if (section.get_is_section_placed())
+      {
+        // std::cout << "Section is placed. section_id" << section.get_id() << std::endl;
         continue;
+      }
 
       SymbolJsonRecord *symbol = obj_file->get_symbol(section.get_id());
       if (!symbol)
@@ -375,12 +379,19 @@ std::string Linker::create_hex()
       {
         SectionJsonRecord *section_ptr = nested_obj_file->get_section(section_name);
         if (!section_ptr)
+        {
+          // std::cout << "Obj file doesn't contain section: " << section_name << ". JSON_FILE: " << std::endl
+          //           << nested_obj_file->convert_to_json() << std::endl;
           continue;
+        }
 
         // mark start addr of section
         Interval section_mem_interval(mem_cnt);
         section_ptr->set_start_mem_addr(mem_cnt);
         std::vector<type::byte> output_file = section_ptr->get_output_file();
+
+        if (output_file.size() == 0)
+          continue;
 
         for (type::byte byte : output_file)
         {
@@ -399,7 +410,7 @@ std::string Linker::create_hex()
         section_mem_interval.set_end(mem_cnt - 1);
 
         // insert section to placed_sections at it's interval
-        if (this->add_placed_section(section_name, section_mem_interval))
+        if (!this->add_placed_section(section_name, section_mem_interval))
         {
           if (this->placed_sections.find(section_name) != this->placed_sections.end())
           {
@@ -416,13 +427,19 @@ std::string Linker::create_hex()
         }
       }
 
-      // check if section is placed and if it is add it to global_sym_table
+      // add section to global_sym_table
       if (this->placed_sections.find(section_name) != this->placed_sections.end())
       {
         // TODO: check addr value
         SymbolJsonRecord section = this->create_new_section(section_name, this->placed_sections[section_name].get_start());
         this->add_sym_to_table(section);
         // this->global_sym_table[section_name] = section;
+      }
+      else
+      {
+        // TODO: check addr value
+        SymbolJsonRecord section = this->create_new_section(section_name, mem_cnt);
+        this->add_sym_to_table(section);
       }
     }
   }
@@ -460,8 +477,24 @@ std::string Linker::create_hex()
       // this->global_sym_table.find(sym.get_name()) != this->global_sym_table.end()
       if (this->is_sym_in_table(sym))
       {
-        this->internal_error("Multiple definitions of symbol. symbol_name: " + sym.get_name());
-        return "";
+        // get symbol
+        SymbolJsonRecord *sym_from_table = this->get_sym_from_table(sym);
+        if (!sym_from_table)
+        {
+          this->internal_error("Symbol cannot be fetched: " + sym.get_name());
+          return "";
+        }
+
+        /* check if symbol has value, and do the following:
+            - if symbol doesn't have value, it's extern ==> continue and resolve it
+            - if symbol already has value ==> error: multiple definitions
+        */
+        int32_t val;
+        if (sym.get_value(&val))
+        {
+          this->internal_error("Multiple definitions of symbol. symbol_name: " + sym.get_name());
+          return "";
+        }
       }
 
       uint32_t sym_section_id;
@@ -497,7 +530,7 @@ std::string Linker::create_hex()
         int32_t sym_value;
         if (!sym.get_value(&sym_value))
         {
-          this->internal_error("Symbol is not resolved (it doesn't have value). symbol_name: " + sym.get_name() + ", symbol_id: " + std::to_string(sym.get_id()));
+          this->internal_error("2. Symbol is not resolved (it doesn't have value). symbol_name: " + sym.get_name() + ", symbol_id: " + std::to_string(sym.get_id()));
           return "";
         }
 
@@ -510,8 +543,10 @@ std::string Linker::create_hex()
       }
       else
       {
-        this->internal_error("Symbol is missing section id. symbol_name: " + sym.get_name() + ", symbol_id: " + std::to_string(sym.get_id()));
-        return "";
+        // extern symbols
+        sym.set_id(this->generate_next_id());
+        sym.set_is_final(false);
+        this->add_sym_to_table(sym);
       }
     }
   }
@@ -553,6 +588,7 @@ std::string Linker::create_hex()
         if (sym->get_type() == type::PARAMETER_TYPE::SECTION)
         {
           SectionJsonRecord *target_section = obj_file->get_section(sym->get_name());
+          if (!target_section)
           {
             this->internal_error("Section cannot be fetched. section_name: " + sym->get_name());
             return "";
@@ -565,9 +601,16 @@ std::string Linker::create_hex()
           }
 
           int32_t global_sym_value;
-          if (!this->global_sym_table[sym->get_name()].get_value(&global_sym_value))
+          SymbolJsonRecord *sym_from_table = this->get_sym_from_table(*sym);
+          if (!sym_from_table)
           {
-            this->internal_error("Symbol is not resolved (it doesn't have value). symbol_name: " + sym->get_name() + ", symbol_id: " + std::to_string(this->global_sym_table[sym->get_name()].get_id()));
+            this->internal_error("Section cannot be fetched from symbol table. section_name: " + sym->get_name());
+            return "";
+          }
+
+          if (!sym_from_table->get_value(&global_sym_value))
+          {
+            this->internal_error("3. Symbol is not resolved (it doesn't have value). symbol_name: " + sym->get_name() + ", symbol_id: " + std::to_string(this->global_sym_table[sym->get_name()].get_id()));
             return "";
           }
 
@@ -608,7 +651,7 @@ std::string Linker::create_hex()
 
   // create result output file
   // sort mem addrs in ASC order
-  std::vector<uint32_t> mem_addrs(this->output_file_byte.size());
+  std::vector<uint32_t> mem_addrs;
 
   for (auto iter : this->output_file_byte)
     mem_addrs.push_back(iter.first);
@@ -625,16 +668,21 @@ std::string Linker::create_hex()
     sprintf(addr_str, "%08X", mem_addrs[cnt]);
     output += std::string(addr_str) + ": ";
 
-    uint32_t previous_addr = mem_addrs[cnt] - 1; // TODO: check this
+    bool overflow = false;
+    uint32_t previous_addr = mem_addrs[cnt]; // TODO: check this
     for (uint8_t j = 0; j < output_width; j++)
     {
       char value_str[3];
 
-      if (mem_addrs[cnt] == previous_addr + 1)
+      if (mem_addrs[cnt] == previous_addr)
       {
         sprintf(value_str, "%02X", this->output_file_byte[mem_addrs[cnt]]);
         output += std::string(value_str);
-        cnt++;
+
+        if (cnt + 1 < mem_addrs.size())
+          cnt++;
+        else
+          overflow = true;
       }
       else
       {
@@ -646,6 +694,9 @@ std::string Linker::create_hex()
 
       previous_addr++; // TODO: check this
     }
+
+    if (overflow)
+      break;
 
     output += "\n";
   }

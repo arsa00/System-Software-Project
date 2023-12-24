@@ -162,10 +162,20 @@ void ObjectFile::init_from_json(std::string json_file)
   val = converter::get_value_from_json(json_file, SECTIONS_KEY, &pos, true);
   std::vector<std::string> sections_str = converter::decode_json_array(val);
 
+  // std::cout << "GOT ARRAY VALUE:" << std::endl
+  //           << val << std::endl
+  //           << std::endl
+  //           << std::endl;
+
   for (std::string str : sections_str)
   {
     if (str.empty())
       continue;
+
+    // std::cout << "GOT AN VALUE:" << std::endl
+    //           << str << std::endl
+    //           << std::endl
+    //           << std::endl;
 
     this->add_section(SectionJsonRecord(str));
   }
@@ -184,6 +194,8 @@ void ObjectFile::init_from_json(std::string json_file)
 
 bool ObjectFile::create_lookup_maps()
 {
+  // std::cout << this->convert_to_json() << std::endl;
+
   if (this->sym_table.size() == 0 || this->sections.size() == 0)
     return false;
 

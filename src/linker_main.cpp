@@ -94,6 +94,18 @@ int main(int argc, char const *argv[])
       Linker::get_instance().set_output_file_name(file_output);
 
     bool linker_res = Linker::get_instance().load_input_obj_files(input_object_files);
+    if (!linker_res)
+    {
+      cout << "Linker finished with an error." << endl;
+      return 1;
+    }
+
+    Linker::get_instance().set_section_places(section_places);
+    if (hex_output)
+    {
+      string output = Linker::get_instance().create_hex();
+      cout << output << endl;
+    }
 
     if (linker_res)
     {

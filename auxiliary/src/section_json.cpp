@@ -196,7 +196,7 @@ uint32_t SectionJsonRecord::get_start_mem_addr()
 
 bool SectionJsonRecord::get_is_section_placed()
 {
-  this->is_section_placed;
+  return this->is_section_placed;
 }
 
 const std::string OUTPUT_FILE_KEY = "out_hex_file:";
