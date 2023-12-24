@@ -1,5 +1,6 @@
 #include "../inc/converters.hpp"
 #include <iostream>
+#include <algorithm>
 
 std::string converter::directive_type_to_string(type::DIRECTIVE_TYPE dir_alias)
 {
@@ -272,21 +273,73 @@ std::array<type::byte, 4> converter::get_instruction_bytes(type::instruction_siz
 
 std::string converter::get_value_from_json(const std::string &json_file, const std::string &key, uint32_t *start_pos, bool is_array)
 { // TODO: implement not crashing on the wrong file and std::string::npos
+  // uint32_t start = 0;
+  // const char *delimiter = is_array ? "],\n" : ",\n";
+  // if (start_pos)
+  // {
+  //   start = *start_pos;
+  // }
+  // size_t pos = json_file.find(key, start);
+  // size_t substr_start = pos + key.size();
+  // size_t substr_end = json_file.find(delimiter, pos) + (is_array ? 1 : 0);
+  // std::string val = json_file.substr(substr_start, substr_end - substr_start);
+  // if (start_pos)
+  // {
+  //   *start_pos = substr_end + 2;
+  // }
+  // return val;
+
+  // NEW IMPLEMENTATION
   uint32_t start = 0;
-  const char *delimiter = is_array ? "],\n" : ",\n";
+  const char *delimiter = ",\n";
   if (start_pos)
   {
     start = *start_pos;
   }
+
   size_t pos = json_file.find(key, start);
+  if (pos == std::string::npos)
+    return "";
+
+  std::string result = "";
+
   size_t substr_start = pos + key.size();
-  size_t substr_end = json_file.find(delimiter, pos) + (is_array ? 1 : 0);
+  size_t substr_end = json_file.find(delimiter, pos);
+  if (substr_end == std::string::npos)
+    return "";
+
   std::string val = json_file.substr(substr_start, substr_end - substr_start);
+  std::string::difference_type nested_objs = 0, nested_arrs = 0;
+  while (true)
+  {
+    result += val;
+
+    // count number of nested objs
+    nested_objs += std::count(val.begin(), val.end(), '{');
+    nested_objs -= std::count(val.begin(), val.end(), '}');
+
+    // count number of nested arrs
+    nested_arrs += std::count(val.begin(), val.end(), '[');
+    nested_arrs -= std::count(val.begin(), val.end(), ']');
+
+    if (nested_objs == 0 && nested_arrs == 0)
+      break;
+
+    // continue searching
+    substr_start = substr_end; // start from previous delimiter
+    pos = substr_end + 2;      // skip the previous delimiter
+    substr_end = json_file.find(delimiter, pos);
+    if (substr_end == std::string::npos)
+      return "";
+
+    val = json_file.substr(substr_start, substr_end - substr_start);
+  }
+
   if (start_pos)
   {
     *start_pos = substr_end + 2;
   }
-  return val;
+  return result;
 }
 
 std::vector<std::string> converter::decode_json_array(const std::string &json_arr)
@@ -323,10 +376,38 @@ std::vector<std::string> converter::decode_json_array(const std::string &json_ar
   else
   { // array contains complex objects (structs)
     start = json_arr.find("{", 0);
+    std::string val = "";
+    bool found_nested_objs = false;
+
     while (true)
     {
+      found_nested_objs = false;
       end = json_arr.find("},", start);
-      if (end == std::string::npos)
+      if (end != std::string::npos)
+      {
+        if (json_arr.substr(start, end - start).find("[{", 0) != std::string::npos)
+        {
+          end = json_arr.find("}]", start);
+          if (end == std::string::npos)
+          {
+            std::cout << "Cannot find end of opened array" << std::endl;
+            return {};
+          }
+
+          end += 2;
+          val += json_arr.substr(start, end - start);
+          start = end; // or end +1 ???
+          found_nested_objs = true;
+        }
+        else if (json_arr.substr(start + 1, end - start - 1).find("{", 0) != std::string::npos)
+        {
+          end += 2;
+          val += json_arr.substr(start, end - start);
+          start = end; // or end +1 ???
+          found_nested_objs = true;
+        }
+      }
+      else
       {
         // '},' not found, look for '}]'
         end = json_arr.find("}]", start);
@@ -334,12 +415,23 @@ std::vector<std::string> converter::decode_json_array(const std::string &json_ar
         {
           break;
         }
+        else if (json_arr.substr(start, end - start).find("[{", 0) != std::string::npos)
+        {
+          end += 2;
+          val += json_arr.substr(start, end - start);
+          start = end; // or end +1 ???
+          found_nested_objs = true;
+        }
       }
 
-      end++; // because of the '}'
+      if (found_nested_objs)
+        continue;
 
-      res.push_back(json_arr.substr(start, end - start));
+      end++; // because of the '}'
+      val += json_arr.substr(start, end - start);
+      res.push_back(val);
       start = end + 1;
+      val = "";
     }
   }
 
