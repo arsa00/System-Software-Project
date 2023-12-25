@@ -224,6 +224,9 @@ Directive *CommandBuilder::build_directive(type::DIRECTIVE_TYPE dir_alias)
   {
     dir = new directive::GLOBAL();
     dir->set_params(this->get_params());
+    dir->execute(nullptr); // the directive is independent of the section
+    dir = nullptr;
+    directive_executed = true;
   }
   break;
   case type::DIRECTIVE_TYPE::EXTERN:

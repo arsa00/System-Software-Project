@@ -1,7 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <cstring>
 #include "../inc/linker.hpp"
+#include "../auxiliary/inc/converters.hpp"
 
 void Interval::set_start(uint32_t start)
 {
@@ -247,33 +249,36 @@ std::vector<type::byte> Linker::resolve_relocation(RelocationJsonRecord relocati
   }
 
   // calculate starting memory offset/addr
-  uint32_t start_mem_offset = sym_value;
+  uint32_t res = sym_value;
 
   if (relocation.get_is_addend_signed())
   {
     int32_t addend = (int32_t)relocation.get_addend();
-    start_mem_offset += addend;
+    res += addend;
   }
   else
   {
-    start_mem_offset += relocation.get_addend();
+    res += relocation.get_addend();
   }
 
-  uint32_t bytes_to_read = 0;
+  // uint32_t bytes_to_read = 0;
   if (relocation.get_type() == type::RELOCATIONS::ABS_32S || relocation.get_type() == type::RELOCATIONS::ABS_32U)
-    bytes_to_read = 4;
-
-  for (uint32_t i = 0; i < bytes_to_read; i++)
   {
-    if (this->output_file_byte.find(start_mem_offset + i) == this->output_file_byte.end())
-    {
-      // no data at given offset
-      this->internal_error("There's no data at calculated offset. offset: " + std::to_string(start_mem_offset + i) + ", relocation_json: " + relocation.convert_to_json());
-      return {};
-    }
-
-    result_bytes.push_back(this->output_file_byte[start_mem_offset + i]);
+    auto arr = converter::get_instruction_bytes(static_cast<type::instruction_size>(res));
+    result_bytes.insert(result_bytes.end(), arr.begin(), arr.end());
   }
+
+  // for (uint32_t i = 0; i < bytes_to_read; i++)
+  // {
+  //   if (this->output_file_byte.find(start_mem_offset + i) == this->output_file_byte.end())
+  //   {
+  //     // no data at given offset
+  //     this->internal_error("There's no data at calculated offset. offset: " + std::to_string(start_mem_offset + i) + ", relocation_json: " + relocation.convert_to_json());
+  //     return {};
+  //   }
+
+  //   result_bytes.push_back(this->output_file_byte[start_mem_offset + i]);
+  // }
 
   return result_bytes;
 }
@@ -310,7 +315,7 @@ std::string Linker::create_hex()
           this->internal_error("Overlapping of two sections: \n\tsection 1: " + section_name + "\n\tsection 2: " + already_placed_section);
           return "";
         }
-
+        std::cout << "[WR] section_name: " << section_name << ", addr: " << std::to_string(start_mem_addr) << ", val: " << std::to_string(static_cast<int>(byte)) << std::endl;
         this->output_file_byte[start_mem_addr] = byte;
         start_mem_addr++;
       }
@@ -401,7 +406,7 @@ std::string Linker::create_hex()
             this->internal_error("Overlapping of two sections: \n\tsection 1: " + section_name + "\n\tsection 2: " + already_placed_section);
             return "";
           }
-
+          std::cout << "[WR] section_name: " << section_name << ", addr: " << std::to_string(mem_cnt) << ", val: " << std::to_string(static_cast<int>(byte)) << std::endl;
           this->output_file_byte[mem_cnt] = byte;
           mem_cnt++;
         }
@@ -490,9 +495,9 @@ std::string Linker::create_hex()
             - if symbol already has value ==> error: multiple definitions
         */
         int32_t val;
-        if (sym.get_value(&val))
+        if (sym_from_table->get_value(&val))
         {
-          this->internal_error("Multiple definitions of symbol. symbol_name: " + sym.get_name());
+          this->internal_error("Multiple definitions of symbol. symbol_name: " + sym_from_table->get_name());
           return "";
         }
       }
@@ -534,8 +539,15 @@ std::string Linker::create_hex()
           return "";
         }
 
+        SymbolJsonRecord *section_from_table = this->get_sym_from_table(*section_sym);
+        if (!section_from_table)
+        {
+          this->internal_error("Section cannot be fetched from symbol table. section_name: " + section_from_table->get_name());
+          return "";
+        }
+
         sym.set_value(sym_value + section->get_start_mem_addr());
-        sym.set_section(this->global_sym_table[section_sym->get_name()].get_id());
+        sym.set_section(section_from_table->get_id());
         sym.set_id(this->generate_next_id());
         sym.set_is_final(true);
         this->add_sym_to_table(sym);
@@ -610,18 +622,25 @@ std::string Linker::create_hex()
 
           if (!sym_from_table->get_value(&global_sym_value))
           {
-            this->internal_error("3. Symbol is not resolved (it doesn't have value). symbol_name: " + sym->get_name() + ", symbol_id: " + std::to_string(this->global_sym_table[sym->get_name()].get_id()));
+            this->internal_error("3. Symbol is not resolved (it doesn't have value). symbol_name: " + sym->get_name() + ", symbol_id: " + std::to_string(sym_from_table->get_id()));
             return "";
           }
 
           relocation.set_addend(relocation.get_addend() + target_section->get_start_mem_addr() - global_sym_value);
-          relocation.set_sym_id(this->global_sym_table[sym->get_name()].get_id());
+          relocation.set_sym_id(sym_from_table->get_id());
           relocation.set_offset(relocation.get_offset() + section.get_start_mem_addr());
           this->global_relocations.push_back(relocation);
         }
         else
         {
-          relocation.set_sym_id(this->global_sym_table[sym->get_name()].get_id());
+          SymbolJsonRecord *sym_from_table = this->get_sym_from_table(*sym);
+          if (!sym_from_table)
+          {
+            this->internal_error("Section cannot be fetched from symbol table. section_name: " + sym->get_name());
+            return "";
+          }
+
+          relocation.set_sym_id(sym_from_table->get_id());
           relocation.set_offset(relocation.get_offset() + section.get_start_mem_addr());
           this->global_relocations.push_back(relocation);
         }
@@ -645,6 +664,7 @@ std::string Linker::create_hex()
     uint32_t start_mem_offset = relocation.get_offset();
     for (uint32_t i = 0; i < bytes_to_write.size(); i++)
     {
+      std::cout << "[WR] addr: " << std::to_string(start_mem_offset + i) << ", val: " << std::to_string(static_cast<int>(bytes_to_write[i])) << std::endl;
       this->output_file_byte[start_mem_offset + i] = bytes_to_write[i];
     }
   }
@@ -654,9 +674,67 @@ std::string Linker::create_hex()
   std::vector<uint32_t> mem_addrs;
 
   for (auto iter : this->output_file_byte)
+  {
     mem_addrs.push_back(iter.first);
+    std::cout << iter.first << ": " << static_cast<int>(iter.second) << std::endl;
+  }
 
   std::sort(mem_addrs.begin(), mem_addrs.end());
+
+  // print symbol table
+  std::cout << std::endl
+            << "SYMBOL TABLE: " << std::endl;
+
+  char *s = new char[100];
+  sprintf(s, "%15s | %3s | %10s | %7s | %10s | %7s |", "NAME", "ID", "SECTION", "GLOBAL", "VALUE", "TYPE");
+  std::cout << s << std::endl;
+  uint8_t padding = 11; // %15s - strlen("NAME")
+  for (uint8_t i = 0; i < strlen(s) + padding; i++)
+    std::cout << "-";
+  std::cout << std::endl;
+
+  for (auto &iter : this->global_sym_table)
+  {
+    SymbolJsonRecord sym = iter.second;
+    // if (!sym.get_defined_flag())
+    //   continue;
+
+    char *s = new char[100];
+    char *value_str = new char[12];
+    int32_t val;
+    if (sym.get_value(&val))
+    {
+      sprintf(value_str, "%#010x", val);
+    }
+    else
+    {
+      value_str = "NO_VALUE";
+    }
+
+    char *section_str = new char[12];
+    uint32_t section;
+    if (sym.get_section(&section))
+    {
+      sprintf(section_str, "%d", section);
+    }
+    else
+    {
+      section_str = "NO_SECTION";
+    }
+
+    sprintf(s, "%15s | %3d | %10s | %7s | %10s | %7s |", sym.get_name().c_str(), sym.get_id(), section_str, sym.get_is_global() ? "true" : "false", value_str, sym.get_type() == type::PARAMETER_TYPE::SYMBOL ? "SYMBOL" : "SECTION");
+    std::cout << s << std::endl;
+  }
+
+  // print symbol table
+  std::cout << std::endl
+            << "RELOCATIONS: " << std::endl;
+
+  for (RelocationJsonRecord rel : this->global_relocations)
+  {
+    std::cout << rel.convert_to_json() << std::endl
+              << std::endl;
+  }
 
   // get all bytes and create output string
   std::string output = "";
