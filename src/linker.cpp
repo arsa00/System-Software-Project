@@ -348,7 +348,7 @@ std::string Linker::create_hex()
     // this->global_sym_table[section_name] = section;
 
     // update maximum free address
-    if (start_mem_addr > max_mem_addr && start_mem_addr > iter.second)
+    if (start_mem_addr > max_mem_addr && start_mem_addr > iter.second) // TODO: check if right part is needed
       max_mem_addr = start_mem_addr;
   }
 
@@ -563,6 +563,19 @@ std::string Linker::create_hex()
     }
   }
 
+  // check if all symbols are resolved
+  for (auto iter : this->global_sym_table)
+  {
+    SymbolJsonRecord sym = iter.second;
+
+    int32_t val;
+    if (!sym.get_value(&val))
+    {
+      this->internal_error("3. Symbol is not resolved (it doesn't have value). symbol_name: " + sym.get_name() + ", symbol_id: " + std::to_string(sym.get_id()));
+      return "";
+    }
+  }
+
   // combine all relocation lists to one global (with recalculating offsets & addends)
   for (ObjectFile *obj_file : this->obj_files)
   {
@@ -586,7 +599,7 @@ std::string Linker::create_hex()
         SymbolJsonRecord *sym = obj_file->get_symbol(relocation.get_sym_id());
         if (!sym)
         {
-          this->internal_error("Symbol cannot be fetched. symbol_name: " + sym->get_name());
+          this->internal_error("Symbol cannot be fetched. symbol_id: " + std::to_string(relocation.get_sym_id()) + ". obj_json_file:" + obj_file->convert_to_json());
           return "";
         }
 
@@ -636,7 +649,7 @@ std::string Linker::create_hex()
           SymbolJsonRecord *sym_from_table = this->get_sym_from_table(*sym);
           if (!sym_from_table)
           {
-            this->internal_error("Section cannot be fetched from symbol table. section_name: " + sym->get_name());
+            this->internal_error("Symbol cannot be fetched from symbol table. symbol_name: " + sym->get_name());
             return "";
           }
 
@@ -785,4 +798,307 @@ std::string Linker::create_hex()
 std::string Linker::create_relocatable()
 {
   // TODO
+  // combine (map) all sections
+  for (ObjectFile *obj_file : this->obj_files)
+  {
+    for (auto section : obj_file->get_sections())
+    {
+      if (section.get_is_section_placed())
+      {
+        // std::cout << "Section is placed. section_id" << section.get_id() << std::endl;
+        continue;
+      }
+
+      SymbolJsonRecord *symbol = obj_file->get_symbol(section.get_id());
+      if (!symbol)
+      {
+        this->internal_error("Symbol cannot be fetched: " + std::to_string(section.get_id()));
+        return "";
+      }
+
+      // use section_name to fetch section in other obj files
+      std::string section_name = symbol->get_name();
+
+      // create combined section (all sections and relocations combined to the global one)
+      SectionJsonRecord combined_section;
+
+      // set offset to zero for every new section
+      uint32_t mem_cnt = 0;
+
+      for (ObjectFile *nested_obj_file : this->obj_files)
+      {
+        SectionJsonRecord *section_ptr = nested_obj_file->get_section(section_name);
+        if (!section_ptr)
+        {
+          // std::cout << "Obj file doesn't contain section: " << section_name << ". JSON_FILE: " << std::endl
+          //           << nested_obj_file->convert_to_json() << std::endl;
+          continue;
+        }
+
+        // mark start offset of section
+        section_ptr->set_start_mem_addr(mem_cnt);
+        std::vector<type::byte> output_file = section_ptr->get_output_file();
+
+        if (output_file.size() == 0)
+          continue;
+
+        // append output file to the end of combined section
+        mem_cnt += output_file.size();
+        for (type::byte byte : output_file)
+        {
+          combined_section.add_to_output_file(byte);
+        }
+      }
+
+      // create section and add it to the global sections map
+      combined_section.set_start_mem_addr(0); // section always starts at zero offset
+      combined_section.set_id(this->generate_next_id());
+      this->global_sections[section_name] = combined_section;
+
+      // add section to global_sym_table
+      SymbolJsonRecord section_sym;
+      section_sym.set_id(combined_section.get_id());
+      section_sym.set_is_final(false);
+      section_sym.set_is_global(true);
+      section_sym.set_name(section_name);
+      section_sym.set_type(type::PARAMETER_TYPE::SECTION);
+      section_sym.set_value(combined_section.get_output_file().size());
+      this->add_sym_to_table(section_sym);
+    }
+  }
+
+  // combine all symbol tables to one (with recalculating offsets)
+  for (ObjectFile *obj_file : this->obj_files)
+  {
+    std::vector<SymbolJsonRecord> sym_table = obj_file->get_symbol_table();
+    for (SymbolJsonRecord sym : sym_table)
+    {
+      // no need to include local symbols
+      if (!sym.get_is_global())
+        continue;
+
+      // sections that contain data should've already beeen added to sym_table
+      if (sym.get_type() == type::PARAMETER_TYPE::SECTION)
+      {
+        SectionJsonRecord *section = obj_file->get_section(sym.get_name());
+        if (!section)
+        {
+          this->internal_error("Section cannot be fetched. section_name: " + sym.get_name());
+          return "";
+        }
+
+        if (!this->is_sym_in_table(sym) && section->get_output_file().size() > 0)
+        {
+          this->internal_error("Section is missing in symbol table of linker. section_name: " + sym.get_name());
+          return "";
+        }
+
+        continue;
+      }
+
+      if (this->is_sym_in_table(sym))
+      {
+        // get symbol
+        SymbolJsonRecord *sym_from_table = this->get_sym_from_table(sym);
+        if (!sym_from_table)
+        {
+          this->internal_error("Symbol cannot be fetched: " + sym.get_name());
+          return "";
+        }
+
+        /* check if symbol has value, and do the following:
+            - if symbol doesn't have value, it's extern ==> continue and resolve it
+            - if symbol already has value ==> error: multiple definitions
+        */
+        int32_t val;
+        if (sym_from_table->get_value(&val))
+        {
+          this->internal_error("Multiple definitions of symbol. symbol_name: " + sym_from_table->get_name());
+          return "";
+        }
+      }
+
+      uint32_t sym_section_id;
+      if (sym.get_section(&sym_section_id))
+      {
+        SymbolJsonRecord *section_sym = obj_file->get_symbol(sym_section_id);
+        if (!section_sym)
+        {
+          this->internal_error("Symbol cannot be fetched: " + std::to_string(sym_section_id));
+          return "";
+        }
+
+        SectionJsonRecord *section = obj_file->get_section(section_sym->get_name());
+        if (!section)
+        {
+          this->internal_error("Section cannot be fetched. section_name: " + section_sym->get_name());
+          return "";
+        }
+
+        if (!section->get_is_section_placed())
+        {
+          this->internal_error("Section is not placed. section_name " + section_sym->get_name());
+          return "";
+        }
+
+        // this->global_sym_table.find(section_sym->get_name()) == this->global_sym_table.end()
+        if (!this->is_sym_in_table(*section_sym))
+        {
+          this->internal_error("Section is missing in symbol table of linker. section_name: " + section_sym->get_name());
+          return "";
+        }
+
+        int32_t sym_value;
+        if (!sym.get_value(&sym_value))
+        {
+          this->internal_error("2. Symbol is not resolved (it doesn't have value). symbol_name: " + sym.get_name() + ", symbol_id: " + std::to_string(sym.get_id()));
+          return "";
+        }
+
+        SymbolJsonRecord *section_from_table = this->get_sym_from_table(*section_sym);
+        if (!section_from_table)
+        {
+          this->internal_error("Section cannot be fetched from symbol table. section_name: " + section_from_table->get_name());
+          return "";
+        }
+
+        sym.set_value(sym_value + section->get_start_mem_addr());
+        sym.set_section(section_from_table->get_id());
+        sym.set_id(this->generate_next_id());
+        sym.set_is_final(false);
+        this->add_sym_to_table(sym);
+      }
+      else
+      {
+        // extern symbols
+        sym.set_id(this->generate_next_id());
+        sym.set_is_final(false);
+        this->add_sym_to_table(sym);
+      }
+    }
+  }
+
+  // combine all relocation lists to one global (with recalculating offsets & addends)
+  for (ObjectFile *obj_file : this->obj_files)
+  {
+    for (SectionJsonRecord section : obj_file->get_sections())
+    {
+      if (!section.get_is_section_placed())
+      {
+        SymbolJsonRecord *sec_sym = obj_file->get_symbol(section.get_id());
+        if (sec_sym)
+        {
+          this->internal_error("Section is not placed. section_name: " + sec_sym->get_name());
+          return "";
+        }
+
+        this->internal_error("Section is not placed. section_id: " + section.get_id());
+        return "";
+      }
+
+      for (RelocationJsonRecord relocation : section.get_relocations())
+      {
+        SymbolJsonRecord *sym = obj_file->get_symbol(relocation.get_sym_id());
+        if (!sym)
+        {
+          this->internal_error("Symbol cannot be fetched. symbol_id: " + std::to_string(relocation.get_sym_id()) + ". obj_json_file:" + obj_file->convert_to_json());
+          return "";
+        }
+
+        if (!this->is_sym_in_table(*sym))
+        {
+          this->internal_error("Symbol is missing in symbol table of linker. symbol_name: " + sym->get_name());
+          return "";
+        }
+
+        if (sym->get_type() == type::PARAMETER_TYPE::SECTION)
+        {
+          SectionJsonRecord *target_section = obj_file->get_section(sym->get_name());
+          if (!target_section)
+          {
+            this->internal_error("Section cannot be fetched. section_name: " + sym->get_name());
+            return "";
+          }
+
+          if (!target_section->get_is_section_placed())
+          {
+            this->internal_error("Section is not placed. section_name: " + sym->get_name());
+            return "";
+          }
+
+          SymbolJsonRecord *sym_from_table = this->get_sym_from_table(*sym);
+          if (!sym_from_table)
+          {
+            this->internal_error("Section cannot be fetched from symbol table. section_name: " + sym->get_name());
+            return "";
+          }
+
+          relocation.set_addend(relocation.get_addend() + target_section->get_start_mem_addr());
+          relocation.set_sym_id(sym_from_table->get_id());
+          relocation.set_offset(relocation.get_offset() + section.get_start_mem_addr());
+
+          SymbolJsonRecord *section_sym = obj_file->get_symbol(section.get_id());
+          if (!section_sym)
+          {
+            this->internal_error("Section cannot be fetched. section_id: " + std::to_string(section.get_id()) + ". obj_json_file:" + obj_file->convert_to_json());
+            return "";
+          }
+
+          if (this->global_sections.find(section_sym->get_name()) == this->global_sections.end())
+          {
+            this->internal_error("Section is not in linkers' internal table. section_name: " + section_sym->get_name());
+            return "";
+          }
+
+          SectionJsonRecord global_section = this->global_sections[section_sym->get_name()];
+          global_section.add_relocation(relocation);
+          this->global_sections[section_sym->get_name()] = global_section;
+        }
+        else
+        {
+          SymbolJsonRecord *sym_from_table = this->get_sym_from_table(*sym);
+          if (!sym_from_table)
+          {
+            this->internal_error("Symbol cannot be fetched from symbol table. symbol_name: " + sym->get_name());
+            return "";
+          }
+
+          relocation.set_sym_id(sym_from_table->get_id());
+          relocation.set_offset(relocation.get_offset() + section.get_start_mem_addr());
+
+          SymbolJsonRecord *section_sym = obj_file->get_symbol(section.get_id());
+          if (!section_sym)
+          {
+            this->internal_error("Section cannot be fetched. section_id: " + std::to_string(section.get_id()) + ". obj_json_file:" + obj_file->convert_to_json());
+            return "";
+          }
+
+          if (this->global_sections.find(section_sym->get_name()) == this->global_sections.end())
+          {
+            this->internal_error("Section is not in linkers' internal table. section_name: " + section_sym->get_name());
+            return "";
+          }
+
+          SectionJsonRecord global_section = this->global_sections[section_sym->get_name()];
+          global_section.add_relocation(relocation);
+          this->global_sections[section_sym->get_name()] = global_section;
+        }
+      }
+    }
+  }
+
+  // create output obj file
+  ObjectFile out_obj_file;
+
+  for (auto iter : this->global_sections)
+  {
+    out_obj_file.add_section(iter.second);
+  }
+
+  for (auto iter : this->global_sym_table)
+  {
+    out_obj_file.add_symbol(iter.second);
+  }
+
+  return out_obj_file.convert_to_json();
 }

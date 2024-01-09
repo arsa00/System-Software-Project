@@ -67,6 +67,8 @@ private:
   std::unordered_map<SymbolTableKey, SymbolJsonRecord, SymbolTableKeyHasher> global_sym_table;
   std::vector<RelocationJsonRecord> global_relocations;
 
+  std::unordered_map<std::string, SectionJsonRecord> global_sections;
+
   // <sym_id, SymbolTableKey> pairs
   std::unordered_map<uint32_t, SymbolTableKey> sym_table_lookup_map;
 
@@ -89,6 +91,7 @@ private:
   SymbolJsonRecord *get_sym_from_table(SymbolJsonRecord sym);
   SymbolJsonRecord *get_sym_from_table(uint32_t sym_id);
   std::vector<type::byte> resolve_relocation(RelocationJsonRecord relocation);
+  bool place_sections(uint32_t max_mem_addr = 0);
 
 public:
   static Linker &get_instance();

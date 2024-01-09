@@ -106,6 +106,11 @@ int main(int argc, char const *argv[])
       string output = Linker::get_instance().create_hex();
       cout << output << endl;
     }
+    else
+    {
+      string output = Linker::get_instance().create_relocatable();
+      cout << output << endl;
+    }
 
     if (linker_res)
     {
