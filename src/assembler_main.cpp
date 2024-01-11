@@ -40,14 +40,14 @@ int main(int argc, char const *argv[])
       {
         argStr.assign(argv[++i]);
         if (argStr.empty())
-          throw new file_exception();
+          throw "Output file name is not valid";
         file_output = argv[i];
         continue;
       }
 
       // after all options ==> get input file
       if (argStr.empty())
-        throw new file_exception();
+        throw "Input file name is not valid";
       file_input = argv[i];
     }
 
@@ -69,7 +69,7 @@ int main(int argc, char const *argv[])
     if (!in_file)
     {
       // Something went wrong
-      yyerror("Cannot read input assembler file1");
+      yyerror("Cannot read input assembler file");
       return 1;
     }
 
@@ -122,6 +122,16 @@ int main(int argc, char const *argv[])
   {
     cerr << e.what() << endl;
     return 1;
+  }
+  catch (string err)
+  {
+    cout << err << endl;
+    return 2;
+  }
+  catch (char const *err)
+  {
+    cout << err << endl;
+    return 2;
   }
 
   // test1();

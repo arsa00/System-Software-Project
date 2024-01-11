@@ -89,10 +89,29 @@ int main(int argc, char const *argv[])
       return 1;
     }
 
-    // run the linker
+    // set output file
     if (file_output)
       Linker::get_instance().set_output_file_name(file_output);
+    else
+    {
+      string new_file;
+      while (true)
+      {
+        new_file = "linker_output_" + to_string(rand());
+        ifstream linker_file(new_file);
+        if (!linker_file.good())
+          break;
+      }
 
+      if (new_file.empty())
+        throw "Failed creating output file";
+
+      // cout << new_file << endl;
+
+      Linker::get_instance().set_output_file_name(new_file);
+    }
+
+    // load input obj files
     bool linker_res = Linker::get_instance().load_input_obj_files(input_object_files);
     if (!linker_res)
     {
@@ -100,16 +119,17 @@ int main(int argc, char const *argv[])
       return 1;
     }
 
+    // set section places
     Linker::get_instance().set_section_places(section_places);
+
+    // run the linker
     if (hex_output)
     {
-      string output = Linker::get_instance().create_hex();
-      cout << output << endl;
+      linker_res = Linker::get_instance().create_hex();
     }
     else
     {
-      string output = Linker::get_instance().create_relocatable();
-      cout << output << endl;
+      linker_res = Linker::get_instance().create_relocatable();
     }
 
     if (linker_res)
@@ -138,25 +158,6 @@ int main(int argc, char const *argv[])
     cout << err << endl;
     return 2;
   }
-
-  for (auto iter : section_places)
-  {
-    cout << "Section: " << iter.first << ", at: " << iter.second << endl;
-  }
-
-  for (auto file : input_object_files)
-  {
-    cout << "Input file: " << file << endl;
-  }
-
-  if (file_output)
-    cout << "Output file: " << file_output << endl;
-
-  if (hex_output)
-    cout << "Output file type: hex" << endl;
-
-  if (relocatable_output)
-    cout << "Output file type: relocatable" << endl;
 
   return 0;
 }

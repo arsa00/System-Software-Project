@@ -96,8 +96,8 @@ private:
 public:
   static Linker &get_instance();
 
-  std::string create_hex();
-  std::string create_relocatable();
+  bool create_hex();
+  bool create_relocatable();
   void internal_error(std::string err_msg);
 
   void set_output_file_name(std::string file_name);
