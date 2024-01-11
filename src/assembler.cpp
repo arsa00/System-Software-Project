@@ -171,6 +171,7 @@ void Assembler::add_section(std::string section_name)
     {
       new_section->set_id(sym->get_id());     // reuse id of non-defined symbol
       this->symbol_table.erase(section_name); // remove unused symbol
+      delete sym;
     }
     this->section_table[section_name] = new_section;
   }

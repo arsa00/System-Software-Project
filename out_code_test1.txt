@@ -12,7 +12,7 @@ type:1,
 offset:0,
 addend:0,
 is_addend_signed:0,
-sym_id:0,
+sym_id:1,
 type:1,
 }],
 },{

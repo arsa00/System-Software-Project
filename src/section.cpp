@@ -33,11 +33,11 @@ Section::~Section()
   }
 
   // free memory for all relocation records
-  while (!this->relocations.empty())
+  std::list<RelocationRecord *> relocations = this->get_all_relocations();
+  this->relocations.clear();
+  for (RelocationRecord *rel : relocations)
   {
-    auto iter = this->relocations.begin();
-    this->relocations.erase(iter);
-    delete *iter;
+    delete rel;
   }
 }
 

@@ -127,9 +127,9 @@ int main(int argc, char const *argv[])
   // test1();
   // test2();
   // test3();
-  testSymbolJsonRecord1();
-  testSectionJsonRecord1();
-  testObjectFile1();
+  // testSymbolJsonRecord1();
+  // testSectionJsonRecord1();
+  // testObjectFile1();
 
   return 0;
 }
