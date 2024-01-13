@@ -46,14 +46,14 @@ Linker &Linker::get_instance()
   return linker_instance;
 }
 
-Linker::Linker()
-{
-  // TODO
-}
-
 Linker::~Linker()
 {
-  // TODO
+  for (ObjectFile *obj_file : this->obj_files)
+  {
+    delete obj_file;
+  }
+
+  this->obj_files.clear();
 }
 
 void Linker::internal_error(std::string err_msg)
