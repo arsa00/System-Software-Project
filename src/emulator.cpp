@@ -100,7 +100,52 @@ void Emulator::load_operands()
 
 void Emulator::execute_operation()
 {
-  // TODO
+  auto instruction_bytes = converter::get_instruction_bytes(static_cast<type::instruction_size>(this->ir));
+  uint8_t oc_mod = static_cast<uint8_t>(instruction_bytes[0]);
+  uint8_t regA = static_cast<uint8_t>(converter::get_upper_half_byte(instruction_bytes[1]));
+  uint8_t regB = static_cast<uint8_t>(converter::get_lower_half_byte(instruction_bytes[1]));
+  uint8_t regC = static_cast<uint8_t>(converter::get_upper_half_byte(instruction_bytes[2]));
+  int16_t disp = converter::get_disp_from_instruction(static_cast<type::instruction_size>(this->ir));
+
+  switch (oc_mod)
+  {
+  case type::CPU_INSTRUCTIONS::HALT:
+    this->is_running = false;
+    break;
+
+  case type::CPU_INSTRUCTIONS::INT:
+    // this->push(this->status);
+    // this->push(*this->pc);
+    this->cause = 4;
+    this->status = this->status & (~0x1);
+    *this->pc = this->handle;
+    break;
+
+  case type::CPU_INSTRUCTIONS::CALL_0:
+    // this->push(*this->pc);
+    *this->pc = this->gpr[regA] + this->gpr[regB] + disp;
+    break;
+
+  case type::CPU_INSTRUCTIONS::CALL_1:
+    // this->push(*this->pc);
+    this->read_memory();
+    *this->pc = this->mdr;
+    break;
+
+  case type::CPU_INSTRUCTIONS::JMP_0:
+    *this->pc = this->gpr[regA] + disp;
+    break;
+
+  case type::CPU_INSTRUCTIONS::JMP_1:
+    if (this->gpr[regB] == this->gpr[regC])
+    {
+      *this->pc = this->gpr[regA] + disp;
+    }
+    break;
+
+  default:
+    break;
+  }
 }
 
 void Emulator::handle_interrupts()

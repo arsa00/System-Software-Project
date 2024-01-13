@@ -22,7 +22,7 @@ private:
   uint32_t *pc = &gpr[15];
   uint32_t *sp = &gpr[14]; // full stack - grows down
 
-  uint32_t handler;
+  uint32_t handle;
   uint32_t status;
   uint32_t cause;
 
@@ -50,6 +50,7 @@ private:
   void get_interrupt_flag();
 
   void read_memory();
+  void push(uint32_t value);
 
   void fetch_instruction();
   void resolve_address();
