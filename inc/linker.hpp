@@ -74,7 +74,7 @@ private:
 
   bool internal_err = false;
 
-  Linker();
+  Linker() = default;
   Linker(const Linker &) = delete;
   Linker &operator=(const Linker &) = delete;
   ~Linker();

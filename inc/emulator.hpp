@@ -13,18 +13,21 @@ class Emulator
 {
 private:
   const uint32_t START_MEM_ADDR = 0x40000000;
-  const uint32_t MEM_MAPPED_REGS_START = 0xFFFFFF00;
-  const uint32_t MEM_MAPPED_REGS_SIZE = 256;
+  const uint32_t MEM_MAPPED_REGS_START = 0xFFFFFF00; // 256 bytes long
+  const uint32_t MEM_MAPPED_REGS_END = 0xFFFFFFFF;
 
   std::unordered_map<uint32_t, type::byte> memory;
 
+  // general purpose registers
   uint32_t gpr[16];
   uint32_t *pc = &gpr[15];
   uint32_t *sp = &gpr[14]; // full stack - grows down
 
-  uint32_t handle;
-  uint32_t status;
-  uint32_t cause;
+  // control-status registers
+  uint32_t csr[3];
+  uint32_t *status = &csr[0];
+  uint32_t *handler = &csr[1];
+  uint32_t *cause = &csr[2];
 
   // CPU registers
   uint32_t ir;  // instruction register
@@ -47,14 +50,15 @@ private:
   bool is_global_interrupt_enabled();
 
   void set_interrupt_flag();
-  void get_interrupt_flag();
+  void clear_interrupt_flag();
 
   void read_memory();
+  void write_memory();
   void push(uint32_t value);
+  uint32_t pop();
 
   void fetch_instruction();
   void resolve_address();
-  void load_operands();
   void execute_operation();
   void handle_interrupts();
 
