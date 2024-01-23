@@ -66,27 +66,17 @@ uint32_t Emulator::pop()
 
 bool Emulator::is_timer_interrupt_enabled()
 {
-  return (*this->status & 0x1) == 0;
+  return (*this->status & Emulator::TIMER_INTERRUPT_FLAG) == 0;
 }
 
 bool Emulator::is_terminal_interrupt_enabled()
 {
-  return (*this->status & 0x2) == 0;
+  return (*this->status & Emulator::TERMINAL_INTERRUPT_FLAG) == 0;
 }
 
 bool Emulator::is_global_interrupt_enabled()
 {
-  return (*this->status & 0x4) == 0;
-}
-
-void Emulator::clear_interrupt_flag()
-{
-  this->interrupted = false;
-}
-
-void Emulator::set_interrupt_flag()
-{
-  this->interrupted = true;
+  return (*this->status & Emulator::GLOBAL_INTERRUPT_FLAG) == 0;
 }
 
 void Emulator::fetch_instruction()
@@ -179,13 +169,12 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::INT:
   {
-    // TODO: see how to realize interrupts
+    // TODO: check this
     this->push(*this->status);
     this->push(*this->pc);
     *this->cause = 4;
-    *this->status = *this->status & (~0x1); // what is this for? (enetering interrupt masks interrupts globally)
+    *this->status = *this->status & (~0x1);
     *this->pc = *this->handler;
-    this->set_interrupt_flag();
     break;
   }
 
@@ -302,7 +291,7 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::ARITH_OP_3:
   {
-    this->gpr[regA] = this->gpr[regB] / this->gpr[regC]; // TODO: check
+    this->gpr[regA] = (int32_t)this->gpr[regB] / (int32_t)this->gpr[regC]; // TODO: check
     break;
   }
 
@@ -338,7 +327,7 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::SHIFT_OP_1:
   {
-    this->gpr[regA] = this->gpr[regB] >> this->gpr[regC]; // TODO: check: (int32_t)this->gpr[regB] >> this->gpr[regC]
+    this->gpr[regA] = (int32_t)this->gpr[regB] >> this->gpr[regC]; // TODO: check: this->gpr[regB] >> this->gpr[regC]
     break;
   }
 
@@ -407,13 +396,7 @@ void Emulator::execute_operation()
 
   default:
   {
-    // TODO: see how to realize interrupts
-    this->push(*this->status);
-    this->push(*this->pc);
-    *this->cause = 1;  // wrong operation code and modificator
-    *this->status = 4; // mask global interrupts
-    *this->pc = *this->handler;
-    this->set_interrupt_flag();
+    this->interrupt_invalid_op = true; // TODO: check if this interrupt should be set elsewhere
     break;
   }
   }
@@ -421,7 +404,34 @@ void Emulator::execute_operation()
 
 void Emulator::handle_interrupts()
 {
-  // TODO
+  // TODO: check
+  bool interrupt_accepted = false;
+  if (this->interrupt_invalid_op)
+  {
+    *this->cause = 1; // wrong operation code, modificator, etc.
+    interrupt_accepted = true;
+    this->interrupt_invalid_op = false;
+  }
+  else if (this->interrupt_timer && this->is_global_interrupt_enabled() && this->is_timer_interrupt_enabled())
+  {
+    *this->cause = 2; // timer interrupt
+    interrupt_accepted = true;
+    this->interrupt_timer = false;
+  }
+  else if (this->interrupt_terminal && this->is_global_interrupt_enabled() && this->is_terminal_interrupt_enabled())
+  {
+    *this->cause = 3; // terminal interrupt
+    interrupt_accepted = true;
+    this->interrupt_terminal = false;
+  }
+
+  if (interrupt_accepted)
+  {
+    this->push(*this->status);
+    this->push(*this->pc);
+    *this->status |= Emulator::GLOBAL_INTERRUPT_FLAG; // mask global interrupts
+    *this->pc = *this->handler;
+  }
 }
 
 void Emulator::run()

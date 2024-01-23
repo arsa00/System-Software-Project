@@ -16,6 +16,10 @@ private:
   const uint32_t MEM_MAPPED_REGS_START = 0xFFFFFF00; // 256 bytes long
   const uint32_t MEM_MAPPED_REGS_END = 0xFFFFFFFF;
 
+  const uint32_t GLOBAL_INTERRUPT_FLAG = 0b0100;
+  const uint32_t TERMINAL_INTERRUPT_FLAG = 0b0010;
+  const uint32_t TIMER_INTERRUPT_FLAG = 0b0001;
+
   std::unordered_map<uint32_t, type::byte> memory;
 
   // general purpose registers
@@ -34,8 +38,10 @@ private:
   uint32_t mar; // memory address register
   uint32_t mdr; // memory data register
 
-  // interrupt flag
-  bool interrupted;
+  // interrupt flags
+  bool interrupt_invalid_op = false;
+  bool interrupt_timer = false;
+  bool interrupt_terminal = false;
 
   bool is_running = false;
   bool internal_err = false;
@@ -48,9 +54,6 @@ private:
   bool is_terminal_interrupt_enabled();
   bool is_timer_interrupt_enabled();
   bool is_global_interrupt_enabled();
-
-  void set_interrupt_flag();
-  void clear_interrupt_flag();
 
   void read_memory();
   void write_memory();
