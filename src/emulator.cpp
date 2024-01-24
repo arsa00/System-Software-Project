@@ -1,6 +1,8 @@
 #include "../auxiliary/inc/converters.hpp"
 #include "../inc/emulator.hpp"
 #include <iostream>
+#include <termios.h>
+#include <unistd.h>
 
 Emulator &Emulator::get_instance()
 {
@@ -41,10 +43,20 @@ void Emulator::read_memory()
 
 void Emulator::write_memory()
 {
+  bool is_write_to_term_out = (this->mar == Emulator::TERM_OUT_REG_ADDR ? true : false);
+
+  // write to memory
   auto write_bytes = converter::get_instruction_bytes(static_cast<type::instruction_size>(this->mdr));
   for (type::byte byte : write_bytes)
   {
     this->memory[this->mar++] = byte;
+  }
+
+  // notify terminal if write was to term_out reg
+  if (is_write_to_term_out)
+  {
+    this->term_out_has_value = true;
+    this->notify_terminal();
   }
 }
 
@@ -60,6 +72,46 @@ uint32_t Emulator::pop()
 {
   this->mar = *this->sp;
   this->sp += 4;
+  this->read_memory();
+  return this->mdr;
+}
+
+bool terminal_ready = false;
+void Emulator::notify_terminal()
+{
+  // lock release
+  std::lock_guard<std::mutex> lock(this->terminal_mutex);
+
+  terminal_ready = true;
+
+  // notify consumer when done
+  this->terminal_cv.notify_one();
+}
+
+void Emulator::write_term_in_reg(uint32_t val)
+{
+  this->mar = Emulator::TERM_IN_REG_ADDR;
+  this->mdr = val;
+  this->write_memory();
+}
+
+uint32_t Emulator::read_term_in_reg()
+{
+  this->mar = Emulator::TERM_IN_REG_ADDR;
+  this->read_memory();
+  return this->mdr;
+}
+
+void Emulator::write_term_out_reg(uint32_t val)
+{
+  this->mar = Emulator::TERM_OUT_REG_ADDR;
+  this->mdr = val;
+  this->write_memory();
+}
+
+uint32_t Emulator::read_term_out_reg()
+{
+  this->mar = Emulator::TERM_OUT_REG_ADDR;
   this->read_memory();
   return this->mdr;
 }
@@ -434,12 +486,65 @@ void Emulator::handle_interrupts()
   }
 }
 
+void Emulator::output_terminal_func()
+{
+  while (this->is_running)
+  {
+    // wake up once there is a data to write or emulator finished running
+
+    // locking
+    std::unique_lock<std::mutex> lock(this->terminal_mutex);
+
+    // waiting
+    this->terminal_cv.wait(lock, []
+                           { return terminal_ready; });
+
+    // reset terminal ready flag
+    terminal_ready = false;
+
+    if (this->term_out_has_value)
+    {
+      char ch = (char)this->read_term_out_reg();
+      putc(ch, stdout);
+      this->term_out_has_value = false;
+    }
+  }
+}
+
+void Emulator::input_terminal_func()
+{
+  while (this->is_running)
+  {
+    char ch = getchar();
+    this->write_term_in_reg((uint32_t)ch);
+    this->interrupt_terminal = true;
+  }
+}
+
 void Emulator::run()
 {
   this->is_running = true;
   *this->pc = Emulator::START_MEM_ADDR;
   *this->sp = Emulator::MEM_MAPPED_REGS_START; // TODO: check if start addr for stack is correct
 
+  // Save the original terminal settings
+  termios original;
+  tcgetattr(STDIN_FILENO, &original);
+
+  // Create a new terminal settings
+  termios newt = original;
+
+  // Disable canonical mode and echo
+  newt.c_lflag &= ~(ICANON | ECHO);
+
+  // Apply the new settings
+  tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+
+  // Run terminal threads
+  std::thread terminal_output_thread(&Emulator::output_terminal_func, this);
+  std::thread terminal_input_thread(&Emulator::input_terminal_func, this);
+
+  // Execute emulator
   while (this->is_running)
   {
     this->fetch_instruction();
@@ -447,4 +552,14 @@ void Emulator::run()
     this->execute_operation();
     this->handle_interrupts();
   }
+
+  // Notify terminal that the emulator stopped running
+  this->notify_terminal();
+
+  // Wait for terminal threads to finish
+  terminal_output_thread.join();
+  terminal_input_thread.join();
+
+  // Restore the original settings
+  tcsetattr(STDIN_FILENO, TCSANOW, &original);
 }

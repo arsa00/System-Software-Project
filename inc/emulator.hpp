@@ -8,6 +8,9 @@
 #include <vector>
 #include <functional>
 #include <iomanip>
+#include <mutex>
+#include <condition_variable>
+#include <thread>
 
 class Emulator
 {
@@ -19,6 +22,9 @@ private:
   const uint32_t GLOBAL_INTERRUPT_FLAG = 0b0100;
   const uint32_t TERMINAL_INTERRUPT_FLAG = 0b0010;
   const uint32_t TIMER_INTERRUPT_FLAG = 0b0001;
+
+  const uint32_t TERM_OUT_REG_ADDR = 0xFFFFFF00;
+  const uint32_t TERM_IN_REG_ADDR = 0xFFFFFF04;
 
   std::unordered_map<uint32_t, type::byte> memory;
 
@@ -43,8 +49,13 @@ private:
   bool interrupt_timer = false;
   bool interrupt_terminal = false;
 
+  bool term_out_has_value = false;
   bool is_running = false;
   bool internal_err = false;
+
+  // mutex lock
+  std::mutex terminal_mutex;
+  std::condition_variable terminal_cv;
 
   Emulator();
   Emulator(const Emulator &) = delete;
@@ -64,6 +75,15 @@ private:
   void resolve_address();
   void execute_operation();
   void handle_interrupts();
+
+  void write_term_in_reg(uint32_t val);
+  uint32_t read_term_in_reg();
+  void write_term_out_reg(uint32_t val);
+  uint32_t read_term_out_reg();
+
+  void notify_terminal();
+  void output_terminal_func();
+  void input_terminal_func();
 
 public:
   static Emulator &get_instance();

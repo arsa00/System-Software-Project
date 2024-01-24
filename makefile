@@ -8,7 +8,7 @@ SRC_FILES := $(filter-out ./src/linker_main.cpp, $(SRC_FILES))
 AUXILIARY_FILES = ./auxiliary/inc/*.hpp ./auxiliary/src/*.cpp
 
 assembler:
-	g++ -g -o asembler $(INC_FILES) $(SRC_FILES) $(AUXILIARY_FILES) ./src/assembler_main.cpp
+	g++ -g -o asembler $(INC_FILES) $(SRC_FILES) $(AUXILIARY_FILES) ./src/assembler_main.cpp -lpthread
 
 linker:
 	rm -f ./linker

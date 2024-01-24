@@ -52,7 +52,12 @@
     "typeindex": "cpp",
     "unordered_set": "cpp",
     "cstring": "cpp",
-    "set": "cpp"
+    "set": "cpp",
+    "thread": "cpp",
+    "mutex": "cpp",
+    "condition_variable": "cpp",
+    "chrono": "cpp",
+    "ratio": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }
