@@ -275,6 +275,8 @@ void Emulator::execute_operation()
   uint8_t regC = static_cast<uint8_t>(converter::get_upper_half_byte(instruction_bytes[2]));
   int16_t disp = converter::get_disp_from_instruction(static_cast<type::instruction_size>(this->ir));
 
+  // std::cout << "executing: " << std::hex << std::to_string(this->ir) << std::endl;
+
   switch (static_cast<type::CPU_INSTRUCTIONS>(oc_mod))
   {
   case type::CPU_INSTRUCTIONS::HALT:
@@ -626,4 +628,21 @@ void Emulator::run()
 
   // Restore the original settings
   tcsetattr(STDIN_FILENO, TCSANOW, &original);
+  this->print_state();
+}
+
+void Emulator::print_state()
+{
+  std::cout << "-----------------------------------------------------------------" << std::endl;
+  std::cout << "Emulated processor executed halt instruction" << std::endl;
+  std::cout << "Emulated processor state:" << std::endl;
+
+  for (uint8_t i = 0; i < 16; i++)
+  {
+    std::cout << "r" + std::to_string(i) << "=0x" << std::setfill('0') << std::setw(8) << std::hex << this->gpr[i];
+    if (i % 4 == 3)
+      std::cout << std::endl;
+    else
+      std::cout << " ";
+  }
 }

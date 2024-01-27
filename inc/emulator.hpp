@@ -85,6 +85,8 @@ private:
   void output_terminal_func();
   void input_terminal_func();
 
+  void print_state();
+
 public:
   static Emulator &get_instance();
 
