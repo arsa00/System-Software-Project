@@ -78,6 +78,7 @@ bool Emulator::load_memory_hex_from_file(std::string file_name)
       // insert data into memory
       // std::cout << token << std::endl;
       this->memory[curr_addr] = static_cast<type::byte>(std::stoul(token, 0, 16));
+      // std::cout << "written at " << std::to_string(curr_addr) << std::endl;
       curr_addr++;
     }
 
@@ -92,6 +93,8 @@ bool Emulator::load_memory_hex_from_file(std::string file_name)
 
 void Emulator::read_memory()
 {
+  // std::cout << "read from " << std::to_string(this->mar) << std::endl;
+  this->mdr = 0;
   for (uint8_t i = 0; i < 4; i++)
   {
     uint8_t read_byte;
@@ -100,9 +103,10 @@ void Emulator::read_memory()
     else
       read_byte = static_cast<uint8_t>(this->memory[this->mar]);
 
-    this->mdr = read_byte >> this->mdr;
+    this->mdr = this->mdr | ((uint32_t)read_byte << i * 8);
     this->mar++;
   }
+  // std::cout << "read from " << std::to_string(this->mar) << std::endl;
 }
 
 void Emulator::write_memory()
@@ -275,7 +279,7 @@ void Emulator::execute_operation()
   uint8_t regC = static_cast<uint8_t>(converter::get_upper_half_byte(instruction_bytes[2]));
   int16_t disp = converter::get_disp_from_instruction(static_cast<type::instruction_size>(this->ir));
 
-  // std::cout << "executing: " << std::hex << std::to_string(this->ir) << std::endl;
+  std::cout << "executing: " << std::hex << std::to_string(this->ir) << std::endl;
 
   switch (static_cast<type::CPU_INSTRUCTIONS>(oc_mod))
   {
