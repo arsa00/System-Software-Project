@@ -279,7 +279,7 @@ void Emulator::execute_operation()
   uint8_t regC = static_cast<uint8_t>(converter::get_upper_half_byte(instruction_bytes[2]));
   int16_t disp = converter::get_disp_from_instruction(static_cast<type::instruction_size>(this->ir));
 
-  std::cout << "executing: " << std::hex << std::to_string(this->ir) << std::endl;
+  // std::cout << "executing: " << std::hex << std::to_string(this->ir) << std::endl;
 
   switch (static_cast<type::CPU_INSTRUCTIONS>(oc_mod))
   {
@@ -583,11 +583,23 @@ void Emulator::output_terminal_func()
 
 void Emulator::input_terminal_func()
 {
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(STDIN_FILENO, &fds);
+
+  timeval timeout;
+  timeout.tv_usec = 100000; // 100ms
+
   while (this->is_running)
   {
-    char ch = getchar();
-    this->write_term_in_reg((uint32_t)ch);
-    this->interrupt_terminal = true;
+    select(STDIN_FILENO + 1, &fds, nullptr, nullptr, &timeout);
+    if (FD_ISSET(STDIN_FILENO, &fds))
+    {
+      char ch = getchar();
+      std::cout << "TERMINAL_IN read: " << ch << std::endl;
+      this->write_term_in_reg((uint32_t)ch);
+      this->interrupt_terminal = true;
+    }
   }
 }
 
