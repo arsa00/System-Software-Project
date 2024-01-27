@@ -1,8 +1,10 @@
 #include "../auxiliary/inc/converters.hpp"
 #include "../inc/emulator.hpp"
 #include <iostream>
+#include <fstream>
 #include <termios.h>
 #include <unistd.h>
+#include <regex>
 
 Emulator &Emulator::get_instance()
 {
@@ -24,6 +26,68 @@ void Emulator::internal_error(std::string err_msg)
 {
   this->internal_err = true;
   std::cerr << "[EMULATOR]: { INTERNAL ERROR: " << err_msg << " }" << std::endl;
+}
+
+bool Emulator::load_memory_hex_from_file(std::string file_name)
+{
+  std::ifstream file_handle(file_name);
+
+  if (!file_handle)
+  {
+    this->internal_error("Cannot read from hex file: " + file_name);
+    return false;
+  }
+
+  std::regex e("[0-9a-fA-F]*:( +[0-9a-fA-F]{2})+$");
+  std::string line;
+  while (std::getline(file_handle, line))
+  {
+    // check if fetched line is valid
+    if (!std::regex_match(line, e))
+    {
+      this->internal_error("Hex file is invalid, invalid_line: " + line);
+      return false;
+    }
+
+    // parse the line into address and (value) content parts
+    std::string delimiter1 = ":";
+    std::string start_addr = line.substr(0, line.find(delimiter1));
+    std::string content = line.substr(line.find(delimiter1) + delimiter1.length());
+    // std::cout << "start_addr: " << start_addr << std::endl;
+    // std::cout << "content: " << content << std::endl;
+
+    std::string delimiter2 = " ";
+    std::size_t pos;
+    uint32_t curr_addr = (uint32_t)std::stoul(start_addr, 0, 16);
+    while ((pos = content.find(delimiter2)) != std::string::npos)
+    {
+      // fetch next value in row
+      std::string token = content.substr(0, pos);
+      content.erase(0, pos + delimiter2.length());
+
+      if (token.empty())
+        continue;
+
+      // check if the addr that is written into is not forbidden (e.g. MEM_MAPPED_REGS_ADDR)
+      if (curr_addr >= Emulator::MEM_MAPPED_REGS_START && curr_addr <= Emulator::MEM_MAPPED_REGS_END)
+      {
+        this->internal_error("Memory access violation, addr: " + converter::uint32_to_hex_string(curr_addr));
+        return false;
+      }
+
+      // insert data into memory
+      // std::cout << token << std::endl;
+      this->memory[curr_addr] = static_cast<type::byte>(std::stoul(token, 0, 16));
+      curr_addr++;
+    }
+
+    // insert data into memory
+    // std::cout << content << std::endl;
+    this->memory[curr_addr] = std::stoul(content, 0, 16);
+  }
+
+  file_handle.close();
+  return true;
 }
 
 void Emulator::read_memory()
@@ -84,7 +148,7 @@ void Emulator::notify_terminal()
 
   terminal_ready = true;
 
-  // notify consumer when done
+  // notify consumer
   this->terminal_cv.notify_one();
 }
 

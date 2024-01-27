@@ -1,6 +1,7 @@
 #include "../inc/converters.hpp"
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 
 std::string converter::directive_type_to_string(type::DIRECTIVE_TYPE dir_alias)
 {
@@ -176,6 +177,15 @@ std::string converter::relocation_type_to_string(type::RELOCATIONS rel_alias)
   default:
     return "";
   }
+}
+
+std::string converter::uint32_to_hex_string(uint32_t value)
+{
+  std::stringstream stream;
+  stream << std::hex << value;
+  std::string result(stream.str());
+
+  return result;
 }
 
 // displacement is 12bit value, so higher 4 bits of arr[0] are always zero and must be overwritten

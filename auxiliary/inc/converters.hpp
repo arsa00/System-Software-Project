@@ -13,6 +13,7 @@ namespace converter
   std::string instruction_type_to_string(type::INSTRUCTION_TYPE ins_alias);
   std::string cpu_instruction_type_to_string(type::CPU_INSTRUCTIONS ins_alias);
   std::string relocation_type_to_string(type::RELOCATIONS rel_alias);
+  std::string uint32_to_hex_string(uint32_t value);
 
   std::array<type::byte, 2> disp_to_byte_arr(int16_t displacement); // returns byte array with 2 elements
   int16_t get_disp_from_instruction(type::instruction_size instruction_record);

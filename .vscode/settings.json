@@ -57,7 +57,10 @@
     "mutex": "cpp",
     "condition_variable": "cpp",
     "chrono": "cpp",
-    "ratio": "cpp"
+    "ratio": "cpp",
+    "map": "cpp",
+    "regex": "cpp",
+    "shared_mutex": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }
