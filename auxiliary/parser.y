@@ -164,10 +164,10 @@ SYMBOL {  CommandBuilder::get_instance().enque_param(Assembler::get_instance().c
 ;
 
 all_num_literals:
-LITERAL_BIN { CommandBuilder::get_instance().enque_param(new Literal(std::stoi($1 + 2, 0, 2))); }
-| LITERAL_OCT {   CommandBuilder::get_instance().enque_param(new Literal(std::stoi($1, 0, 8))); }
-| LITERAL_DEC {  CommandBuilder::get_instance().enque_param(new Literal(std::stoi($1, 0, 10))); }
-| LITERAL_HEX {  CommandBuilder::get_instance().enque_param(new Literal(std::stoi($1, 0, 16))); }
+LITERAL_BIN { CommandBuilder::get_instance().enque_param(new Literal(std::stoul($1 + 2, 0, 2))); }
+| LITERAL_OCT {   CommandBuilder::get_instance().enque_param(new Literal(std::stoul($1, 0, 8))); }
+| LITERAL_DEC {  CommandBuilder::get_instance().enque_param(new Literal(std::stoul($1, 0, 10))); }
+| LITERAL_HEX {  CommandBuilder::get_instance().enque_param(new Literal(std::stoul($1, 0, 16))); }
 ;
 
 string_literal:

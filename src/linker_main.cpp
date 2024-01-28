@@ -44,7 +44,16 @@ int main(int argc, char const *argv[])
           throw "Wrong '-place=' parameter format (@ is missing)";
 
         string section_name = arg_str.substr(start_index + place_option_len, at_index - start_index - place_option_len);
-        uint32_t place_value = (uint32_t)stoul(arg_str.substr(at_index + 1));
+        uint32_t place_value;
+
+        if (arg_str.substr(at_index + 1, 2) == "0x")
+          place_value = (uint32_t)stoul(arg_str.substr(at_index + 1), 0, 16);
+        else if (arg_str.substr(at_index + 1, 2) == "0b")
+          place_value = (uint32_t)stoul(arg_str.substr(at_index + 1), 0, 2);
+        else if (arg_str.substr(at_index + 1, 1) == "0")
+          place_value = (uint32_t)stoul(arg_str.substr(at_index + 1), 0, 8);
+        else
+          place_value = (uint32_t)stoul(arg_str.substr(at_index + 1), 0, 10);
 
         if (section_places.find(section_name) != section_places.end())
           throw "Duplicate section entry used with '-place=' option";

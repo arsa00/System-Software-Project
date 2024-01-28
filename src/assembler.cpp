@@ -250,12 +250,12 @@ bool Assembler::run()
     section->create_output_file();
     out_obj_file->add_section(section);
     out_obj_file->add_symbol(section);
-  }
 
-  if (this->internal_err || this->parsing_err)
-  {
-    this->is_running = false;
-    return false; // failed
+    if (this->internal_err || this->parsing_err)
+    {
+      this->is_running = false;
+      return false; // failed
+    }
   }
 
   // add all symbols to output obj file

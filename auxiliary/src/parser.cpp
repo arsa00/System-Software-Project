@@ -1753,25 +1753,25 @@ yyreduce:
 
   case 50:
 #line 167 "./auxiliary/parser.y"
-            { CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value) + 2, 0, 2))); }
+            { CommandBuilder::get_instance().enque_param(new Literal(std::stoul((yyvsp[0].literal_value) + 2, 0, 2))); }
 #line 1758 "./auxiliary/src/parser.cpp"
     break;
 
   case 51:
 #line 168 "./auxiliary/parser.y"
-              {   CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value), 0, 8))); }
+              {   CommandBuilder::get_instance().enque_param(new Literal(std::stoul((yyvsp[0].literal_value), 0, 8))); }
 #line 1764 "./auxiliary/src/parser.cpp"
     break;
 
   case 52:
 #line 169 "./auxiliary/parser.y"
-              {  CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value), 0, 10))); }
+              {  CommandBuilder::get_instance().enque_param(new Literal(std::stoul((yyvsp[0].literal_value), 0, 10))); }
 #line 1770 "./auxiliary/src/parser.cpp"
     break;
 
   case 53:
 #line 170 "./auxiliary/parser.y"
-              {  CommandBuilder::get_instance().enque_param(new Literal(std::stoi((yyvsp[0].literal_value), 0, 16))); }
+              {  CommandBuilder::get_instance().enque_param(new Literal(std::stoul((yyvsp[0].literal_value), 0, 16))); }
 #line 1776 "./auxiliary/src/parser.cpp"
     break;
 

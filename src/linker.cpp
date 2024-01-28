@@ -508,8 +508,14 @@ bool Linker::create_hex()
         int32_t val;
         if (sym_from_table->get_value(&val))
         {
-          this->internal_error("Multiple definitions of symbol. symbol_name: " + sym_from_table->get_name());
-          return false;
+          if (sym.get_value(&val))
+          {
+            this->internal_error("Multiple definitions of symbol. symbol_name: " + sym_from_table->get_name());
+            return false;
+          }
+
+          // current symbol doesn't have value, but the one in glboal sym_table has ==> skip current sym
+          continue;
         }
       }
 
@@ -947,8 +953,14 @@ bool Linker::create_relocatable()
         int32_t val;
         if (sym_from_table->get_value(&val))
         {
-          this->internal_error("Multiple definitions of symbol. symbol_name: " + sym_from_table->get_name());
-          return false;
+          if (sym.get_value(&val))
+          {
+            this->internal_error("Multiple definitions of symbol. symbol_name: " + sym_from_table->get_name());
+            return false;
+          }
+
+          // current symbol doesn't have value, but the one in glboal sym_table has ==> skip current sym
+          continue;
         }
       }
 
