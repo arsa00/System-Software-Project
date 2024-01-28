@@ -37,7 +37,7 @@ instruction::IRET::IRET()
 }
 
 void instruction::IRET::execute(Section *dest_section) const
-{
+{ // FIXME
   std::array<type::byte, 4> ins_bytes = {0, 0, 0, 0};
   std::array<type::byte, 2> displacement;
 
@@ -862,7 +862,7 @@ void instruction::LD::execute(Section *dest_section) const
 
     // create temp ld instruction to load symbol/litreal value in passed GP register
     // temp_param is needed because Instruction's destructor deletes all literals in it's params list. Symbols are not deleted.
-    Parameter *temp_param = param->get_type() == type::PARAMETER_TYPE::SYMBOL ? param : ((Literal *)param)->clone();
+    Parameter *temp_param = (param->get_type() == type::PARAMETER_TYPE::SYMBOL ? param : ((Literal *)param)->clone());
     instruction::LD *ld_temp = new instruction::LD();
     ld_temp->set_mem_addr_mode(type::MEMORY_ADDRESSING_MODES::IMMED);
     ld_temp->set_gp_reg_0(this->get_gp_reg_0());

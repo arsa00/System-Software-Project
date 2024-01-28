@@ -3,13 +3,14 @@
 
 .section my_code_main
 ld $0xFFFFFF00, %sp
-ld $handler, %r1
-csrwr %r1, %handler
-halt
+ld $handler, %r7
+csrwr %r7, %handler
 wait:
-ld read_char, %r1
+ld read_char, %r7
 ld $122, %r2
-bne %r1, %r2, wait
+bne %r7, %r2, wait
+ld $0x404, %r8
+# jmp wait
 halt
 
 .global read_char

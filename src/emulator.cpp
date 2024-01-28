@@ -279,7 +279,7 @@ void Emulator::execute_operation()
   uint8_t regC = static_cast<uint8_t>(converter::get_upper_half_byte(instruction_bytes[2]));
   int16_t disp = converter::get_disp_from_instruction(static_cast<type::instruction_size>(this->ir));
 
-  std::cout << "executing: " << std::hex << std::to_string(this->ir) << std::endl;
+  // std::cout << "executing: " << std::hex << std::to_string(this->ir) << std::endl;
 
   switch (static_cast<type::CPU_INSTRUCTIONS>(oc_mod))
   {
@@ -530,18 +530,21 @@ void Emulator::handle_interrupts()
   bool interrupt_accepted = false;
   if (this->interrupt_invalid_op)
   {
+    // std::cout << "INTERRUPT: interrupt_invalid_op" << std::endl;
     *this->cause = 1; // wrong operation code, modificator, etc.
     interrupt_accepted = true;
     this->interrupt_invalid_op = false;
   }
   else if (this->interrupt_timer && this->is_global_interrupt_enabled() && this->is_timer_interrupt_enabled())
   {
+    // std::cout << "INTERRUPT: interrupt_timer" << std::endl;
     *this->cause = 2; // timer interrupt
     interrupt_accepted = true;
     this->interrupt_timer = false;
   }
   else if (this->interrupt_terminal && this->is_global_interrupt_enabled() && this->is_terminal_interrupt_enabled())
   {
+    // std::cout << "INTERRUPT: interrupt_terminal" << std::endl;
     *this->cause = 3; // terminal interrupt
     interrupt_accepted = true;
     this->interrupt_terminal = false;
@@ -566,7 +569,7 @@ void Emulator::output_terminal_func()
     std::unique_lock<std::mutex> lock(this->terminal_mutex);
 
     // waiting
-    std::cout << "TERMINAL_OUT waiting" << std::endl;
+    // std::cout << "TERMINAL_OUT waiting" << std::endl;
     this->terminal_cv.wait(lock, []
                            { return terminal_ready; });
 
@@ -578,7 +581,7 @@ void Emulator::output_terminal_func()
       char ch = (char)this->read_term_out_reg();
       putc(ch, stdout);
       this->term_out_has_value = false;
-      std::cout << "TERMINAL_OUW wrote: " << ch << std::endl;
+      // std::cout << "TERMINAL_OUW wrote: " << ch << std::endl;
     }
   }
 }
@@ -594,11 +597,11 @@ void Emulator::input_terminal_func()
 
   while (this->is_running)
   {
-    select(STDIN_FILENO + 1, &fds, nullptr, nullptr, &timeout);
+    select(STDIN_FILENO + 1, &fds, &fds, nullptr, &timeout);
     if (FD_ISSET(STDIN_FILENO, &fds))
     {
       char ch = getchar();
-      std::cout << "TERMINAL_IN read: " << ch << std::endl;
+      // std::cout << "TERMINAL_IN read: " << ch << std::endl;
       this->write_term_in_reg((uint32_t)ch);
       this->interrupt_terminal = true;
     }

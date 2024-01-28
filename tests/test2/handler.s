@@ -6,7 +6,7 @@
 .section my_code_handler
 
 handler:
-push %r1
+# push %r1
 push %r2
 csrrd %cause, %r1
 ld $3, %r2
@@ -21,6 +21,8 @@ st %r1, read_char
 
 finish:
 pop %r2
-pop %r1
+# pop %r1
+ld $0x11, %r11
+halt
 iret
 .end
