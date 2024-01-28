@@ -58,13 +58,26 @@ int main(int argc, char const *argv[])
     }
 
     // create tempporary copy file with one new line appended (needed because of lexer/parser)
-    char *file_input_copy = new char[strlen(file_input) + 1];
-    strcpy(file_input_copy, file_input);
-    file_input_copy = strcat(file_input_copy, "_copy");
+    // char *file_input_copy = new char[strlen(file_input) + 1];
+    // strcpy(file_input_copy, file_input);
+    // file_input_copy = strcat(file_input_copy, "_copy");
+
+    std::string file_input_copy3(file_input);
+    std::size_t pos;
+    if ((pos = file_input_copy3.rfind("/")) == std::string::npos)
+    {
+      if ((pos = file_input_copy3.rfind("\\")) == std::string::npos)
+      {
+        pos = -1;
+      }
+    }
+    file_input_copy3 = file_input_copy3.substr(++pos) + "_temp_copy_" + to_string(rand());
+
+    std::cout << file_input_copy3 << std::endl;
 
     string line;
     ifstream in_file{string(file_input)};
-    ofstream copy_file{string(file_input_copy)};
+    ofstream copy_file{string(file_input_copy3)};
 
     if (!in_file)
     {
@@ -90,12 +103,12 @@ int main(int argc, char const *argv[])
     copy_file.close();
 
     // define file handle for parser and lexer
-    yyin = fopen(file_input_copy, "r");
+    yyin = fopen(file_input_copy3.c_str(), "r");
     if (yyin == nullptr)
     {
       // Something went wrong
       yyerror("Cannot parse input assembler file");
-      remove(file_input_copy);
+      remove(file_input_copy3.c_str());
       return 1;
     }
 
@@ -105,7 +118,7 @@ int main(int argc, char const *argv[])
 
     // close handle for parser and lexer, and remove the temporary file
     fclose(yyin);
-    remove(file_input_copy);
+    remove(file_input_copy3.c_str());
 
     if (asmRes)
     {
