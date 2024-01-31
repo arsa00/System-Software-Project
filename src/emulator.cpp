@@ -125,7 +125,7 @@ void Emulator::write_memory()
   if (is_write_to_term_out)
   {
     this->term_out_has_value = true;
-    this->notify_terminal();
+    // this->notify_terminal();
     // std::cout << "term_out wr: " << (char)this->mdr << std::endl;
   }
 }
@@ -149,6 +149,7 @@ uint32_t Emulator::pop()
 bool terminal_ready = false;
 void Emulator::notify_terminal()
 {
+  // std::cout << "notify_terminal..start" << std::endl;
   // lock release
   std::lock_guard<std::mutex> lock(this->terminal_mutex);
 
@@ -156,6 +157,7 @@ void Emulator::notify_terminal()
 
   // notify consumer
   this->terminal_cv.notify_one();
+  // std::cout << "notify_terminal..end" << std::endl;
 }
 
 void Emulator::write_term_in_reg(uint32_t val)
@@ -187,7 +189,9 @@ void Emulator::write_term_out_reg(uint32_t val)
 
 uint32_t Emulator::read_term_out_reg()
 {
+  // std::cout << std::endl << "TERM WAIT MEM LOCK" << std::endl;
   this->memory_mutex.lock();
+  // std::cout << std::endl << "TERM GOT MEM LOCK" << std::endl;
   this->mar = Emulator::TERM_OUT_REG_ADDR;
   this->read_memory();
   this->memory_mutex.unlock();
@@ -211,6 +215,7 @@ bool Emulator::is_global_interrupt_enabled()
 
 void Emulator::fetch_instruction()
 {
+  // std::cout << std::endl << "> " << converter::uint32_to_hex_string(*this->pc) << std::endl;
   this->mar = *this->pc;
   this->read_memory();
   this->ir = this->mdr;
@@ -295,6 +300,7 @@ void Emulator::execute_operation()
   {
   case type::CPU_INSTRUCTIONS::HALT:
   {
+    // std::cout << "executing: HALT" << std::endl;
     this->is_running = false;
     break;
   }
@@ -302,6 +308,7 @@ void Emulator::execute_operation()
   case type::CPU_INSTRUCTIONS::INT:
   {
     // TODO: check this
+    // std::cout << "executing: INT" << std::endl;
     this->push(*this->status);
     this->push(*this->pc);
     *this->cause = 4;
@@ -312,6 +319,7 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::CALL_0:
   {
+    // std::cout << "executing: CALL_0" << std::endl;
     this->push(*this->pc);
     *this->pc = this->gpr[regA] + this->gpr[regB] + disp;
     break;
@@ -319,6 +327,7 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::CALL_1:
   {
+    // std::cout << "executing: CALL_1" << std::endl;
     this->push(*this->pc);
     this->read_memory();
     *this->pc = this->mdr;
@@ -327,12 +336,14 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::JMP_0:
   {
+    // std::cout << "executing: JMP_0" << std::endl;
     *this->pc = this->gpr[regA] + disp;
     break;
   }
 
   case type::CPU_INSTRUCTIONS::JMP_1:
   {
+    // std::cout << "executing: JMP_1" << std::endl;
     if (this->gpr[regB] == this->gpr[regC])
     {
       *this->pc = this->gpr[regA] + disp;
@@ -342,6 +353,7 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::JMP_2:
   {
+    // std::cout << "executing: JMP_2" << std::endl;
     if (this->gpr[regB] != this->gpr[regC])
     {
       *this->pc = this->gpr[regA] + disp;
@@ -351,6 +363,7 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::JMP_3:
   {
+    // std::cout << "executing: JMP_3" << std::endl;
     if ((int32_t)this->gpr[regB] > (int32_t)this->gpr[regC])
     {
       *this->pc = this->gpr[regA] + disp;
@@ -360,6 +373,7 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::JMP_4:
   {
+    // std::cout << "executing: JMP_4" << std::endl;
     this->read_memory();
     *this->pc = this->mdr;
     break;
@@ -367,6 +381,7 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::JMP_5:
   {
+    // std::cout << "executing: JMP_5" << std::endl;
     if (this->gpr[regB] == this->gpr[regC])
     {
       this->read_memory();
@@ -377,6 +392,7 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::JMP_6:
   {
+    // std::cout << "executing: JMP_6" << std::endl;
     if (this->gpr[regB] != this->gpr[regC])
     {
       this->read_memory();
@@ -387,6 +403,7 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::JMP_7:
   {
+    // std::cout << "executing: JMP_7" << std::endl;
     if ((int32_t)this->gpr[regB] > (int32_t)this->gpr[regC])
     {
       this->read_memory();
@@ -397,6 +414,7 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::XCHG:
   {
+    // std::cout << "executing: XCHG" << std::endl;
     uint32_t temp = this->gpr[regB];
     this->gpr[regB] = this->gpr[regC];
     this->gpr[regC] = temp;
@@ -405,60 +423,70 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::ARITH_OP_0:
   {
+    // std::cout << "executing: ARITH_OP_0" << std::endl;
     this->gpr[regA] = this->gpr[regB] + this->gpr[regC];
     break;
   }
 
   case type::CPU_INSTRUCTIONS::ARITH_OP_1:
   {
+    // std::cout << "executing: ARITH_OP_1" << std::endl;
     this->gpr[regA] = this->gpr[regB] - this->gpr[regC];
     break;
   }
 
   case type::CPU_INSTRUCTIONS::ARITH_OP_2:
   {
+    // std::cout << "executing: ARITH_OP_2" << std::endl;
     this->gpr[regA] = this->gpr[regB] * this->gpr[regC];
     break;
   }
 
   case type::CPU_INSTRUCTIONS::ARITH_OP_3:
   {
+    // std::cout << "executing: ARITH_OP_3" << std::endl;
     this->gpr[regA] = (int32_t)this->gpr[regB] / (int32_t)this->gpr[regC]; // TODO: check
     break;
   }
 
   case type::CPU_INSTRUCTIONS::LOGIC_OP_0:
   {
+    // std::cout << "executing: LOGIC_OP_0" << std::endl;
     this->gpr[regA] = ~this->gpr[regB];
     break;
   }
 
   case type::CPU_INSTRUCTIONS::LOGIC_OP_1:
   {
+    // std::cout << "executing: LOGIC_OP_1" << std::endl;
     this->gpr[regA] = this->gpr[regB] & this->gpr[regC];
     break;
   }
 
   case type::CPU_INSTRUCTIONS::LOGIC_OP_2:
   {
+    // std::cout << "executing: LOGIC_OP_2" << std::endl;
     this->gpr[regA] = this->gpr[regB] | this->gpr[regC];
     break;
   }
 
   case type::CPU_INSTRUCTIONS::LOGIC_OP_3:
   {
+    // std::cout << "executing: LOGIC_OP_3" << std::endl;
     this->gpr[regA] = this->gpr[regB] ^ this->gpr[regC];
     break;
   }
 
   case type::CPU_INSTRUCTIONS::SHIFT_OP_0:
   {
+    // std::cout << "executing: SHIFT_OP_0" << std::endl;
     this->gpr[regA] = this->gpr[regB] << this->gpr[regC];
     break;
   }
 
   case type::CPU_INSTRUCTIONS::SHIFT_OP_1:
   {
+    // std::cout << "executing: SHIFT_OP_1" << std::endl;
     this->gpr[regA] = (int32_t)this->gpr[regB] >> this->gpr[regC]; // TODO: check: this->gpr[regB] >> this->gpr[regC]
     break;
   }
@@ -467,6 +495,7 @@ void Emulator::execute_operation()
   case type::CPU_INSTRUCTIONS::ST_DATA_1:
   case type::CPU_INSTRUCTIONS::ST_DATA_2:
   {
+    // std::cout << "executing: ST_DATA_0/1/2" << std::endl;
     this->mdr = this->gpr[regC];
     this->write_memory();
     break;
@@ -474,18 +503,21 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::LD_DATA_0:
   {
+    // std::cout << "executing: LD_DATA_0" << std::endl;
     this->gpr[regA] = this->csr[regB];
     break;
   }
 
   case type::CPU_INSTRUCTIONS::LD_DATA_1:
   {
+    // std::cout << "executing: LD_DATA_1" << std::endl;
     this->gpr[regA] = this->gpr[regB] + disp;
     break;
   }
 
   case type::CPU_INSTRUCTIONS::LD_DATA_2:
   {
+    // std::cout << "executing: LD_DATA_2" << std::endl;
     this->read_memory();
     this->gpr[regA] = this->mdr;
     break;
@@ -493,6 +525,7 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::LD_DATA_3:
   {
+    // std::cout << "executing: LD_DATA_3" << std::endl;
     this->read_memory();
     this->gpr[regA] = this->mdr;
     this->gpr[regB] += disp;
@@ -501,18 +534,21 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::LD_DATA_4:
   {
+    // std::cout << "executing: LD_DATA_4" << std::endl;
     this->csr[regA] = this->gpr[regB];
     break;
   }
 
   case type::CPU_INSTRUCTIONS::LD_DATA_5:
   {
+    // std::cout << "executing: LD_DATA_5" << std::endl;
     this->csr[regA] = this->csr[regB] | disp;
     break;
   }
 
   case type::CPU_INSTRUCTIONS::LD_DATA_6:
   {
+    // std::cout << "executing: LD_DATA_6" << std::endl;
     this->read_memory();
     this->csr[regA] = this->mdr;
     break;
@@ -520,6 +556,7 @@ void Emulator::execute_operation()
 
   case type::CPU_INSTRUCTIONS::LD_DATA_7:
   {
+    // std::cout << "executing: LD_DATA_7" << std::endl;
     this->read_memory();
     this->csr[regA] = this->mdr;
     this->gpr[regB] += disp;
@@ -528,6 +565,7 @@ void Emulator::execute_operation()
 
   default:
   {
+    // std::cout << "executing: INVALID" << std::endl;
     this->interrupt_invalid_op = true; // TODO: check if this interrupt should be set elsewhere
     break;
   }
@@ -647,15 +685,30 @@ void Emulator::run()
   while (this->is_running)
   {
     // lock the memory
+    // std::cout << std::endl << "MAIN wait mem lock" << std::endl;
     this->memory_mutex.lock();
+    // std::cout << std::endl << "MAIN got mem lock" << std::endl;
 
+    // std::cout << "fetch_instruction..start" << std::endl;
     this->fetch_instruction();
+    // std::cout << "fetch_instruction..end" << std::endl;
+    // std::cout << "resolve_address..start" << std::endl;
     this->resolve_address();
+    // std::cout << "resolve_address..end" << std::endl;
+    // std::cout << "execute_operation..start" << std::endl;
     this->execute_operation();
+    // std::cout << "execute_operation..end" << std::endl;
+    // std::cout << "handle_interrupts..start" << std::endl;
     this->handle_interrupts();
+    // std::cout << "handle_interrupts..end" << std::endl;
 
     // unlock the memory
+    // std::cout << std::endl << "MAIN start release mem lock" << std::endl;
     this->memory_mutex.unlock();
+    // std::cout << std::endl << "MAIN end release mem lock" << std::endl;
+
+    if (this->term_out_has_value && this->is_running)
+      this->notify_terminal();
   }
 
   // Notify terminal that the emulator stopped running

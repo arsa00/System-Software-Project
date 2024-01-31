@@ -3,8 +3,8 @@
 
 .section my_code_main
 ld $0xFFFFFF00, %sp
-ld $handler, %r7
-csrwr %r7, %handler
+ld $handler, %r12
+csrwr %r12, %handler
 wait:
 ld read_char, %r7
 ld $122, %r2

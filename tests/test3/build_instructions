@@ -1,0 +1,4 @@
+./asembler -o ./tests/test2/handler.o ./tests/test2/handler.s
+./asembler -o ./tests/test2/main.o ./tests/test2/main.s
+./linker -hex -place=my_code_main@0x40000000 -place=my_code_handler@0xC0000000 -o ./tests/test2/program.hex ./tests/test2/handler.o ./tests/test2/main.o
+./emulator ./tests/test2/program.hex
