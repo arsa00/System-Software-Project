@@ -54,6 +54,7 @@ private:
   bool internal_err = false;
 
   // mutex lock
+  std::mutex memory_mutex;
   std::mutex terminal_mutex;
   std::condition_variable terminal_cv;
 

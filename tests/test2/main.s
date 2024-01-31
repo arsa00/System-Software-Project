@@ -10,7 +10,6 @@ ld read_char, %r7
 ld $122, %r2
 bne %r7, %r2, wait
 ld $0x404, %r8
-# jmp wait
 halt
 
 .global read_char

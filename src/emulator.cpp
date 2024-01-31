@@ -5,6 +5,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <regex>
+#include <sys/ioctl.h>
 
 Emulator &Emulator::get_instance()
 {
@@ -125,6 +126,7 @@ void Emulator::write_memory()
   {
     this->term_out_has_value = true;
     this->notify_terminal();
+    // std::cout << "term_out wr: " << (char)this->mdr << std::endl;
   }
 }
 
@@ -158,29 +160,37 @@ void Emulator::notify_terminal()
 
 void Emulator::write_term_in_reg(uint32_t val)
 {
+  this->memory_mutex.lock();
   this->mar = Emulator::TERM_IN_REG_ADDR;
   this->mdr = val;
   this->write_memory();
+  this->memory_mutex.unlock();
 }
 
 uint32_t Emulator::read_term_in_reg()
 {
+  this->memory_mutex.lock();
   this->mar = Emulator::TERM_IN_REG_ADDR;
   this->read_memory();
+  this->memory_mutex.unlock();
   return this->mdr;
 }
 
 void Emulator::write_term_out_reg(uint32_t val)
 {
+  this->memory_mutex.lock();
   this->mar = Emulator::TERM_OUT_REG_ADDR;
   this->mdr = val;
   this->write_memory();
+  this->memory_mutex.unlock();
 }
 
 uint32_t Emulator::read_term_out_reg()
 {
+  this->memory_mutex.lock();
   this->mar = Emulator::TERM_OUT_REG_ADDR;
   this->read_memory();
+  this->memory_mutex.unlock();
   return this->mdr;
 }
 
@@ -544,7 +554,11 @@ void Emulator::handle_interrupts()
   }
   else if (this->interrupt_terminal && this->is_global_interrupt_enabled() && this->is_terminal_interrupt_enabled())
   {
-    // std::cout << "INTERRUPT: interrupt_terminal" << std::endl;
+    // uint32_t temp = this->mar;
+    // this->mar = Emulator::TERM_IN_REG_ADDR;
+    // this->read_memory();
+    // this->mar = temp;
+    // std::cout << "INTERRUPT: interrupt_terminal: " << (char)this->mdr << std::endl;
     *this->cause = 3; // terminal interrupt
     interrupt_accepted = true;
     this->interrupt_terminal = false;
@@ -569,17 +583,19 @@ void Emulator::output_terminal_func()
     std::unique_lock<std::mutex> lock(this->terminal_mutex);
 
     // waiting
-    // std::cout << "TERMINAL_OUT waiting" << std::endl;
-    this->terminal_cv.wait(lock, []
-                           { return terminal_ready; });
+    // std::cout << std::endl << "term sleep" << std::endl;
+    this->terminal_cv.wait(lock, [] { return terminal_ready; });
 
     // reset terminal ready flag
     terminal_ready = false;
+    // std::cout << std::endl << "term woke" << std::endl;
 
     if (this->term_out_has_value)
     {
       char ch = (char)this->read_term_out_reg();
-      putc(ch, stdout);
+      // putc(ch, stdout);
+      // putchar(ch);
+      std::cout << ch << std::flush;
       this->term_out_has_value = false;
       // std::cout << "TERMINAL_OUW wrote: " << ch << std::endl;
     }
@@ -588,23 +604,19 @@ void Emulator::output_terminal_func()
 
 void Emulator::input_terminal_func()
 {
-  fd_set fds;
-  FD_ZERO(&fds);
-  FD_SET(STDIN_FILENO, &fds);
-
-  timeval timeout;
-  timeout.tv_usec = 100000; // 100ms
+  int key_pressed;
 
   while (this->is_running)
   {
-    select(STDIN_FILENO + 1, &fds, &fds, nullptr, &timeout);
-    if (FD_ISSET(STDIN_FILENO, &fds))
+    ioctl(0, FIONREAD, &key_pressed);
+    if (key_pressed > 0)
     {
       char ch = getchar();
-      // std::cout << "TERMINAL_IN read: " << ch << std::endl;
       this->write_term_in_reg((uint32_t)ch);
       this->interrupt_terminal = true;
     }
+    else
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }
 
@@ -634,10 +646,16 @@ void Emulator::run()
   // Execute emulator
   while (this->is_running)
   {
+    // lock the memory
+    this->memory_mutex.lock();
+
     this->fetch_instruction();
     this->resolve_address();
     this->execute_operation();
     this->handle_interrupts();
+
+    // unlock the memory
+    this->memory_mutex.unlock();
   }
 
   // Notify terminal that the emulator stopped running
