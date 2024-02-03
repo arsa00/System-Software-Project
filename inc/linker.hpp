@@ -105,6 +105,11 @@ public:
 
   void set_section_places(std::unordered_map<std::string, uint32_t> section_places);
   std::unordered_map<std::string, uint32_t> get_section_places();
+
+
+  // --- additional (for debugging):
+  bool verbose_print = false;
+  // end ---
 };
 
 #endif

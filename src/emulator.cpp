@@ -216,7 +216,11 @@ bool Emulator::is_global_interrupt_enabled()
 
 void Emulator::fetch_instruction()
 {
-  // std::cout << "> " << converter::uint32_to_hex_string(*this->pc) << std::endl;
+  if (this->verbose_print)
+  {
+    std::cout << "> " << converter::uint32_to_hex_string(*this->pc) << std::endl;
+  }
+
   this->mar = *this->pc;
   this->read_memory();
   this->ir = this->mdr;
@@ -724,7 +728,7 @@ void Emulator::run()
 
 void Emulator::print_state()
 {
-  std::cout << "-----------------------------------------------------------------" << std::endl;
+  std::cout << std::endl << "-----------------------------------------------------------------" << std::endl;
   std::cout << "Emulated processor executed halt instruction" << std::endl;
   std::cout << "Emulated processor state:" << std::endl;
 

@@ -17,7 +17,10 @@ Assembler &Assembler::get_instance()
 
 Assembler::Assembler()
 {
-  std::cout << "[ASSEMBLER]: Created Assembler instance." << std::endl;
+  if (this->verbose_print)
+  {
+    std::cout << "[ASSEMBLER]: Created Assembler instance." << std::endl;
+  }
   // this->no_data_section = new Section("__NO_DATA_SECTION__");
 
   // set .text to be default section
@@ -225,7 +228,11 @@ bool Assembler::run()
   this->is_running = true;
   yyparse();
 
-  std::cout << "finished parsing..." << std::endl;
+  if(this->verbose_print)
+  {
+    std::cout << "finished parsing..." << std::endl;
+  }
+  
 
   // execute __NO_DATA_SECTION__, although it should be empty
   // std::cout << "executing section: __NO_DATA_SECTION__" << std::endl;
@@ -245,8 +252,11 @@ bool Assembler::run()
   for (auto &iter : this->section_table)
   {
     Section *section = iter.second;
-    std::cout << std::endl
-              << "executing section: " << iter.first << std::endl;
+    if(this->verbose_print)
+    {
+      std::cout << std::endl
+                << "executing section: " << iter.first << std::endl;
+    }
     section->create_output_file();
     out_obj_file->add_section(section);
     out_obj_file->add_symbol(section);
@@ -268,92 +278,95 @@ bool Assembler::run()
     out_obj_file->add_symbol(sym);
   }
 
-  // print sections
-  std::cout << std::endl;
-
-  char *s; // s is used for formatted output
-  for (auto &iter : this->section_table)
+  if(this->verbose_print)
   {
-    Section *section = iter.second;
-    std::cout << std::endl
-              << "SECTION: " << iter.first << std::endl;
-    std::vector<type::byte> output_file = section->get_output_file();
-    std::list<RelocationRecord *> relocations = section->get_all_relocations();
+    // print sections
+    std::cout << std::endl;
 
-    std::cout << "0x00: | ";
-    uint32_t new_line_cnt = 0;
-    for (type::byte single_byte : output_file)
+    char *s; // s is used for formatted output
+    for (auto &iter : this->section_table)
     {
-      std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)single_byte << " | ";
+      Section *section = iter.second;
+      std::cout << std::endl
+                << "SECTION: " << iter.first << std::endl;
+      std::vector<type::byte> output_file = section->get_output_file();
+      std::list<RelocationRecord *> relocations = section->get_all_relocations();
 
-      if (++new_line_cnt % 4 == 0)
+      std::cout << "0x00: | ";
+      uint32_t new_line_cnt = 0;
+      for (type::byte single_byte : output_file)
       {
-        std::cout << std::endl;
+        std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)single_byte << " | ";
 
-        if (new_line_cnt < output_file.size())
-          std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)new_line_cnt << ": | ";
+        if (++new_line_cnt % 4 == 0)
+        {
+          std::cout << std::endl;
+
+          if (new_line_cnt < output_file.size())
+            std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)new_line_cnt << ": | ";
+        }
+      }
+
+      std::cout << std::endl
+                << "RELOCATIONS: " << std::endl;
+
+      s = new char[100];
+      sprintf(s, "%10s | %7s | %7s | %8s | %7s", "OFFSET", "SYM_ID", "ADDEND", "SIGN", "TYPE");
+      std::cout << s << std::endl;
+
+      for (uint8_t i = 0; i < strlen(s) + 4; i++)
+        std::cout << "-";
+      std::cout << std::endl;
+      for (RelocationRecord *rel : relocations)
+      {
+        s = new char[100];
+        sprintf(s, "%#010x | %7d | %7d | %8s | %7s", rel->get_offset(), rel->get_symbol_id(), rel->get_addend(), rel->get_addend_signed_flag() ? "SIGNED" : "UNSIGNED", converter::relocation_type_to_string(rel->get_type()).c_str());
+        std::cout << s << std::endl;
       }
     }
 
+    // print symbol table
     std::cout << std::endl
-              << "RELOCATIONS: " << std::endl;
+              << "SYMBOL TABLE: " << std::endl;
 
     s = new char[100];
-    sprintf(s, "%10s | %7s | %7s | %8s | %7s", "OFFSET", "SYM_ID", "ADDEND", "SIGN", "TYPE");
+    sprintf(s, "%15s | %3s | %10s | %7s | %10s | %7s |", "NAME", "ID", "SECTION", "GLOBAL", "VALUE", "TYPE");
     std::cout << s << std::endl;
-
-    for (uint8_t i = 0; i < strlen(s) + 4; i++)
+    uint8_t padding = 11; // %15s - strlen("NAME")
+    for (uint8_t i = 0; i < strlen(s) + padding; i++)
       std::cout << "-";
     std::cout << std::endl;
-    for (RelocationRecord *rel : relocations)
+
+    for (auto &iter : this->symbol_table)
     {
+      Symbol *sym = iter.second;
+      if (!sym->get_defined_flag())
+        continue;
+
       s = new char[100];
-      sprintf(s, "%#010x | %7d | %7d | %8s | %7s", rel->get_offset(), rel->get_symbol_id(), rel->get_addend(), rel->get_addend_signed_flag() ? "SIGNED" : "UNSIGNED", converter::relocation_type_to_string(rel->get_type()).c_str());
+      char *value_str = new char[12];
+      if (sym->has_set_value())
+      {
+        sprintf(value_str, "%#010x", sym->get_value());
+      }
+      else
+      {
+        value_str = "NO_VALUE";
+      }
+      sprintf(s, "%15s | %3d | %10s | %7s | %10s | %7s |", sym->get_name().c_str(), sym->get_id(), sym->get_section() != nullptr ? std::to_string(sym->get_section()->get_id()).c_str() : "NO_SECTION", sym->get_global_flag() ? "true" : "false", value_str, "SYMBOL");
       std::cout << s << std::endl;
     }
-  }
 
-  // print symbol table
-  std::cout << std::endl
-            << "SYMBOL TABLE: " << std::endl;
-
-  s = new char[100];
-  sprintf(s, "%15s | %3s | %10s | %7s | %10s | %7s |", "NAME", "ID", "SECTION", "GLOBAL", "VALUE", "TYPE");
-  std::cout << s << std::endl;
-  uint8_t padding = 11; // %15s - strlen("NAME")
-  for (uint8_t i = 0; i < strlen(s) + padding; i++)
-    std::cout << "-";
-  std::cout << std::endl;
-
-  for (auto &iter : this->symbol_table)
-  {
-    Symbol *sym = iter.second;
-    if (!sym->get_defined_flag())
-      continue;
-
-    s = new char[100];
-    char *value_str = new char[12];
-    if (sym->has_set_value())
+    for (auto &iter : this->section_table)
     {
-      sprintf(value_str, "%#010x", sym->get_value());
-    }
-    else
-    {
-      value_str = "NO_VALUE";
-    }
-    sprintf(s, "%15s | %3d | %10s | %7s | %10s | %7s |", sym->get_name().c_str(), sym->get_id(), sym->get_section() != nullptr ? std::to_string(sym->get_section()->get_id()).c_str() : "NO_SECTION", sym->get_global_flag() ? "true" : "false", value_str, "SYMBOL");
-    std::cout << s << std::endl;
-  }
+      Section *sym = iter.second;
 
-  for (auto &iter : this->section_table)
-  {
-    Section *sym = iter.second;
-
-    s = new char[100];
-    char *value_str = new char[12];
-    sprintf(value_str, "%#010x", sym->get_length());
-    sprintf(s, "%15s | %3d | %10s | %7s | %10s | %7s |", sym->get_name().c_str(), sym->get_id(), "", "true", value_str, "SECTION");
-    std::cout << s << std::endl;
+      s = new char[100];
+      char *value_str = new char[12];
+      sprintf(value_str, "%#010x", sym->get_length());
+      sprintf(s, "%15s | %3d | %10s | %7s | %10s | %7s |", sym->get_name().c_str(), sym->get_id(), "", "true", value_str, "SECTION");
+      std::cout << s << std::endl;
+    }
   }
 
   // get json content from output obj file

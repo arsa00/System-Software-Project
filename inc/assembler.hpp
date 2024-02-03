@@ -61,6 +61,11 @@ public:
 
   void set_output_file_name(std::string file_name);
   std::string get_output_file_name();
+
+
+  // --- additional (for debugging):
+  bool verbose_print = false;
+  // end ---
 };
 
 #endif

@@ -20,6 +20,7 @@ int main(int argc, char const *argv[])
   unordered_map<string, uint32_t> section_places;
   vector<string> input_object_files;
   bool hex_output = false, relocatable_output = false;
+  bool verbose_flag = false;
 
   try
   {
@@ -29,6 +30,12 @@ int main(int argc, char const *argv[])
       string arg_str(argv[i]);
 
       // every option should have "continue" at the end of if statement
+      if (arg_str == "--verbose") // used for debugging
+      {
+        verbose_flag = true;
+        continue;
+      }
+
       if (arg_str == "-o")
       {
         if (i + 1 >= argc)
@@ -97,6 +104,9 @@ int main(int argc, char const *argv[])
       throw "At least one of -hex or -relocatable options must be set";
       return 1;
     }
+
+    // set verbose flag
+    Linker::get_instance().verbose_print = verbose_flag;
 
     // set output file
     if (file_output)

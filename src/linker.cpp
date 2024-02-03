@@ -711,60 +711,64 @@ bool Linker::create_hex()
 
   std::sort(mem_addrs.begin(), mem_addrs.end());
 
-  // print symbol table
-  std::cout << std::endl
-            << "SYMBOL TABLE: " << std::endl;
-
-  char *s = new char[100];
-  sprintf(s, "%15s | %3s | %10s | %7s | %10s | %7s |", "NAME", "ID", "SECTION", "GLOBAL", "VALUE", "TYPE");
-  std::cout << s << std::endl;
-  uint8_t padding = 11; // %15s - strlen("NAME")
-  for (uint8_t i = 0; i < strlen(s) + padding; i++)
-    std::cout << "-";
-  std::cout << std::endl;
-
-  for (auto &iter : this->global_sym_table)
+  if (this->verbose_print)
   {
-    SymbolJsonRecord sym = iter.second;
-    // if (!sym.get_defined_flag())
-    //   continue;
+    // print symbol table
+    std::cout << std::endl
+              << "SYMBOL TABLE: " << std::endl;
 
     char *s = new char[100];
-    char *value_str = new char[12];
-    int32_t val;
-    if (sym.get_value(&val))
-    {
-      sprintf(value_str, "%#010x", val);
-    }
-    else
-    {
-      value_str = "NO_VALUE";
-    }
-
-    char *section_str = new char[12];
-    uint32_t section;
-    if (sym.get_section(&section))
-    {
-      sprintf(section_str, "%d", section);
-    }
-    else
-    {
-      section_str = "NO_SECTION";
-    }
-
-    sprintf(s, "%15s | %3d | %10s | %7s | %10s | %7s |", sym.get_name().c_str(), sym.get_id(), section_str, sym.get_is_global() ? "true" : "false", value_str, sym.get_type() == type::PARAMETER_TYPE::SYMBOL ? "SYMBOL" : "SECTION");
+    sprintf(s, "%15s | %3s | %10s | %7s | %10s | %7s |", "NAME", "ID", "SECTION", "GLOBAL", "VALUE", "TYPE");
     std::cout << s << std::endl;
+    uint8_t padding = 11; // %15s - strlen("NAME")
+    for (uint8_t i = 0; i < strlen(s) + padding; i++)
+      std::cout << "-";
+    std::cout << std::endl;
+
+    for (auto &iter : this->global_sym_table)
+    {
+      SymbolJsonRecord sym = iter.second;
+      // if (!sym.get_defined_flag())
+      //   continue;
+
+      char *s = new char[100];
+      char *value_str = new char[12];
+      int32_t val;
+      if (sym.get_value(&val))
+      {
+        sprintf(value_str, "%#010x", val);
+      }
+      else
+      {
+        value_str = "NO_VALUE";
+      }
+
+      char *section_str = new char[12];
+      uint32_t section;
+      if (sym.get_section(&section))
+      {
+        sprintf(section_str, "%d", section);
+      }
+      else
+      {
+        section_str = "NO_SECTION";
+      }
+
+      sprintf(s, "%15s | %3d | %10s | %7s | %10s | %7s |", sym.get_name().c_str(), sym.get_id(), section_str, sym.get_is_global() ? "true" : "false", value_str, sym.get_type() == type::PARAMETER_TYPE::SYMBOL ? "SYMBOL" : "SECTION");
+      std::cout << s << std::endl;
+    }
+    
+
+    // print symbol table
+    // std::cout << std::endl
+    //           << "RELOCATIONS: " << std::endl;
+
+    // for (RelocationJsonRecord rel : this->global_relocations)
+    // {
+    //   std::cout << rel.convert_to_json() << std::endl
+    //             << std::endl;
+    // }
   }
-
-  // print symbol table
-  // std::cout << std::endl
-  //           << "RELOCATIONS: " << std::endl;
-
-  // for (RelocationJsonRecord rel : this->global_relocations)
-  // {
-  //   std::cout << rel.convert_to_json() << std::endl
-  //             << std::endl;
-  // }
 
   // get all bytes and create output string
   std::string output = "";

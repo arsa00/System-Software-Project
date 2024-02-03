@@ -27,6 +27,7 @@ void yyerror(char *s)
 int main(int argc, char const *argv[])
 {
   const char *file_input = nullptr, *file_output = nullptr;
+  bool verbose_flag = false;
 
   try
   {
@@ -36,6 +37,12 @@ int main(int argc, char const *argv[])
       string argStr(argv[i]);
 
       // every option should have "continue" at the end of if statement
+      if (argStr == "--verbose") // used for debugging
+      {
+        verbose_flag = true;
+        continue;
+      }
+
       if (argStr == "-o")
       {
         argStr.assign(argv[++i]);
@@ -73,7 +80,7 @@ int main(int argc, char const *argv[])
     }
     file_input_copy3 = file_input_copy3.substr(++pos) + "_temp_copy_" + to_string(rand());
 
-    std::cout << file_input_copy3 << std::endl;
+    // std::cout << file_input_copy3 << std::endl;
 
     string line;
     ifstream in_file{string(file_input)};
@@ -111,6 +118,9 @@ int main(int argc, char const *argv[])
       remove(file_input_copy3.c_str());
       return 1;
     }
+
+    // set verbose flag
+    Assembler::get_instance().verbose_print = verbose_flag;
 
     // run the assembler
     Assembler::get_instance().set_output_file_name(file_output ? string(file_output) : "out_" + std::string(file_input));

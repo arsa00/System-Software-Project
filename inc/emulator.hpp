@@ -94,6 +94,11 @@ public:
   void internal_error(std::string err_msg);
   void run();
   bool load_memory_hex_from_file(std::string file_name);
+
+
+  // --- additional (for debugging):
+  bool verbose_print = false;
+  // end ---
 };
 
 #endif

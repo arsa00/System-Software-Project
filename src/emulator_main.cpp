@@ -13,6 +13,7 @@ void yyerror(char *s)
 int main(int argc, char const *argv[])
 {
   const char *file_input = nullptr;
+  bool verbose_flag = false;
 
   try
   {
@@ -20,6 +21,12 @@ int main(int argc, char const *argv[])
     for (int i = 1; i < argc; i++)
     {
       string arg_str(argv[i]);
+
+      if (arg_str == "--verbose") // used for debugging
+      {
+        verbose_flag = true;
+        continue;
+      }
 
       // get input file
       if (arg_str.empty())
@@ -30,6 +37,9 @@ int main(int argc, char const *argv[])
 
     if (!file_input)
       throw "Emulator did not start, an error occured. { Error: \"Input hex file is missing.\" }";
+
+    // set verbose flag
+    Emulator::get_instance().verbose_print = verbose_flag;
 
     // load input hex file
     bool emulator_res = Emulator::get_instance().load_memory_hex_from_file(file_input);
