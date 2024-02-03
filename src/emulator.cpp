@@ -125,6 +125,7 @@ void Emulator::write_memory()
   if (is_write_to_term_out)
   {
     this->term_out_has_value = true;
+    std::cout << (char)this->mdr << std::flush;
     // this->notify_terminal();
     // std::cout << "term_out wr: " << (char)this->mdr << std::endl;
   }
@@ -215,7 +216,7 @@ bool Emulator::is_global_interrupt_enabled()
 
 void Emulator::fetch_instruction()
 {
-  // std::cout << std::endl << "> " << converter::uint32_to_hex_string(*this->pc) << std::endl;
+  // std::cout << "> " << converter::uint32_to_hex_string(*this->pc) << std::endl;
   this->mar = *this->pc;
   this->read_memory();
   this->ir = this->mdr;
@@ -236,6 +237,7 @@ void Emulator::resolve_address()
   case type::CPU_INSTRUCTIONS::CALL_1:
   {
     this->mar = this->gpr[regA] + this->gpr[regB] + disp;
+    // std::cout << "CALL1_MEM_ADDR: " << converter::uint32_to_hex_string(this->mar) << std::endl;
     break;
   }
 
@@ -251,14 +253,17 @@ void Emulator::resolve_address()
   case type::CPU_INSTRUCTIONS::ST_DATA_0:
   {
     this->mar = this->gpr[regA] + this->gpr[regB] + disp;
+    // std::cout << "ST_DATA_0_MEM_ADDR: " << converter::uint32_to_hex_string(this->mar) << std::endl;
     break;
   }
 
   case type::CPU_INSTRUCTIONS::ST_DATA_1:
   {
     this->mar = this->gpr[regA] + this->gpr[regB] + disp;
+    // std::cout << "ST_DATA_1_MEM_ADDR(0): " << converter::uint32_to_hex_string(this->mar) << std::endl;
     this->read_memory();
     this->mar = this->mdr;
+    // std::cout << "ST_DATA_1_MEM_ADDR(1): " << converter::uint32_to_hex_string(this->mar) << std::endl;
     break;
   }
 
@@ -266,6 +271,7 @@ void Emulator::resolve_address()
   {
     this->gpr[regA] += disp;
     this->mar = this->gpr[regA];
+    // std::cout << "ST_DATA_2_MEM_ADDR: " << converter::uint32_to_hex_string(this->mar) << std::endl;
     break;
   }
 
@@ -322,15 +328,17 @@ void Emulator::execute_operation()
     // std::cout << "executing: CALL_0" << std::endl;
     this->push(*this->pc);
     *this->pc = this->gpr[regA] + this->gpr[regB] + disp;
+    // std::cout << "executing: CALL_0; new_pc = " << converter::uint32_to_hex_string(*this->pc) << std::endl;
     break;
   }
 
   case type::CPU_INSTRUCTIONS::CALL_1:
   {
-    // std::cout << "executing: CALL_1" << std::endl;
-    this->push(*this->pc);
     this->read_memory();
-    *this->pc = this->mdr;
+    uint32_t new_pc = this->mdr;
+    this->push(*this->pc);
+    *this->pc = new_pc;
+    // std::cout << "executing: CALL_1; new_pc = " << converter::uint32_to_hex_string(*this->pc) << std::endl;
     break;
   }
 
@@ -678,44 +686,35 @@ void Emulator::run()
   tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
   // Run terminal threads
-  std::thread terminal_output_thread(&Emulator::output_terminal_func, this);
+  // std::thread terminal_output_thread(&Emulator::output_terminal_func, this);
   std::thread terminal_input_thread(&Emulator::input_terminal_func, this);
 
   // Execute emulator
   while (this->is_running)
   {
     // lock the memory
-    // std::cout << std::endl << "MAIN wait mem lock" << std::endl;
     this->memory_mutex.lock();
-    // std::cout << std::endl << "MAIN got mem lock" << std::endl;
 
-    // std::cout << "fetch_instruction..start" << std::endl;
     this->fetch_instruction();
-    // std::cout << "fetch_instruction..end" << std::endl;
-    // std::cout << "resolve_address..start" << std::endl;
     this->resolve_address();
-    // std::cout << "resolve_address..end" << std::endl;
-    // std::cout << "execute_operation..start" << std::endl;
     this->execute_operation();
-    // std::cout << "execute_operation..end" << std::endl;
-    // std::cout << "handle_interrupts..start" << std::endl;
     this->handle_interrupts();
-    // std::cout << "handle_interrupts..end" << std::endl;
 
     // unlock the memory
-    // std::cout << std::endl << "MAIN start release mem lock" << std::endl;
     this->memory_mutex.unlock();
-    // std::cout << std::endl << "MAIN end release mem lock" << std::endl;
 
-    if (this->term_out_has_value && this->is_running)
-      this->notify_terminal();
+    // if (this->term_out_has_value && this->is_running)
+    // {
+    //   this->notify_terminal();
+    //   // while(terminal_ready);
+    // }
   }
 
   // Notify terminal that the emulator stopped running
-  this->notify_terminal();
+  // this->notify_terminal();
 
   // Wait for terminal threads to finish
-  terminal_output_thread.join();
+  // terminal_output_thread.join();
   terminal_input_thread.join();
 
   // Restore the original settings

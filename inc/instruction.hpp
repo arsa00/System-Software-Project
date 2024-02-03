@@ -8,8 +8,8 @@ class Instruction : public Command
 {
 private:
   type::MEMORY_ADDRESSING_MODES mem_addr_mode = type::MEMORY_ADDRESSING_MODES::NO_MODE;
-  type::GP_REG gp_reg_0, gp_reg_1;
-  type::CS_REG cs_reg_0, cs_reg_1;
+  type::GP_REG gp_reg_0 = type::GP_REG::NO_REG, gp_reg_1 = type::GP_REG::NO_REG;
+  type::CS_REG cs_reg_0 = type::CS_REG::NO_REG, cs_reg_1 = type::CS_REG::NO_REG;
 
 public:
   Instruction() : Command(type::COMMAND_TYPE::INSTRUCTION, type::DEFAULT_INSTRUCTION_SIZE) {}

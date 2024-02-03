@@ -1108,6 +1108,8 @@ void instruction::ST::execute(Section *dest_section) const
       return;
     }
 
+    // std::cout << "REG_ING_ASM: gp0: " << std::to_string(static_cast<uint8_t>(this->get_gp_reg_0())) << " gp1: " << std::to_string(static_cast<uint8_t>(this->get_gp_reg_1())) << std::endl;
+
     ins_bytes[0] = static_cast<type::byte>(type::CPU_INSTRUCTIONS::ST_DATA_0);
     ins_bytes[1] = converter::create_byte_of_two_halves(static_cast<type::byte>(this->get_gp_reg_1()), static_cast<type::byte>(type::GP_REG::R0));
     displacement = converter::disp_to_byte_arr(0);

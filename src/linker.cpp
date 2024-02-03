@@ -326,7 +326,7 @@ bool Linker::create_hex()
           this->internal_error("Overlapping of two sections: \n\tsection 1: " + section_name + "\n\tsection 2: " + already_placed_section);
           return false;
         }
-        std::cout << "[WR] section_name: " << section_name << ", addr: " << std::to_string(start_mem_addr) << ", val: " << std::to_string(static_cast<int>(byte)) << std::endl;
+        // std::cout << "[WR] section_name: " << section_name << ", addr: " << std::to_string(start_mem_addr) << ", val: " << std::to_string(static_cast<int>(byte)) << std::endl;
         this->output_file_byte[start_mem_addr] = byte;
         start_mem_addr++;
       }
@@ -417,7 +417,7 @@ bool Linker::create_hex()
             this->internal_error("Overlapping of two sections: \n\tsection 1: " + section_name + "\n\tsection 2: " + already_placed_section);
             return false;
           }
-          std::cout << "[WR] section_name: " << section_name << ", addr: " << std::to_string(mem_cnt) << ", val: " << std::to_string(static_cast<int>(byte)) << std::endl;
+          // std::cout << "[WR] section_name: " << section_name << ", addr: " << std::to_string(mem_cnt) << ", val: " << std::to_string(static_cast<int>(byte)) << std::endl;
           this->output_file_byte[mem_cnt] = byte;
           mem_cnt++;
         }
@@ -694,7 +694,7 @@ bool Linker::create_hex()
     uint32_t start_mem_offset = relocation.get_offset();
     for (uint32_t i = 0; i < bytes_to_write.size(); i++)
     {
-      std::cout << "[WR] addr: " << std::to_string(start_mem_offset + i) << ", val: " << std::to_string(static_cast<int>(bytes_to_write[i])) << std::endl;
+      // std::cout << "[WR] addr: " << std::to_string(start_mem_offset + i) << ", val: " << std::to_string(static_cast<int>(bytes_to_write[i])) << std::endl;
       this->output_file_byte[start_mem_offset + i] = bytes_to_write[i];
     }
   }
@@ -706,7 +706,7 @@ bool Linker::create_hex()
   for (auto iter : this->output_file_byte)
   {
     mem_addrs.push_back(iter.first);
-    std::cout << iter.first << ": " << static_cast<int>(iter.second) << std::endl;
+    // std::cout << iter.first << ": " << static_cast<int>(iter.second) << std::endl;
   }
 
   std::sort(mem_addrs.begin(), mem_addrs.end());
@@ -757,14 +757,14 @@ bool Linker::create_hex()
   }
 
   // print symbol table
-  std::cout << std::endl
-            << "RELOCATIONS: " << std::endl;
+  // std::cout << std::endl
+  //           << "RELOCATIONS: " << std::endl;
 
-  for (RelocationJsonRecord rel : this->global_relocations)
-  {
-    std::cout << rel.convert_to_json() << std::endl
-              << std::endl;
-  }
+  // for (RelocationJsonRecord rel : this->global_relocations)
+  // {
+  //   std::cout << rel.convert_to_json() << std::endl
+  //             << std::endl;
+  // }
 
   // get all bytes and create output string
   std::string output = "";
