@@ -122,8 +122,24 @@ int main(int argc, char const *argv[])
     // set verbose flag
     Assembler::get_instance().verbose_print = verbose_flag;
 
+    // create default output file name
+    string default_output_file;
+    if(file_output == nullptr)
+    {
+      while (true)
+      {
+        default_output_file = "assembler_output_" + to_string(rand());
+        ifstream asm_file(default_output_file);
+        if (!asm_file.good())
+          break;
+      }
+
+      if (default_output_file.empty())
+        throw "Failed creating output file";
+    }
+
     // run the assembler
-    Assembler::get_instance().set_output_file_name(file_output ? string(file_output) : "out_" + std::string(file_input));
+    Assembler::get_instance().set_output_file_name(file_output ? string(file_output) : default_output_file);
     bool asmRes = Assembler::get_instance().run();
 
     // close handle for parser and lexer, and remove the temporary file
