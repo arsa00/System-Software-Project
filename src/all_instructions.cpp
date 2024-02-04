@@ -1,7 +1,7 @@
 #include "../inc/all_instructions.hpp"
 #include "../inc/symbol.hpp"
 #include "../inc/literal.hpp"
-#include "../auxiliary/inc/converters.hpp"
+#include "../inc/converters.hpp"
 #include "../inc/assembler.hpp"
 #include "../inc/literal_pool_record.hpp"
 #include "../inc/relocation_record.hpp"

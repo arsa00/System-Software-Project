@@ -2,7 +2,7 @@
 #include "../inc/all_instructions.hpp"
 #include "../inc/all_directives.hpp"
 #include "../inc/assembler.hpp"
-#include "../auxiliary/inc/converters.hpp"
+#include "../inc/converters.hpp"
 #include <iostream>
 // TODO: maybe add validation in building process
 

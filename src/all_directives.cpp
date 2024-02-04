@@ -2,7 +2,7 @@
 #include "../inc/symbol.hpp"
 #include "../inc/literal.hpp"
 #include "../inc/assembler.hpp"
-#include "../auxiliary/inc/converters.hpp"
+#include "../inc/converters.hpp"
 #include <iostream>
 
 directive::GLOBAL::GLOBAL()

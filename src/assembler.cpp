@@ -1,11 +1,11 @@
 #include "../inc/assembler.hpp"
-#include "../auxiliary/inc/converters.hpp"
+#include "../inc/converters.hpp"
 #include <iostream>
 #include <cstring>
 #include <fstream>
-#include "../auxiliary/inc/symbol_json.hpp"
-#include "../auxiliary/inc/section_json.hpp"
-#include "../auxiliary/inc/object_file.hpp"
+#include "../inc/symbol_json.hpp"
+#include "../inc/section_json.hpp"
+#include "../inc/object_file.hpp"
 
 extern int yyparse();
 

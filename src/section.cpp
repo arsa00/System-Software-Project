@@ -1,5 +1,5 @@
 #include "../inc/section.hpp"
-#include "../auxiliary/inc/converters.hpp"
+#include "../inc/converters.hpp"
 #include <iostream>
 #include <iomanip>
 #include <bitset>

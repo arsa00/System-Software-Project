@@ -1,7 +1,7 @@
 #ifndef EMULATOR_HPP
 #define EMULATOR_HPP
 
-#include "../auxiliary/inc/object_file.hpp"
+#include "../inc/object_file.hpp"
 #include <string>
 #include <unordered_map>
 #include <list>

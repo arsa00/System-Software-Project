@@ -1,4 +1,4 @@
-#include "../auxiliary/inc/converters.hpp"
+#include "../inc/converters.hpp"
 #include "../inc/emulator.hpp"
 #include <iostream>
 #include <fstream>

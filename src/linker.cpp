@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cstring>
 #include "../inc/linker.hpp"
-#include "../auxiliary/inc/converters.hpp"
+#include "../inc/converters.hpp"
 
 void Interval::set_start(uint32_t start)
 {

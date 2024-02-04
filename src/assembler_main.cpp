@@ -1,21 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
-#include "../auxiliary/inc/exceptions.hpp"
-#include "../auxiliary/inc/parser.hpp"
+#include "../inc/parser.hpp"
 #include "../inc/assembler.hpp"
 
 using namespace std;
 
 extern int yyparse();
 extern FILE *yyin;
-
-extern void test1();
-extern void test2();
-extern void test3();
-extern void testSymbolJsonRecord1();
-extern void testSectionJsonRecord1();
-extern void testObjectFile1();
 
 void yyerror(char *s)
 {
@@ -172,13 +164,6 @@ int main(int argc, char const *argv[])
     cout << err << endl;
     return 2;
   }
-
-  // test1();
-  // test2();
-  // test3();
-  // testSymbolJsonRecord1();
-  // testSectionJsonRecord1();
-  // testObjectFile1();
 
   return 0;
 }
